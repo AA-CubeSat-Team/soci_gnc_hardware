@@ -1,1 +1,1 @@
-# soci_gnc_hardware
+Repository for all code related to the GNC system's sensors and actuators.
