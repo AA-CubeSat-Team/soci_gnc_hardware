@@ -13,9 +13,6 @@ for c in range(0, txLength):
     txByteArray[c] = inpCharList[2*c] + inpCharList[(2*c)+1]
     txByteArray[c] = int(txByteArray[c],16)
 
-print(hex(txByteArray))
 
-
-#txHex = hex(txDec)
 
 

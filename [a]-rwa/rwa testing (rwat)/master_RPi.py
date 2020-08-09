@@ -869,6 +869,7 @@ while True:
             
             print(txByteArray)
             print(rxByteArray)
+            print(" ")
 
             spiAvail = True
 
