@@ -839,6 +839,38 @@ while True:
             
     if opMode == 3:
         print("\nFULL MANUAL OP MODE")
+        print("enter '99' to return to mode select")
+
+        while True:
+            inpString = input("enter hex bytes with no spaces: \n")
+            inpCharList = list(inpString)
+
+            inpLength = len(inpCharList)
+            txLength = int(inpLength / 2)
+
+            txByteArray = [0] * txLength
+
+            for c in range(0, txLength):
+                txByteArray[c] = inpCharList[2*c] + inpCharList[(2*c)+1]
+                txByteArray[c] = int(txByteArray[c],16) 
+
+            rplN2 = int(input("enter expected reply length (bytes): \n"))
+
+            spiAvail = False
+            
+            reqArrX = flatList([0x7e, txByteArray, 0x7e])               
+         
+            slvEmpArr = spi.xfer2(reqArrX)
+
+            time.sleep(0.100)                           # waits 100 ms for RWA to process
+            
+            msrEmpArr = [0x7e] * (2*rplN2 + 3)    
+            rxByteArray = spi.xfer2(msrEmpArr)
+            
+            print(txByteArray)
+            print(rxByteArray)
+
+            spiAvail = True
 
 
 
