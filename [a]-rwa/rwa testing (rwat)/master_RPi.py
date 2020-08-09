@@ -681,7 +681,14 @@ while True:
         pullSensorsThr.start()
 
         while True: 
-            testMode = input("\nenter a test mode:\n1 - manual speed\n2 - step speed\n3 - minimum ramp time\n4 - zero \n\n")
+            print("\nenter a test mode:\n")
+            print("1 - manual speed\n")
+            print("2 - step speed\n")
+            print("3 - ramp speed\n")
+            print("4 - minimum ramp time\n")
+            print("5 - zero crossing\n")
+            print("6 - fixed RPM noise")
+            testMode = input("")
             testMode = int(testMode)
 
             if testMode == 99:
@@ -752,8 +759,46 @@ while True:
 
                 runSensors = 0
                 print("test complete")
-                
+
             if testMode == 3:
+                print("\nRAMP SPEED TEST MODE\n")
+                nominalState = True
+
+                fileName = "rampSpeedTest"
+                header = ["entry","timeGMT","timeELA (s)","CRC","exec","currSpeed (0.1 RPM)","refSpeed (0.1 RPM)","state","clcMode","voltage (V)","current (mA)","power (mW)"]
+                csvStart(fileName, header)
+
+                fileName2 = fileName
+
+                time0 = time.time()
+
+                samplePeriod = 0.05
+                runSensors = 2
+
+                for speedInp in range(10000, 65500, 500):
+                    if nominalState == False:
+                        print("nominalState: ", nominalState)
+                        break
+
+                    if nominalState == True:
+                        print("speedInp: ", speedInp)
+                        processAuto(6, speedInp, 0)
+                        time.sleep(0.1)
+
+                for speedInp in range(65000, 9500, -500):
+                    if nominalState == False:
+                        print("nominalState: ", nominalState)
+                        break
+
+                    if nominalState == True:
+                        print("speedInp: ", speedInp)
+                        processAuto(6, speedInp, 0)
+                        time.sleep0(0.1)
+
+                runSensors = 0
+                print("test complete")
+                
+            if testMode == 4:
                 print("\nMINIMUM RAMP TIME TEST MODE\n")
                 nominalState = True
 
@@ -786,7 +831,7 @@ while True:
                 runSensors = 0
                 print("test complete")
 
-            if testMode == 4:
+            if testMode == 5:
                 print("\nZERO CROSSING TEST MODE\n")
                 nominalState = True
 
@@ -821,6 +866,9 @@ while True:
 
                 runSensors = 0
                 print("test complete")
+
+            if testMode == 6:
+                print("\nFIXED RPM NOISE TEST MODE\n")
 
 
     if opMode == 2:
