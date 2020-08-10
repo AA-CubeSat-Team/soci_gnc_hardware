@@ -869,6 +869,41 @@ while True:
 
             if testMode == 6:
                 print("\nFIXED RPM NOISE TEST MODE\n")
+                nominalState = True
+
+                fileName = "fixedRpmNoiseTest"
+                header = ["entry","timeGMT","timeELA (s)","CRC","exec","currSpeed (0.1 RPM)","refSpeed (0.1 RPM)","state","clcMode","voltage (V)","current (mA)","power (mW)"]
+                csvStart(fileName, header)
+
+                fileName2 = fileName
+
+                time0 = time.time()
+
+                samplePeriod = 0.2
+                runSensors = 2
+
+                for speedInp in [1000, 5000, 10000, 30000, 65000]:
+                    if nominalState == False:
+                        print("nominalState: ", nominalState)
+                        break
+
+                    if nominalState == True:
+                        print("speedInp: ", speedInp)
+                        processAuto(6, speedInp, 0)
+                        time.sleep(30)
+
+                for speedInp in [-1000, -5000, -10000, -30000, -65000]:
+                    if nominalState == False:
+                        print("nominalState: ", nominalState)
+                        break
+
+                    if nominalState == True:
+                        print("speedInp: ", speedInp)
+                        processAuto(6, speedInp, 0)
+                        time.sleep(30)
+
+                runSensors = 0
+                print("test complete")
 
 
     if opMode == 2:
