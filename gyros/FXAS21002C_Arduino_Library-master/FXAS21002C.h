@@ -1,10 +1,8 @@
 /* FXAS21002C
- * Author: Andres Sabas <s@theinventorhouse.org>
  *
  *Basada en:
  * FXOS8700CQ
  *
- * Author: Matt Warner <mlw2224@rit.edu>
  *
  * The FXAS21002C is an gyroscope I2C sensor which is 3.3V tolerant.
  */
@@ -40,21 +38,27 @@
 #define FXAS21002C_H_CTRL_REG3        0x15
 
 enum GyroODR {
-	GODR_800HZ = 0, // 200 Hz
+	GODR_800HZ = 0,
 	GODR_400HZ,
 	GODR_200HZ,
 	GODR_100HZ,
 	GODR_50HZ,
-	GODR_12_5HZ, // 12.5 Hz, etc.
-	GODR_6_25HZ,
-	GODR_1_56HZ
+	GODR_25HZ,
+	GODR_12_5HZ,
+
 };
 // Set initial input parameters
-enum gyroFSR {
-  GFS_2000DPS = 0,
-  GFS_1000DPS,
-  GFS_500DPS,
-  GFS_250DPS
+enum GyroFSR {
+  GFSR_2000DPS = 0,
+  GFSR_1000DPS,
+  GFSR_500DPS,
+  GFSR_250DPS,
+};
+
+enum GyroBW {
+  GBW_L1 = 0,
+  GBW_L2,
+  GBW_L3,
 };
 
 class FXAS21002C
@@ -62,9 +66,9 @@ class FXAS21002C
 	public:
 	typedef struct 
 	{
-	    int16_t	x;
-	    int16_t	y;
-	    int16_t	z;
+	    float	x;
+	    float	y;
+	    float	z;
 	} SRAWDATA;
 
 	// Sensor data
@@ -72,20 +76,22 @@ class FXAS21002C
 	int8_t tempData; // RAW temperature data
 
 	// Sensor configuration
-	uint8_t gyroFSR = GFS_250DPS;
-	uint8_t gyroODR = GODR_200HZ;
-	float gRes, gBias[3] = {0, 0, 0}; // scale resolutions per LSB for the sensors
+	uint8_t gyroFSR;
+	uint8_t gyroODR;
+	uint8_t gyroBW;
+	float gBias[3] = {0,0,0};
 
-	FXAS21002C(byte addr);
+	FXAS21002C(GyroFSR fsr, GyroODR odr, GyroBW bw);
 
 	// Register functions
 	void writeReg(byte reg, byte value);
 	byte readReg(byte reg);
+	void writeField(byte reg, byte bit, byte value);
 	void readRegs(byte startReg, uint8_t count, byte dest[]);
 
 	// FXAS21002C functions
 	// Initialization & Termination
-	void init(void);
+	void setConfigures(void);
 	void standby(void);
 	void active(void);
 	void ready(void);
@@ -94,18 +100,22 @@ class FXAS21002C
 	void readGyroData(void);
 	void readTempData(void);
 
-	// Resolution
-	float getGres(void);
+	
+	// output data rate
+	int getODR(void);
 
 	//Calibrate
-	void calibrate(float * gBias);
+	void calibrate();
 
 	//Reset
 	void reset(void);
 
 	private:
 	// Sensor address
-	byte address;
+	byte address = 0x20;
+
+	// Sensitivity
+	float sensitivity(void);
 };
 
 #endif
