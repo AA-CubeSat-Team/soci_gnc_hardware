@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include <FXOS8700CQ.h>
 
-FXOS8700CQ sensor = FXOS8700CQ(0x1F);
+FXOS8700CQ sensor = FXOS8700CQ(0x1E);
 
 void setup() {
   Serial.begin(9600);
@@ -27,13 +27,13 @@ void loop() {
   Serial.println((int)sensor.accelData.z);
   
   // Magnometer
-  Serial.print("Mag ");
-  Serial.print("X: ");
-  Serial.print((int)sensor.magData.x);
-  Serial.print(" Y: ");
-  Serial.print((int)sensor.magData.y);
-  Serial.print(" Z: ");
-  Serial.println((int)sensor.magData.z);
+//  Serial.print("Mag ");
+//  Serial.print("X: ");
+//  Serial.print((int)sensor.magData.x);
+//  Serial.print(" Y: ");
+//  Serial.print((int)sensor.magData.y);
+//  Serial.print(" Z: ");
+//  Serial.println((int)sensor.magData.z);
 
   delay(100);
 }
