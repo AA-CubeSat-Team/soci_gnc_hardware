@@ -10,6 +10,7 @@ import threading
 import board
 import busio
 import adafruit_ina219 
+import RPi.GPIO as GPIO
 
 
 # SPI INITIALIZATION
@@ -23,6 +24,11 @@ spi.open(bus, device)       # opens connection on specified bus, device
 spi.max_speed_hz = 250000   # sets master freq at 250 kHz, must be (150:300) kHz for RWA
 spi.mode = 0                # sets SPI mode to 0 (look up online)
 
+
+# ENABLE GPIO INITIALIZATION
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(22, GPIO.OUT)
+GPIO.output(22, True)
 
 # INA219 INITIALIZATION
 i2c = busio.I2C(board.SCL, board.SDA) 
