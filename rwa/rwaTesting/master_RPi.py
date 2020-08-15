@@ -707,7 +707,7 @@ while True:
             print("4 - minimum ramp time")
             print("5 - zero crossing")
             print("6 - fixed RPM noise")
-            testMode = input("")
+            testMode = input("\n")
             testMode = int(testMode)
 
             if testMode == 99:
