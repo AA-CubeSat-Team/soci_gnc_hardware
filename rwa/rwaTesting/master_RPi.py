@@ -6,6 +6,7 @@
 import time
 import spidev
 import csv 
+import os
 import threading
 import board
 import busio
@@ -28,7 +29,9 @@ spi.mode = 0                # sets SPI mode to 0 (look up online)
 # ENABLE GPIO INITIALIZATION
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(22, GPIO.OUT)
-GPIO.output(22, True)
+
+GPIO.output(22, True)       # sets ENABLE to high - 3.3V
+
 
 # INA219 INITIALIZATION
 i2c = busio.I2C(board.SCL, board.SDA) 
@@ -170,9 +173,10 @@ def xorSwitch(arr, mode):
 
 
 # CSV INITIALIZATION
+global folderName2
 global fileName2
 
-def csvStart(fileName1, header1):
+def csvStart(folderName1, fileName1, header1):
     global qq
     qq = 0
 
@@ -185,7 +189,7 @@ def csvStart(fileName1, header1):
 # CSV FUNCTION                                              
 global time0
 
-def csvAdd(fileName1, outputArr1):
+def csvAdd(folderName1, fileName1, outputArr1):
     global qq
     global time0
 
@@ -246,6 +250,7 @@ global samplePeriod
 def pullSensors():             
     global runSensors
     global samplePeriod
+    global folderName2
     global fileName2
     global lastResetStatus2
     global nominalState
@@ -293,7 +298,7 @@ def pullSensors():
             ina219Arr = [voltage, current, power]
 
             outputArr2 = flatList([rwStatusArr, ina219Arr])
-            csvAdd(fileName2, outputArr2)
+            csvAdd(folderName2, fileName2, outputArr2)
 
         time.sleep(samplePeriod)
         
@@ -704,10 +709,11 @@ while True:
                 print("\nMANUAL SPEED TEST MODE\n") 
                 nominalState = True
 
-                header = ["entry","timeGMT","timeELA (s)","CRC","exec","currSpeed (0.1 RPM)","refSpeed (0.1 RPM)","state","clcMode"]
+                folderName = "manSpeedDirec"
                 fileName = "manSpeedTest"
-                csvStart(fileName, header)
-                
+                header = ["entry","timeGMT","timeELA (s)","CRC","exec","currSpeed (0.1 RPM)","refSpeed (0.1 RPM)","state","clcMode"]
+                csvStart(folderName, fileName, header)
+                folderName2 = folderName
                 fileName2 = fileName
 
                 time0 = time.time()
@@ -732,10 +738,11 @@ while True:
                 print("\nSTEP SPEED TEST MODE\n")
                 nominalState = True
 
+                folderName = "stepSpeedDirec"
                 fileName = "stepSpeedTest"
                 header = ["entry","timeGMT","timeELA (s)","CRC","exec","currSpeed (0.1 RPM)","refSpeed (0.1 RPM)","state","clcMode","voltage (V)","current (mA)","power (mW)"]
-                csvStart(fileName, header)
-
+                csvStart(folderName, fileName, header)
+                folderName2 = folderName
                 fileName2 = fileName
 
                 time0 = time.time()
@@ -770,10 +777,11 @@ while True:
                 print("\nRAMP SPEED TEST MODE\n")
                 nominalState = True
 
+                folderName = "rampSpeedDirec"
                 fileName = "rampSpeedTest"
                 header = ["entry","timeGMT","timeELA (s)","CRC","exec","currSpeed (0.1 RPM)","refSpeed (0.1 RPM)","state","clcMode","voltage (V)","current (mA)","power (mW)"]
-                csvStart(fileName, header)
-
+                csvStart(folderName, fileName, header)
+                folderName2 = folderName
                 fileName2 = fileName
 
                 time0 = time.time()
@@ -808,10 +816,11 @@ while True:
                 print("\nMINIMUM RAMP TIME TEST MODE\n")
                 nominalState = True
 
+                fileName = "minRampTimeDirec"
                 fileName = "minRampTimeTest"
                 header = ["entry","timeGMT","timeELA (s)","CRC","exec","currSpeed (0.1 RPM)","refSpeed (0.1 RPM)","state","clcMode","voltage (V)","current (mA)","power (mW)"]
-                csvStart(fileName, header)
-
+                csvStart(folderName, fileName, header)
+                folderName2 = folderName
                 fileName2 = fileName
 
                 time0 = time.time()
@@ -841,10 +850,11 @@ while True:
                 print("\nZERO CROSSING TEST MODE\n")
                 nominalState = True
 
+                folderName = "zeroCrossDirec"
                 fileName = "zeroCrossTest"
                 header = ["entry","timeGMT","timeELA (s)","CRC","exec","currSpeed (0.1 RPM)","refSpeed (0.1 RPM)","state","clcMode","voltage (V)","current (mA)","power (mW)"]
-                csvStart(fileName, header)
-
+                csvStart(folderName, fileName, header)
+                folderName2 = folderName
                 fileName2 = fileName
 
                 time0 = time.time()
@@ -877,10 +887,11 @@ while True:
                 print("\nFIXED RPM NOISE TEST MODE\n")
                 nominalState = True
 
+                folderName = "fixedRpmNoiseDirec"
                 fileName = "fixedRpmNoiseTest"
                 header = ["entry","timeGMT","timeELA (s)","CRC","exec","currSpeed (0.1 RPM)","refSpeed (0.1 RPM)","state","clcMode","voltage (V)","current (mA)","power (mW)"]
-                csvStart(fileName, header)
-
+                csvStart(folderName, fileName, header)
+                folderName2 = folderName
                 fileName2 = fileName
 
                 time0 = time.time()
