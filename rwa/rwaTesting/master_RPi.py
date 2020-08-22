@@ -176,12 +176,14 @@ def xorSwitch(arr, mode):
 # CSV INITIALIZATION
 global rwID
 global testMode
+global timeStart1
+global fileName1
 
 def csvStart(folderName1, fileName1, header1):
     global absFilePath
-    global rwID
-    global testMode
+    global fileName1
     global qq
+    global timeStart1
 
     qq = 0
 
@@ -193,7 +195,7 @@ def csvStart(folderName1, fileName1, header1):
     
     absFilePath = os.path.join(scriptDir, relFilePath)
 
-    header1 = flatList([header1, "rw" + str(rwID), timeStart1.strftime("%m/%d/%Y %H:%M:%S"), fileName1])
+    header1 = flatList([header1, 'rwID', 'startTime', 'fileName'])
 
     file = open(absFilePath, 'w', newline ='')         # open(..'w'..) creates new CSV file
     with file:   
@@ -206,15 +208,19 @@ global time0
 
 def csvAdd(outputArr1):
     global absFilePath
+    global fileName1
     global qq
     global time0
+    global rwID
+    global testMode
+    global timeStart1
 
     qq = qq + 1
     timeGMT1 = time.strftime("%H:%M:%S %Z", time.gmtime())
     timeELA1 = time.time() - time0
     timeELA1 = round(timeELA1, 3)
 
-    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1])         
+    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1, "RW-" + str(rwID), timeStart1.strftime("%Y%m%d%H%M%S"), fileName1])         
 
     file = open(absFilePath, 'a', newline ='')      # open(..'a'..) appends existing CSV file
     with file:   
@@ -731,7 +737,7 @@ while True:
 
                 folderName = "manSpeedDir"
                 fileName = "manSpeedTest"
-                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM)","refSpeed_01_RPM)","state","clcMode","voltage_V","current_mA","power_mW"]
+                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
                 csvStart(folderName, fileName, header)
                 folderName2 = folderName
                 fileName2 = fileName
@@ -760,7 +766,7 @@ while True:
 
                 folderName = "stepSpeedDir"
                 fileName = "stepSpeedTest"
-                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM)","refSpeed_01_RPM)","state","clcMode","voltage_V","current_mA","power_mW"]
+                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
                 csvStart(folderName, fileName, header)
                 folderName2 = folderName
                 fileName2 = fileName
@@ -799,7 +805,7 @@ while True:
 
                 folderName = "rampSpeedDir"
                 fileName = "rampSpeedTest"
-                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM)","refSpeed_01_RPM)","state","clcMode","voltage_V","current_mA","power_mW"]
+                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
                 csvStart(folderName, fileName, header)
                 folderName2 = folderName
                 fileName2 = fileName
@@ -838,7 +844,7 @@ while True:
 
                 fileName = "minRampTimeDir"
                 fileName = "minRampTimeTest"
-                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM)","refSpeed_01_RPM)","state","clcMode","voltage_V","current_mA","power_mW"]
+                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
                 csvStart(folderName, fileName, header)
                 folderName2 = folderName
                 fileName2 = fileName
@@ -872,7 +878,7 @@ while True:
 
                 folderName = "zeroCrossDir"
                 fileName = "zeroCrossTest"
-                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM)","refSpeed_01_RPM)","state","clcMode","voltage_V","current_mA","power_mW"]
+                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
                 csvStart(folderName, fileName, header)
                 folderName2 = folderName
                 fileName2 = fileName
@@ -909,7 +915,7 @@ while True:
 
                 folderName = "fixedRpmNoiseDir"
                 fileName = "fixedRpmNoiseTest"
-                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM)","refSpeed_01_RPM)","state","clcMode","voltage_V","current_mA","power_mW"]
+                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
                 csvStart(folderName, fileName, header)
                 folderName2 = folderName
                 fileName2 = fileName
