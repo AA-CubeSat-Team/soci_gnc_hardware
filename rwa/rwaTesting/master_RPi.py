@@ -174,17 +174,23 @@ def xorSwitch(arr, mode):
 
 
 # CSV INITIALIZATION
+global rwID
+
 def csvStart(folderName1, fileName1, header1):
     global absFilePath
     global qq
 
     qq = 0
 
-    fileNameTime1 = fileName1 + datetime.now().strftime("_d%Y%m%dt%H%M%S")
-    relFilePath = folderName1 + "/" + fileNameTime1 + '.csv'
+    timeStart1 = datetime.now()
+
+    fileName_timeStart1 = fileName1 + timeStart1.strftime("_d%Y%m%dt%H%M%S")
+    relFilePath = folderName1 + "/" + fileName_timeStart1 + '.csv'
     scriptDir = os.path.dirname(__file__)
     
     absFilePath = os.path.join(scriptDir, relFilePath)
+
+    header1 = flatList([header1, rwID, timeStart1.strftime("_d%Y%m%dt%H%M%S")]
 
     file = open(absFilePath, 'w', newline ='')         # open(..'w'..) creates new CSV file
     with file:   
@@ -686,6 +692,9 @@ gLRS = processAuto(2, 0, 0)
 print("last reset status: ",gLRS[2])
 processAuto(3, 0, 0)
 print("cleared last reset status")
+
+rwID = input("\nenter which reaction wheel is in use (1-4):\n\n")
+rwID = int(rwID)
 
 while True: 
     opMode = input("\nenter an operating mode:\n1 - auto test\n2 - user input\n3 - full manual\n\n")
