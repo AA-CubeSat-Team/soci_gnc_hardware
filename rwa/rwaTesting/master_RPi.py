@@ -177,13 +177,15 @@ def xorSwitch(arr, mode):
 global rwID
 global testMode
 global timeStart1
-global fileName1
+global fileNameG
 
 def csvStart(folderName1, fileName1, header1):
     global absFilePath
-    global fileName1
+    global fileNameG
     global qq
     global timeStart1
+
+    fileNameG = fileName1
 
     qq = 0
 
@@ -208,7 +210,7 @@ global time0
 
 def csvAdd(outputArr1):
     global absFilePath
-    global fileName1
+    global fileNameG
     global qq
     global time0
     global rwID
