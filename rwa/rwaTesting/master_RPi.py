@@ -193,7 +193,7 @@ def csvStart(folderName1, fileName1, header1):
     
     absFilePath = os.path.join(scriptDir, relFilePath)
 
-    header1 = flatList([header1, "rw" + rwID, timeStart1.strftime("%m/%d/%Y %H:%M:%S"), fileName1])
+    header1 = flatList([header1, "rw" + str(rwID), timeStart1.strftime("%m/%d/%Y %H:%M:%S"), fileName1])
 
     file = open(absFilePath, 'w', newline ='')         # open(..'w'..) creates new CSV file
     with file:   
