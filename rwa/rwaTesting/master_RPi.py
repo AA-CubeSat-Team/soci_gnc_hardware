@@ -192,7 +192,7 @@ def csvStart(folderName1, fileName1, header1):
 
     timeStart1 = datetime.now()
 
-    fileName_timeStart1 = fileName1 + '_' + rw + str(rwID) + '_' + timeStart1.strftime('d%Y%m%dt%H%M%S')
+    fileName_timeStart1 = fileName1 + '_' + 'rw' + str(rwID) + '_' + timeStart1.strftime('d%Y%m%dt%H%M%S')
     relFilePath = folderName1 + "/" + fileName_timeStart1 + '.csv'
     scriptDir = os.path.dirname(__file__)
     
