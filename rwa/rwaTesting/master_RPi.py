@@ -198,7 +198,7 @@ def csvStart(folderName1, fileName1, header1):
     
     absFilePath = os.path.join(scriptDir, relFilePath)
 
-    header1 = flatList([header1, 'rwID', 'startTime', 'fileName'])
+    header1 = flatList([header1, 'testName', 'rwID', 'startTime'])
 
     file = open(absFilePath, 'w', newline ='')         # open(..'w'..) creates new CSV file
     with file:   
@@ -223,7 +223,7 @@ def csvAdd(outputArr1):
     timeELA1 = time.time() - time0
     timeELA1 = round(timeELA1, 3)
 
-    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1, "RW-" + str(rwID), timeStart1.strftime("%Y%m%d%H%M%S"), fileNameG])         
+    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1, fileNameG, "RW-" + str(rwID), timeStart1.strftime("%Y%m%d%H%M%S")])         
 
     file = open(absFilePath, 'a', newline ='')      # open(..'a'..) appends existing CSV file
     with file:   
