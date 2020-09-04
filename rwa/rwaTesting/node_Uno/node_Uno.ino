@@ -70,7 +70,7 @@ void setup (void){
   SPCR = SPCR | bit(SPIE);          // sets SPIE bit in SPCR to 1, enabling SPI interrupts
   
   SPDR = 0;
-  flag = 0;
+  flag = false;
   kk = 0;
   yy = 0;
   reqB_old = 126;
@@ -82,40 +82,52 @@ void setup (void){
 ISR (SPI_STC_vect){
   reqB_new = SPDR;
 
-  if ( (reqB_old == 126) && (reqB_new == 126) ){      // master querying reply   
-    if (yy < rplLenCRC_XF){
+  //querying reply
+  if ( (reqB_old == 0x7E) && (reqB_new == 0x7E) ){         
+    if (yy < rplLenCRC_XF){                             // query up to length of reply array
       SPDR = rplArrCRC_XF[yy];
       yy++;
     }
-    if (yy >= rplLenCRC_XF){
-      SPDR = 126;
+    if (yy >= rplLenCRC_XF){                            // query past length of reply array
+      SPDR = 0x7B;
     }
   }
-  if ( (reqB_old == 126) && (reqB_new != 126) ){      // beginning of request
+
+  //request
+  if ( (reqB_old == 0x7E) && (reqB_new != 0x7E) ){      // beginning of request
     reqArrCRC_XF[kk] = reqB_old;
     kk++;
     reqArrCRC_XF[kk] = reqB_new;
     kk++;
-    SPDR = 126;
+    SPDR = 0x7C;
   }
-  if ( (reqB_old != 126) && (reqB_new != 126) ){      // during request
+  if ( (reqB_old != 0x7E) && (reqB_new != 0x7E) ){      // during request
     reqArrCRC_XF[kk] = reqB_new;
     kk++;
-    SPDR = 126;
+    SPDR = 0x7D;
   }
-  if ( (reqB_old != 126) && (reqB_new == 126) ){      // end of request
-    SPI.detachInterrupt();   
-    reqArrCRC_XF[kk] = reqB_new;
+  if ( (reqB_old != 0x7E) && (reqB_new == 0x7E) ){      // end of request
+    SPI.detachInterrupt();                              // SPI interrupt is detached, unable to receive new bytes
+    reqArrCRC_XF[kk] = reqB_new;                        // with interrupt off, bytes in SPDR repeated back to master
     kk++;       
-    flag = 1;
+    flag = true;
   }
   
   reqB_old = reqB_new;
 }
 
+// ISSUE: is master querying reply before node has finished preparing the reply array?
+// SOLVE: increase master timeout
+
+// ISSUE: node seems to be responding with random data in reqArr bytes
+// SOLVE: node might not have time to generate reply, instead pulls from random memory
+
+// ISSUE: node doesn't register when request is sent, doesn't print anything in Serial Monitor
+// SOLVE: debug flow to find hangup, likely not re-enabling interrupt and continuing to ignore SPI transfers
                                      
 void loop (void){
-  if (flag == 1){
+  if (flag == true){                                    // block runs after request finishes, before query starts
+    Serial.println("request received");
     
     qq = 0;
     int reqLenCRC_XF = kk;
@@ -138,7 +150,7 @@ void loop (void){
     }
     
     genRpl(reqArrCRC_T[0]);                
-    yy = 0;
+    yy = 0;                                             // reply array is ready to be loaded into SPDR upon query
 
     Serial.print("reqArrCRC_XF: ");
     for (int jj = 0; jj < sizeof(reqArrCRC_XF); jj++){
@@ -153,9 +165,9 @@ void loop (void){
     }
     Serial.println();
 
-    // resets rplArr arrays
+    // resets reqArr arrays
     for (int jj = 0; jj < sizeof(reqArrCRC_XF); jj++){
-      rplArrCRC_T[jj] = 0;
+      reqArrCRC_T[jj] = 0;
       reqArrCRC_X[jj] = 0;
       reqArrCRC_XF[jj] = 0;
     }
