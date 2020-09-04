@@ -29,9 +29,9 @@ spi.mode = 0                # sets SPI mode to 0 (look up online)
 
 # ENABLE GPIO INITIALIZATION
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(22, GPIO.OUT)
+GPIO.setup(25, GPIO.OUT)
 
-GPIO.output(22, True)       # sets ENABLE to high - 3.3V
+GPIO.output(25, True)       # sets ENABLE to high - 3.3V
 
 
 # INA219 INITIALIZATION
