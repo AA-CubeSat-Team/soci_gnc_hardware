@@ -223,7 +223,7 @@ def csvAdd(outputArr1):
     timeELA1 = time.time() - time0
     timeELA1 = round(timeELA1, 3)
 
-    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1, fileNameG, "RW-" + str(rwID), timeStart1.strftime("%Y%m%d%H%M%S")])         
+    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1, fileNameG, "RW" + str(rwID), timeStart1.strftime("%Y%m%d%H%M%S")])         
 
     file = open(absFilePath, 'a', newline ='')      # open(..'a'..) appends existing CSV file
     with file:   
@@ -705,6 +705,8 @@ gLRS = processAuto(2, 0, 0)
 print("last reset status: ",gLRS[2])
 processAuto(3, 0, 0)
 print("cleared last reset status")
+gLRS = processAuto(2, 0, 0)
+print("last reset status: ",gLRS[2])
 
 rwID = input("\nenter which reaction wheel is in use (1-4):\n\n")
 rwID = int(rwID)
