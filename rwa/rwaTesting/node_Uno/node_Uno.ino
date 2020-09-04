@@ -115,19 +115,10 @@ ISR (SPI_STC_vect){
   
   reqB_old = reqB_new;
 }
-
-// ISSUE: is master querying reply before node has finished preparing the reply array?
-// SOLVE: increase master timeout
-
-// ISSUE: node seems to be responding with random data in reqArr bytes
-// SOLVE: node might not have time to generate reply, instead pulls from random memory
-
-// ISSUE: node doesn't register when request is sent, doesn't print anything in Serial Monitor
-// SOLVE: debug flow to find hangup, likely not re-enabling interrupt and continuing to ignore SPI transfers
                                      
 void loop (void){
   if (flag == true){                                    // block runs after request finishes, before query starts
-    Serial.println("request received");
+    //Serial.println("request received");
     
     qq = 0;
     int reqLenCRC_XF = kk;
@@ -149,9 +140,10 @@ void loop (void){
       }
     }
     
-    genRpl(reqArrCRC_T[0]);                
-    yy = 0;                                             // reply array is ready to be loaded into SPDR upon query
+    genRpl(reqArrCRC_T[0]);                                // creates reply array, but SPI interrupt still detached
+    yy = 0;                                             
 
+/*
     Serial.print("reqArrCRC_XF: ");
     for (int jj = 0; jj < sizeof(reqArrCRC_XF); jj++){
       Serial.print(reqArrCRC_XF[jj], HEX);
@@ -164,7 +156,7 @@ void loop (void){
       Serial.print(" ");
     }
     Serial.println();
-
+*/
     // resets reqArr arrays
     for (int jj = 0; jj < sizeof(reqArrCRC_XF); jj++){
       reqArrCRC_T[jj] = 0;
@@ -179,6 +171,7 @@ void loop (void){
     
     readReg = SPSR;
     readReg = SPDR;
+    //Serial.println("SPI interrupt re-attached");
     SPCR = SPCR | bit(SPIE);            
   }
 }

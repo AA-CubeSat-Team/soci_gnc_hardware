@@ -249,7 +249,7 @@ def spiTransfer(reqArr1,rplN1):
     slvEmpArr = spi.xfer2(reqArrX)
     #print('slvEmpArr: ', [hex(x) for x in slvEmpArr])
 
-    time.sleep(0.200)                           # waits 200 ms for RWA to process
+    time.sleep(0.100)                           # waits 100 ms for RWA to process
     
     #print('reply')
     #print('msrEmpArr: ', [hex(x) for x in msrEmpArr])   
