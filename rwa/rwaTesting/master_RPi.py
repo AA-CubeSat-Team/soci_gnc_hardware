@@ -708,6 +708,10 @@ print("cleared last reset status")
 rwID = input("\nenter which reaction wheel is in use (1-4):\n\n")
 rwID = int(rwID)
 
+samplePeriod = 1
+runSensors = 0
+pullSensorsThr.start()
+
 while True: 
     opMode = input("\nenter an operating mode:\n1 - auto test\n2 - user input\n3 - full manual\n\n")
     opMode = int(opMode)
@@ -715,10 +719,6 @@ while True:
     if opMode == 1:
         print("\nAUTO TEST OP MODE")
         print("enter '99' to return to op mode select")
-
-        samplePeriod = 1
-        runSensors = 0
-        pullSensorsThr.start()
 
         while True: 
             print("\nenter a test mode:")
