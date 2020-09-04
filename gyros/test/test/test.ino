@@ -1,12 +1,13 @@
 #include <Wire.h>
 #include <FXAS21002C.h>
 
-FXAS21002C sensor = FXAS21002C(GFSR_250DPS, GODR_50HZ, GBW_L2); // SA0=1 0x21
+FXAS21002C sensor = FXAS21002C(GFSR_2000DPS, GODR_200HZ, GBW_L3); // SA0=1 0x21
 long waitt = 0;
 long intt;
 long starttime;
 long i = 0;
 long ODR;
+int testtime;
 
 void setup() {
   Serial.begin(115200);
@@ -17,6 +18,7 @@ void setup() {
   sensor.calibrate();
   sensor.active();
   intt = micros();
+  testtime = 180;
 }
 
 void loop() {
@@ -25,11 +27,10 @@ void loop() {
 
   // Query the sensor
   sensor.readGyroData();
-//  sensor.readTempData();
-
+  sensor.readTempData();
+//  Serial.println(sensor.tempData);
   // Print out the data
   // Gyroscope
-//  Serial.println(sensor.readReg(FXAS21002C_H_CTRL_REG0),BIN);
 //  Serial.print("X:");
 //  Serial.print((float)sensor.gyroData.x);
 //  Serial.print(" Y:");
@@ -40,7 +41,19 @@ void loop() {
   waitt = waitt + 1.0/(ODR)*1e6;
   while(micros()-intt<waitt){
   }
-if (i == 20*ODR+60){
-  while(1){}
+if (i == testtime*ODR+60){
+  int j = 1;
+  while(j){
+    if(Serial.available())  {
+  String value = Serial.readStringUntil('\n');
+  Serial.println(value);
+  if(value=="reset") {
+    i = 0;
+    waitt = 0;
+    intt = micros();
+    j = 0;
+  }
+    }
+  }
 }
 }
