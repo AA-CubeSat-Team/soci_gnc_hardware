@@ -285,7 +285,7 @@ def pullSensors():
         if runSensors == 0:
             continue
 
-        if runSensors == 1:
+        if runSensors == 1:     # checks RW status (currSpeed, refSpeed, state, clcMode) and last reset status
             rwStatusArr = processAuto(4, 0, 0)
             lastResetStatusArr = processAuto(2, 0, 0)
             rwState2 = rwStatusArr[4]
@@ -298,7 +298,7 @@ def pullSensors():
                 nominalState = False
                 fixIssue(2)          
 
-        if runSensors == 2:
+        if runSensors == 2:     # checks RW status, last reset status, and runs INA219 sensor
             print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
             lastResetStatusArr = processAuto(2, 0, 0)
@@ -336,6 +336,7 @@ global nominalState
 nominalState = True
 
 def fixIssue(runIssue):                                     # will need to be adjusted to fit CDH error processes
+    global lastResetStatus2
     global nominalState
 
     if runIssue == 1:
