@@ -1003,7 +1003,7 @@ while True:
         while True:
             inpString = input("enter hex bytes with no spaces: \n")
 
-            if inpString = 'zz':
+            if inpString == 'zz':
                 break
 
             inpCharList = list(inpString)
