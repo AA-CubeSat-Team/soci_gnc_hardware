@@ -707,12 +707,12 @@ def processUser(comID1):
     
 
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-gLRS = processAuto(2, 0, 0)
-print("last reset status: ",gLRS[2])
-processAuto(3, 0, 0)
-print("cleared last reset status")
-gLRS = processAuto(2, 0, 0)
-print("last reset status: ",gLRS[2])
+#gLRS = processAuto(2, 0, 0)
+#print("last reset status: ",gLRS[2])
+#processAuto(3, 0, 0)
+#print("cleared last reset status")
+#gLRS = processAuto(2, 0, 0)
+#print("last reset status: ",gLRS[2])
 
 rwID = input("\nenter which reaction wheel is in use (1-4):\n\n")
 rwID = int(rwID)
