@@ -80,8 +80,6 @@ void setup (void){
 
 
 ISR (SPI_STC_vect){
-  Serial.print("SPCR: ");
-  Serial.println(SPCR, BIN);
   reqB_new = SPDR;
 
   //querying reply
@@ -121,6 +119,8 @@ ISR (SPI_STC_vect){
 // ISSUE: node never re-attaches the SPI interrupt, leaving the SPDR to repeat back the empty 0x7E query from master
                                      
 void loop (void){
+  //Serial.print("SPCR: ");
+  //Serial.println(SPCR, BIN);
   if (flag == true){                                    // block runs after request finishes, before query starts
     Serial.println("flag = true");
     Serial.println("gate 0");
@@ -148,7 +148,7 @@ void loop (void){
     genRpl(reqArrCRC_T[0]);                                // creates reply array, but SPI interrupt still detached
     yy = 0;                                             
     Serial.println("gate 2");
-/*
+
     Serial.print("reqArrCRC_XF: ");
     for (int jj = 0; jj < sizeof(reqArrCRC_XF); jj++){
       Serial.print(reqArrCRC_XF[jj], HEX);
@@ -161,7 +161,7 @@ void loop (void){
       Serial.print(" ");
     }
     Serial.println();
-*/
+
     // resets reqArr arrays
     for (int jj = 0; jj < sizeof(reqArrCRC_XF); jj++){
       reqArrCRC_T[jj] = 0;

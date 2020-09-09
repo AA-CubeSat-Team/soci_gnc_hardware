@@ -854,7 +854,7 @@ while True:
                 print("\nMINIMUM RAMP TIME TEST MODE\n")
                 nominalState = True
 
-                fileName = "minRampTimeDir"
+                folderName = "minRampTimeDir"
                 fileName = "minRampTimeTest"
                 header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
                 csvStart(folderName, fileName, header)
