@@ -1005,10 +1005,10 @@ while True:
             time.sleep(0.100)                           # waits 100 ms for RWA to process
             
             msrEmpArr = [0x7e] * (2*rplN2 + 3)    
-            rxByteArray = spi.xfer2(msrEmpArr)
+            #rxByteArray = spi.xfer2(msrEmpArr)
             
             print(txByteArray)
-            print(rxByteArray)
+            #print(rxByteArray)
             print(" ")
 
             spiAvail = True
