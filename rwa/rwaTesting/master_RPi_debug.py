@@ -1007,7 +1007,7 @@ while True:
             #msrEmpArr = [0x7e] * (2*rplN2 + 3)    
             #rxByteArray = spi.xfer2(msrEmpArr)
             
-            print('txByteArray: ', txByteArray)
+            print('txByteArray: ', [hex(x) for x in txByteArray])
             #print(rxByteArray)
             print(" ")
 
