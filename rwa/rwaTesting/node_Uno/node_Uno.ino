@@ -80,6 +80,8 @@ void setup (void){
 
 
 ISR (SPI_STC_vect){
+  Serial.print("SPCR: ");
+  Serial.println(SPCR, BIN);
   reqB_new = SPDR;
 
   //querying reply
@@ -115,10 +117,13 @@ ISR (SPI_STC_vect){
   
   reqB_old = reqB_new;
 }
+
+// ISSUE: node never re-attaches the SPI interrupt, leaving the SPDR to repeat back the empty 0x7E query from master
                                      
 void loop (void){
   if (flag == true){                                    // block runs after request finishes, before query starts
-    //Serial.println("request received");
+    Serial.println("flag = true");
+    Serial.println("gate 0");
     
     qq = 0;
     int reqLenCRC_XF = kk;
@@ -139,10 +144,10 @@ void loop (void){
         qq++;
       }
     }
-    
+    Serial.println("gate 1");
     genRpl(reqArrCRC_T[0]);                                // creates reply array, but SPI interrupt still detached
     yy = 0;                                             
-
+    Serial.println("gate 2");
 /*
     Serial.print("reqArrCRC_XF: ");
     for (int jj = 0; jj < sizeof(reqArrCRC_XF); jj++){
@@ -172,13 +177,14 @@ void loop (void){
     readReg = SPSR;
     readReg = SPDR;
     //Serial.println("SPI interrupt re-attached");
-    SPCR = SPCR | bit(SPIE);            
+    SPCR = SPCR | bit(SPIE);
+    Serial.println("gate 3");         
   }
 }
 
 
 void genRpl(byte comID1){ 
-
+  Serial.println("gate A");
   // PROCESS REQUEST DATA --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   long reqRefSpeed;
   int reqRampTime;
@@ -276,7 +282,7 @@ void genRpl(byte comID1){
       break;
   }   
 
-
+  Serial.println("gate B");
   // CRC/XOR/FRAME REPLY ARRAY --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
                                               
   // runs CRC algorithm on rplArr_T, adds CRC bytes on to end
@@ -330,4 +336,5 @@ void genRpl(byte comID1){
     rplArrCRC_XF[ff+1] = rplArrCRC_X[ff];
   }
   rplLenCRC_XF = rplLenCRC_X + 2;
+  Serial.println("gate C");
 }
