@@ -333,7 +333,7 @@ def pullSensors():
             csvAdd(outputArr2)
 
         if runSensors == 3:     # checks RW status, last reset status, and runs INA219 sensor
-            print("ina219 pull")
+            #print("ina219 pull")
 
             voltage = ina219.bus_voltage
             voltage = round(voltage, 3)
@@ -346,7 +346,7 @@ def pullSensors():
             outputArr2 = ina219Arr
             csvAdd(outputArr2)
 
-            print('voltage: ',voltage,'\tcurrent: ',current,'\tpower: ',power)
+            print('voltage: ',voltage,' \tcurrent: ',current,' \tpower: ',power)
 
         time.sleep(samplePeriod)
         
