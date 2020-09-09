@@ -312,10 +312,10 @@ def pullSensors():
             rwState2 = rwStatusArr[4]
             lastResetStatus2 = lastResetStatusArr[2]
 
-            if rwState2 == 0:
+            #if rwState2 == 0:
                 #nominalState = False
                 #fixIssue(1)
-            if lastResetStatus2 != 6 and lastResetStatus2 != 7:
+            #if lastResetStatus2 != 6 and lastResetStatus2 != 7:
                 #nominalState = False
                 #fixIssue(2)
             
