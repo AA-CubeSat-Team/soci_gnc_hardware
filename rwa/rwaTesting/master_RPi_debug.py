@@ -332,6 +332,20 @@ def pullSensors():
             outputArr2 = flatList([rwStatusArr, ina219Arr])
             csvAdd(outputArr2)
 
+        if runSensors == 3:     # checks RW status, last reset status, and runs INA219 sensor
+            print("ina219 pull")
+
+            voltage = ina219.bus_voltage
+            voltage = round(voltage, 3)
+            current = ina219.current
+            current = round(current, 3)
+            power = voltage * current
+            power = round(power, 3)
+            ina219Arr = [voltage, current, power]
+
+            outputArr2 = ina219Arr
+            csvAdd(outputArr2)
+
         time.sleep(samplePeriod)
         
     return 
@@ -714,7 +728,7 @@ def processUser(comID1):
 #gLRS = processAuto(2, 0, 0)
 #print("last reset status: ",gLRS[2])
 
-rwID = input("\nenter which reaction wheel is in use (1-4):\n\n")
+rwID = input("\nenter which reaction wheel is in use (0071, 0072, 0109, 0110):\n\n")
 rwID = int(rwID)
 
 samplePeriod = 1
@@ -722,7 +736,12 @@ runSensors = 0
 pullSensorsThr.start()
 
 while True: 
-    opMode = input("\nenter an operating mode:\n1 - auto test\n2 - user input\n3 - full manual\n\n")
+    print("\nenter an operating mode:")
+    print("1 - auto test")
+    print("2 - user input")
+    print("3 - full manual")
+    print("4 - run ina219")
+    opMode = input("\n")
     opMode = int(opMode)
 
     if opMode == 1:
@@ -979,10 +998,14 @@ while True:
             
     if opMode == 3:
         print("\nFULL MANUAL OP MODE")
-        print("enter '99' to return to mode select")
+        print("enter 'zz' to return to mode select")
 
         while True:
             inpString = input("enter hex bytes with no spaces: \n")
+
+            if inpString = 'zz':
+                break
+
             inpCharList = list(inpString)
 
             inpLength = len(inpCharList)
@@ -1012,6 +1035,40 @@ while True:
             print(" ")
 
             spiAvail = True
+
+
+    if opMode == 4:
+        print("\nINA219 OP MODE")
+        print("enter 'zz' to return to mode select")
+
+        while True: 
+            print("\nenter a test duration in seconds:")
+            testDur = input("\n")
+            
+            if testDur == 'zz':
+                break
+
+            testDur = int(testDur)
+
+            nominalState = True
+
+            folderName = "ina219Dir"
+            fileName = "ina219Test"
+            header = ["entry","timeGMT","timeELA_s","voltage_V","current_mA","power_mW"]
+            csvStart(folderName, fileName, header)
+            folderName2 = folderName
+            fileName2 = fileName
+
+            time0 = time.time()
+
+            samplePeriod = 1
+            runSensors = 3
+
+            time.sleep(testDur)
+
+            runSensors = 0
+            print("test complete")
+            
 
 
 
