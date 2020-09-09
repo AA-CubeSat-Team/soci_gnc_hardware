@@ -23,8 +23,8 @@ spi = spidev.SpiDev()       # enables spi, creates "spi" object
 
 spi.open(bus, device)       # opens connection on specified bus, device
 
-spi.max_speed_hz = 250000   # sets master freq at 250 kHz, must be (150:300) kHz for RWA
-spi.mode = 0                # sets SPI mode to 0 (look up online)
+spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
+spi.mode = 0b01             # sets SPI mode to 0 (look up online)
 
 
 # ENABLE GPIO INITIALIZATION
@@ -249,7 +249,7 @@ def spiTransfer(reqArr1,rplN1):
     slvEmpArr = spi.xfer2(reqArrX)
     print('slvEmpArr: ', [hex(x) for x in slvEmpArr])
 
-    time.sleep(0.100)                           # waits 100 ms for RWA to process
+    time.sleep(0.200)                           # waits 200 ms for RWA to process
     
     print('reply')
     print('msrEmpArr: ', [hex(x) for x in msrEmpArr])   
