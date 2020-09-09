@@ -1012,26 +1012,27 @@ while True:
             inpLength = len(inpCharList)
             txLength = int(inpLength / 2)
 
-            txByteArray = [0] * txLength
+            txByteArray1 = [0] * txLength
 
             for c in range(0, txLength):
-                txByteArray[c] = inpCharList[2*c] + inpCharList[(2*c)+1]
-                txByteArray[c] = int(txByteArray[c],16) 
+                txByteArray1[c] = inpCharList[2*c] + inpCharList[(2*c)+1]
+                txByteArray1[c] = int(txByteArray1[c],16) 
 
             #rplN2 = int(input("enter expected reply length (bytes): \n"))
 
             spiAvail = False
             
-            reqArrX = flatList([0x7e, txByteArray, 0x7e])               
+            reqArrX = flatList([0x7e, txByteArray1, 0x7e])               
          
-            slvEmpArr = spi.xfer2(reqArrX)
+            rxByteArray1 = spi.xfer2(reqArrX)
 
             #time.sleep(0.100)                           # waits 100 ms for RWA to process
             
             #msrEmpArr = [0x7e] * (2*rplN2 + 3)    
             #rxByteArray = spi.xfer2(msrEmpArr)
             
-            print('txByteArray: ', [hex(x) for x in txByteArray])
+            print('txByteArray1: ', [hex(x) for x in txByteArray1])
+            print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
             #print(rxByteArray)
             print(" ")
 
