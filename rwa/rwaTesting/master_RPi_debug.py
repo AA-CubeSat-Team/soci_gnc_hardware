@@ -346,7 +346,7 @@ def pullSensors():
             outputArr2 = ina219Arr
             csvAdd(outputArr2)
 
-            print('voltage: ',voltage,' \tcurrent: ',current,' \tpower: ',power)
+            print('voltage (V): ',voltage,'  \tcurrent (mA): ',current,'  \tpower (mW): ',power)
 
         time.sleep(samplePeriod)
         
