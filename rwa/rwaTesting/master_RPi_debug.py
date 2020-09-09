@@ -994,7 +994,7 @@ while True:
                 txByteArray[c] = inpCharList[2*c] + inpCharList[(2*c)+1]
                 txByteArray[c] = int(txByteArray[c],16) 
 
-            rplN2 = int(input("enter expected reply length (bytes): \n"))
+            #rplN2 = int(input("enter expected reply length (bytes): \n"))
 
             spiAvail = False
             
@@ -1002,12 +1002,12 @@ while True:
          
             slvEmpArr = spi.xfer2(reqArrX)
 
-            time.sleep(0.100)                           # waits 100 ms for RWA to process
+            #time.sleep(0.100)                           # waits 100 ms for RWA to process
             
-            msrEmpArr = [0x7e] * (2*rplN2 + 3)    
+            #msrEmpArr = [0x7e] * (2*rplN2 + 3)    
             #rxByteArray = spi.xfer2(msrEmpArr)
             
-            print(txByteArray)
+            print('txByteArray: ', txByteArray)
             #print(rxByteArray)
             print(" ")
 
