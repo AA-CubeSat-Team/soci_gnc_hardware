@@ -260,7 +260,7 @@ def spiTransfer(reqArr1,rplN1):
 
     #need to find start and finish 0x7e
     bytOld = 0x7e
-    for idx, byt in enumerate(rplArr):
+    for idx, byt in enumerate(rplArrH):
         bytNew = byt
         if (bytOld == 0x7e) & (bytNew != 0x7e):
             idxStart = idx
