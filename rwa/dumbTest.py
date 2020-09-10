@@ -1,18 +1,20 @@
 
 
-inpString = input("enter hex bytes with no spaces: \n")
+rplArr = [0x7e, 0x7e, 0x7e, 0x7e, 0x03, 0x01, 0xe5, 0xe2, 0x7e, 0x7e, 0x7e, 0x7e]
 
-inpCharList = list(inpString)
+bytOld = 0x7e
+for idx, byt in enumerate(rplArr):
+    bytNew = byt
+    if (bytOld == 0x7e) & (bytNew != 0x7e):
+        idxStart = idx
+        print('start: ',idxStart)
+    if (bytOld != 0x7e) & (bytNew == 0x7e):
+        idxEnd = idx - 1
+        print('end: ',idxEnd)
+    bytOld = bytNew
 
-inpLength = len(inpCharList)
-txLength = int(inpLength / 2)
-
-txByteArray = [0] * txLength
-
-for c in range(0, txLength):
-    txByteArray[c] = inpCharList[2*c] + inpCharList[(2*c)+1]
-    txByteArray[c] = int(txByteArray[c],16)
-
+rplArr1 = rplArr[idxStart:(idxEnd+1)] 
+print(rplArr1)
 
 
 

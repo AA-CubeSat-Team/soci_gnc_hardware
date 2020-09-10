@@ -256,8 +256,19 @@ def spiTransfer(reqArr1,rplN1):
     rplArrX = spi.xfer2(msrEmpArr)
     print('rplArrX: ', [hex(x) for x in rplArrX])
 
-    rplArrH = xorSwitch(rplArrX, "rplMode")   
-    rplArr1 = rplArrH[(0+2):(rplN1+2)] 
+    rplArrH = xorSwitch(rplArrX, "rplMode") 
+
+    #need to find start and finish 0x7e
+    bytOld = 0x7e
+    for idx, byt in enumerate(rplArr):
+        bytNew = byt
+        if (bytOld == 0x7e) & (bytNew != 0x7e):
+            idxStart = idx
+        if (bytOld != 0x7e) & (bytNew == 0x7e):
+            idxEnd = idx - 1
+        bytOld = bytNew
+
+    rplArr1 = rplArrH[idxStart:(idxEnd+1)] 
 
     spiAvail = True
     return rplArr1 
