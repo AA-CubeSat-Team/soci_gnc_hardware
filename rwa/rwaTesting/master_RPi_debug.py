@@ -259,6 +259,8 @@ def spiTransfer(reqArr1,rplN1):
     rplArrH = xorSwitch(rplArrX, "rplMode") 
 
     #need to find start and finish 0x7e
+    idxStart = 0
+    idxEnd = len(msrEmpArr)
     bytOld = 0x7e
     for idx, byt in enumerate(rplArrH):
         bytNew = byt
@@ -1044,8 +1046,8 @@ while True:
             
             print('txByteArray1: ', [hex(x) for x in txByteArray1])
             print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
-            print('txByteArray2: ', [hex(x) for x in txByteArray2])
-            print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
+            #print('txByteArray2: ', [hex(x) for x in txByteArray2])
+            #print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
             print(" ")
 
             spiAvail = True
