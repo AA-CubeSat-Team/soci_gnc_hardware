@@ -757,7 +757,6 @@ def processUser(comID1):
         uid3 = int.from_bytes(bytes(bytearray(rplArr[18:22])), byteorder='little', signed=False)
         print("UID 3: ", uid3)
 
-      
     
 
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
