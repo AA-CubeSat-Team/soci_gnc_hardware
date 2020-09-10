@@ -23,8 +23,8 @@ spi = spidev.SpiDev()       # enables spi, creates "spi" object
 
 spi.open(bus, device)       # opens connection on specified bus, device
 
-spi.max_speed_hz = 250000   # sets master freq at 250 kHz, must be (150:300) kHz for RWA
-spi.mode = 0                # sets SPI mode to 0 (look up online)
+spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
+spi.mode = 0b00             # sets SPI mode to 0 (look up online)
 
 
 # ENABLE GPIO INITIALIZATION
@@ -192,7 +192,7 @@ def csvStart(folderName1, fileName1, header1):
 
     timeStart1 = datetime.now()
 
-    fileName_timeStart1 = fileName1 + '_' + 'rw' + str(rwID) + '_' + timeStart1.strftime('d%Y%m%dt%H%M%S')
+    fileName_timeStart1 = fileName1 + '_' + 'rw' + rwID + '_' + timeStart1.strftime('d%Y%m%dt%H%M%S')
     relFilePath = folderName1 + "/" + fileName_timeStart1 + '.csv'
     scriptDir = os.path.dirname(__file__)
     
@@ -223,7 +223,7 @@ def csvAdd(outputArr1):
     timeELA1 = time.time() - time0
     timeELA1 = round(timeELA1, 3)
 
-    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1, fileNameG, "RW" + str(rwID), timeStart1.strftime("%Y%m%d%H%M%S")])         
+    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1, fileNameG, "RW" + rwID, timeStart1.strftime("%Y%m%d%H%M%S")])         
 
     file = open(absFilePath, 'a', newline ='')      # open(..'a'..) appends existing CSV file
     with file:   
@@ -249,15 +249,25 @@ def spiTransfer(reqArr1,rplN1):
     slvEmpArr = spi.xfer2(reqArrX)
     #print('slvEmpArr: ', [hex(x) for x in slvEmpArr])
 
-    time.sleep(0.100)                           # waits 100 ms for RWA to process
+    time.sleep(0.200)                           # waits 100 ms for RWA to process
     
     #print('reply')
     #print('msrEmpArr: ', [hex(x) for x in msrEmpArr])   
     rplArrX = spi.xfer2(msrEmpArr)
     #print('rplArrX: ', [hex(x) for x in rplArrX])
 
-    rplArrH = xorSwitch(rplArrX, "rplMode")   
-    rplArr1 = rplArrH[(0+2):(rplN1+2)] 
+    rplArrH = xorSwitch(rplArrX, "rplMode") 
+
+    bytOld = 0x7e
+    for idx, byt in enumerate(rplArrH):
+        bytNew = byt
+        if (bytOld == 0x7e) & (bytNew != 0x7e):
+            idxStart = idx
+        if (bytOld != 0x7e) & (bytNew == 0x7e):
+            idxEnd = idx - 1
+        bytOld = bytNew
+
+    rplArr1 = rplArrH[idxStart:(idxEnd+1)] 
 
     spiAvail = True
     return rplArr1 
@@ -545,6 +555,7 @@ def processAuto(comID1,data1,data2):
 # SPI USER MECHANISM
 def processUser(comID1):
     if comID1 == 1:
+        print('reset MCU')
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
@@ -553,6 +564,7 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
     if comID1 == 2:
+        print('get last reset status')
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
@@ -561,9 +573,27 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
         lastResetStatus = rplArr[2]
-        print("\nlast reset status: ", lastResetStatus)     
+        if lastResetStatus == 0:
+            lastResetStatusTxt = 'pin reset'
+        if lastResetStatus == 1:
+            lastResetStatusTxt = 'POR/PDR/BOR reset'
+        if lastResetStatus == 2:
+            lastResetStatusTxt = 'software reset'
+        if lastResetStatus == 3:
+            lastResetStatusTxt = 'independent watchdog reset'
+        if lastResetStatus == 4:
+            lastResetStatusTxt = 'window watchdog reset'
+        if lastResetStatus == 5:
+            lastResetStatusTxt = 'low power reset'
+        if lastResetStatus == 6:
+            lastResetStatusTxt = 'cleared'
+        if lastResetStatus == 7:
+            lastResetStatusTxt = 'cleared'
+        else lastResetStatusTxt = 'ISSUE'
+        print("\nlast reset status: ", lastResetStatus, '\t- ', lastResetStatusTxt)     
 
     if comID1 == 3:
+        print('clear last reset status')
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
@@ -572,6 +602,7 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
     if comID1 == 4:
+        print('get reaction wheel status')
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
@@ -580,15 +611,32 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
-        print("\ncurr speed: ", currSpeed)
+        print("\ncurr speed (0.1 RPM): ", currSpeed)
         refSpeed = int.from_bytes(bytes(bytearray(rplArr[6:10])), byteorder='little', signed=True)
-        print("ref speed: ", refSpeed)
+        print("ref speed (0.1 RPM): ", refSpeed)
         state = rplArr[10]
-        print("state: ", state)
+        if state == 0:
+            stateTxt = 'error'
+        if state == 1:
+            stateTxt = 'idle'
+        if state == 2:
+            stateTxt = 'coasting'
+        if state == 3:
+            stateTxt = 'running, speed stable'
+        if state == 4:
+            stateTxt = 'running, speed changing'
+        else stateTxt = 'ISSUE'
+        print("state: ", state, '\t- ', stateTxt)
         clcModeS = rplArr[11]
-        print("clc mode: ", clcModeS)
+        if clcModeS == 0:
+            clcModeSTxt = 'low current mode (0.3 A)'
+        if clcModeS == 1:
+            clcModeSTxt = 'high current mode (0.6 A)'
+        else clcModeSTxt = 'ISSUE'
+        print("clc mode: ", clcModeS, '\t- ', clcModeSTxt)
 
     if comID1 == 5:
+        print('initialize reaction wheel controller')
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
@@ -597,6 +645,7 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
     if comID1 == 6:
+        print('set reference speed')
         speed = input("enter a speed [-65000:65000, 0.1 RPM]:\n")
         speed = int(speed)
         speedArr = list(bytearray((speed).to_bytes(4, byteorder='little', signed=True)))
@@ -613,6 +662,7 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
     if comID1 == 7:
+        print('set current limit mode')
         clcModeM = input("enter a current limit control mode [0 - low, 1 - high]:\n")
         clcModeM = int(clcModeM)
         clcModeArr = list(bytearray((clcModeM).to_bytes(1, byteorder='little', signed=False)))
@@ -625,6 +675,7 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
     if comID1 == 8:
+        print('get temperature')
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
@@ -633,9 +684,10 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
         mcuTemp = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
-        print("\nmcu temp: ", mcuTemp)
+        print("\nmcu temp (C): ", mcuTemp)
 
     if comID1 == 9:
+        print('get telemetry')
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
@@ -646,16 +698,16 @@ def processUser(comID1):
         lastResetStatus = rplArr[2]
         print("\nlast reset status: ", lastResetStatus)
         mcuTemp = int.from_bytes(bytes(bytearray(rplArr[3:7])), byteorder='little', signed=True)
-        print("mcu temp: ", mcuTemp)
+        print("mcu temp (C): ", mcuTemp)
         rwState = rplArr[7]
         print("rw state: ", rwState)
         rwClcMode = rplArr[8]
         print("rw clc mode: ", rwClcMode)
         rwCurrSpeed = int.from_bytes(bytes(bytearray(rplArr[9:13])), byteorder='little', signed=True)
-        print("rw curr speed: ", rwCurrSpeed)        
+        print("rw curr speed (0.1 RPM): ", rwCurrSpeed)        
         rwRefSpeed = int.from_bytes(bytes(bytearray(rplArr[13:17])), byteorder='little', signed=True)
         numOfInvalidCrcPackets = int.from_bytes(bytes(bytearray(rplArr[17:21])), byteorder='little', signed=False)
-        print("rw ref speed: ", rwRefSpeed) 
+        print("rw ref speed (0.1 RPM): ", rwRefSpeed) 
         numOfInvalidLenPackets = int.from_bytes(bytes(bytearray(rplArr[21:25])), byteorder='little', signed=False)
         numOfInvalidCmdPackets = int.from_bytes(bytes(bytearray(rplArr[25:29])), byteorder='little', signed=False)
         numOfCmdExecutedRequests = int.from_bytes(bytes(bytearray(rplArr[29:33])), byteorder='little', signed=False)
@@ -677,6 +729,7 @@ def processUser(comID1):
         print("num of total errors: ", spiTotalNumOfErrors) 
 
     if comID1 == 10:
+        print('ping')
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
@@ -685,6 +738,7 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
     if comID1 == 11:
+        print('get system information')
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
@@ -707,22 +761,60 @@ def processUser(comID1):
     
 
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-gLRS = processAuto(2, 0, 0)
-print("last reset status: ",gLRS[2])
+lastResetStatus0 = processAuto(2, 0, 0)
+if lastResetStatus0 == 0:
+    lastResetStatus0Txt = 'pin reset'
+if lastResetStatus0 == 1:
+    lastResetStatus0Txt = 'POR/PDR/BOR reset'
+if lastResetStatus0 == 2:
+    lastResetStatus0Txt = 'software reset'
+if lastResetStatus0 == 3:
+    lastResetStatus0Txt = 'independent watchdog reset'
+if lastResetStatus0 == 4:
+    lastResetStatus0Txt = 'window watchdog reset'
+if lastResetStatus0 == 5:
+    lastResetStatus0Txt = 'low power reset'
+if lastResetStatus0 == 6:
+    lastResetStatus0Txt = 'cleared'
+if lastResetStatus0 == 7:
+    lastResetStatus0Txt = 'cleared'
+else lastResetStatus0Txt = 'ISSUE'
+print("\nlast reset status: ", lastResetStatus0, '\t- ', lastResetStatus0Txt) 
+print("last reset status: ",lastResetStatus0[2])
 processAuto(3, 0, 0)
 print("cleared last reset status")
-gLRS = processAuto(2, 0, 0)
-print("last reset status: ",gLRS[2])
+lastResetStatus0 = processAuto(2, 0, 0)
+if lastResetStatus0 == 0:
+    lastResetStatus0Txt = 'pin reset'
+if lastResetStatus0 == 1:
+    lastResetStatus0Txt = 'POR/PDR/BOR reset'
+if lastResetStatus0 == 2:
+    lastResetStatus0Txt = 'software reset'
+if lastResetStatus0 == 3:
+    lastResetStatus0Txt = 'independent watchdog reset'
+if lastResetStatus0 == 4:
+    lastResetStatus0Txt = 'window watchdog reset'
+if lastResetStatus0 == 5:
+    lastResetStatus0Txt = 'low power reset'
+if lastResetStatus0 == 6:
+    lastResetStatus0Txt = 'cleared'
+if lastResetStatus0 == 7:
+    lastResetStatus0Txt = 'cleared'
+else lastResetStatus0Txt = 'ISSUE'
+print("\nlast reset status: ", lastResetStatus0, '\t- ', lastResetStatus0Txt) 
 
-rwID = input("\nenter which reaction wheel is in use (1-4):\n\n")
-rwID = int(rwID)
+rwID = input("\nenter which reaction wheel is in use (0071, 0072, 0109, 0110):\n\n")
 
 samplePeriod = 1
 runSensors = 0
 pullSensorsThr.start()
 
 while True: 
-    opMode = input("\nenter an operating mode:\n1 - auto test\n2 - user input\n3 - full manual\n\n")
+    print("\nenter an operating mode:")
+    print("1 - auto test")
+    print("2 - user input")
+    print("3 - full manual")
+    opMode = input("\n")
     opMode = int(opMode)
 
     if opMode == 1:
@@ -979,36 +1071,42 @@ while True:
             
     if opMode == 3:
         print("\nFULL MANUAL OP MODE")
-        print("enter '99' to return to mode select")
+        print("enter 'zz' to return to mode select")
 
         while True:
             inpString = input("enter hex bytes with no spaces: \n")
+
+            if inpString == 'zz':
+                break
+
             inpCharList = list(inpString)
 
             inpLength = len(inpCharList)
             txLength = int(inpLength / 2)
 
-            txByteArray = [0] * txLength
+            txByteArray1 = [0] * txLength
 
             for c in range(0, txLength):
-                txByteArray[c] = inpCharList[2*c] + inpCharList[(2*c)+1]
-                txByteArray[c] = int(txByteArray[c],16) 
+                txByteArray1[c] = inpCharList[2*c] + inpCharList[(2*c)+1]
+                txByteArray1[c] = int(txByteArray1[c],16) 
 
-            rplN2 = int(input("enter expected reply length (bytes): \n"))
+            #rplN2 = int(input("enter expected reply length (bytes): \n"))
 
             spiAvail = False
             
-            reqArrX = flatList([0x7e, txByteArray, 0x7e])               
+            reqArrX = flatList([0x7e, txByteArray1, 0x7e])               
          
-            slvEmpArr = spi.xfer2(reqArrX)
+            rxByteArray1 = spi.xfer2(reqArrX)
 
-            time.sleep(0.100)                           # waits 100 ms for RWA to process
+            #time.sleep(0.200)                           # waits 100 ms for RWA to process
             
-            msrEmpArr = [0x7e] * (2*rplN2 + 3)    
-            rxByteArray = spi.xfer2(msrEmpArr)
+            #txByteArray2 = [0x7e] * (2*rplN2 + 3)    
+            #rxByteArray2 = spi.xfer2(txByteArray2)
             
-            print(txByteArray)
-            print(rxByteArray)
+            print('txByteArray1: ', [hex(x) for x in txByteArray1])
+            print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
+            print('txByteArray2: ', [hex(x) for x in txByteArray2])
+            print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
             print(" ")
 
             spiAvail = True

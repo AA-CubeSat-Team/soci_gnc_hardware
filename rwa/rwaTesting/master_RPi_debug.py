@@ -1037,14 +1037,15 @@ while True:
          
             rxByteArray1 = spi.xfer2(reqArrX)
 
-            #time.sleep(0.100)                           # waits 100 ms for RWA to process
+            #time.sleep(0.200)                           # waits 100 ms for RWA to process
             
-            #msrEmpArr = [0x7e] * (2*rplN2 + 3)    
-            #rxByteArray = spi.xfer2(msrEmpArr)
+            #txByteArray2 = [0x7e] * (2*rplN2 + 3)    
+            #rxByteArray2 = spi.xfer2(txByteArray2)
             
             print('txByteArray1: ', [hex(x) for x in txByteArray1])
             print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
-            #print(rxByteArray)
+            print('txByteArray2: ', [hex(x) for x in txByteArray2])
+            print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
             print(" ")
 
             spiAvail = True
