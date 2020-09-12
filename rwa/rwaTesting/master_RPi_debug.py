@@ -85,6 +85,9 @@ def crcAppend(payloadArr1):
 
 # CRC CHECK FUNCTION
 def autoResults(reqArr1, rplArr1, rplN1):
+    if len(rplArr1) < 4:                       # 4 bytes is shortest correct reply package
+        return
+
     slvCRC = [rplArr1[-2],rplArr1[-1]]
 
     rplArrCorr = crcAppend(rplArr1[0:(rplN1-2)])
@@ -107,7 +110,7 @@ def autoResults(reqArr1, rplArr1, rplN1):
 # CRC CHECK FUNCTION
 def userResults(reqArr1, rplArr1, rplN1):
     if len(rplArr1) < 4:                       # 4 bytes is shortest correct reply package
-        break
+        return
 
     slvCRC = [rplArr1[-2],rplArr1[-1]]
 
