@@ -16,15 +16,14 @@ import RPi.GPIO as GPIO
 
 
 # SPI INITIALIZATION
-bus = 0
-device = 0      # slave select pin
-
 spi = spidev.SpiDev()       # enables spi, creates "spi" object
-
-spi.open(bus, device)       # opens connection on specified bus, device
+bus = 0
 
 spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
 spi.mode = 0b00            # sets SPI mode to 0 (look up online)
+
+device = 0      # slave select pin
+spi.open(bus, device)       # opens connection on specified bus, device
 
 
 # ENABLE GPIO INITIALIZATION
