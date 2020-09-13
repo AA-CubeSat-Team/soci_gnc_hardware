@@ -600,7 +600,8 @@ def processUser(comID1):
             lastResetStatusTxt = 'cleared'
         if lastResetStatus == 7:
             lastResetStatusTxt = 'cleared'
-        else lastResetStatusTxt = 'ISSUE'
+        else:
+            lastResetStatusTxt = 'ISSUE'
         print("\nlast reset status: ", lastResetStatus, '\t- ', lastResetStatusTxt)     
 
     if comID1 == 3:
@@ -636,14 +637,16 @@ def processUser(comID1):
             stateTxt = 'running, speed stable'
         if state == 4:
             stateTxt = 'running, speed changing'
-        else stateTxt = 'ISSUE'
+        else:
+            stateTxt = 'ISSUE'
         print("state: ", state, '\t- ', stateTxt)
         clcModeS = rplArr[11]
         if clcModeS == 0:
             clcModeSTxt = 'low current mode (0.3 A)'
         if clcModeS == 1:
             clcModeSTxt = 'high current mode (0.6 A)'
-        else clcModeSTxt = 'ISSUE'
+        else:
+            clcModeSTxt = 'ISSUE'
         print("clc mode: ", clcModeS, '\t- ', clcModeSTxt)
 
     if comID1 == 5:
@@ -788,7 +791,8 @@ if lastResetStatus0 == 6:
     lastResetStatus0Txt = 'cleared'
 if lastResetStatus0 == 7:
     lastResetStatus0Txt = 'cleared'
-else lastResetStatus0Txt = 'ISSUE'
+else:
+    lastResetStatus0Txt = 'ISSUE'
 print("\nlast reset status: ", lastResetStatus0, '\t- ', lastResetStatus0Txt) 
 print("last reset status: ",lastResetStatus0[2])
 processAuto(3, 0, 0)
@@ -810,7 +814,8 @@ if lastResetStatus0 == 6:
     lastResetStatus0Txt = 'cleared'
 if lastResetStatus0 == 7:
     lastResetStatus0Txt = 'cleared'
-else lastResetStatus0Txt = 'ISSUE'
+else:
+    lastResetStatus0Txt = 'ISSUE'
 print("\nlast reset status: ", lastResetStatus0, '\t- ', lastResetStatus0Txt) 
 
 rwID = input("\nenter which reaction wheel is in use (0071, 0072, 0109, 0110):\n\n")
