@@ -1039,6 +1039,11 @@ while True:
             #rplN2 = int(input("enter expected reply length (bytes): \n"))
 
             spiAvail = False
+
+            device = 0      # slave select pin
+            spi.open(bus, device)       # opens connection on specified bus, device
+            spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
+            spi.mode = 0b00            # sets SPI mode to 0 (look up online)
             
             reqArrX = flatList([0x7e, txByteArray1, 0x7e])               
          
@@ -1054,6 +1059,8 @@ while True:
             #print('txByteArray2: ', [hex(x) for x in txByteArray2])
             #print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
             print(" ")
+
+            spi.close()
 
             spiAvail = True
 
