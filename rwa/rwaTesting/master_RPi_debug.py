@@ -21,9 +21,12 @@ bus = 0
 
 # ENABLE GPIO INITIALIZATION
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(25, GPIO.OUT)
 
+GPIO.setup(25, GPIO.OUT)
 GPIO.output(25, True)       # sets ENABLE to high - 3.3V
+
+GPIO.setup(21, GPIO.OUT)
+GPIO.output(21, True)
 
 
 # INA219 INITIALIZATION
@@ -241,6 +244,7 @@ def spiTransfer(reqArr1,rplN1):
     spi.open(bus, device)       # opens connection on specified bus, device
     spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
     spi.mode = 0b00            # sets SPI mode to 0 (look up online)
+    GPIO.output(21, False)
 
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
@@ -249,14 +253,14 @@ def spiTransfer(reqArr1,rplN1):
     
     print('request')
     print('reqArrX: ', [hex(x) for x in reqArrX])
-    slvEmpArr = spi.xfer(reqArrX)
+    slvEmpArr = spi.xfer2(reqArrX)
     print('slvEmpArr: ', [hex(x) for x in slvEmpArr])
 
     time.sleep(0.200)                           # waits 200 ms for RWA to process
     
     print('reply')
     print('msrEmpArr: ', [hex(x) for x in msrEmpArr])   
-    rplArrX = spi.xfer(msrEmpArr)
+    rplArrX = spi.xfer2(msrEmpArr)
     print('rplArrX: ', [hex(x) for x in rplArrX])
 
     rplArrH = xorSwitch(rplArrX, "rplMode") 
@@ -276,6 +280,7 @@ def spiTransfer(reqArr1,rplN1):
     rplArr1 = rplArrH[idxStart:(idxEnd+1)] 
 
     spi.close()
+    GPIO.output(21, True)
 
     spiAvail = True
     return rplArr1 
@@ -1044,15 +1049,16 @@ while True:
             spi.open(bus, device)       # opens connection on specified bus, device
             spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
             spi.mode = 0b00            # sets SPI mode to 0 (look up online)
-            
+            GPIO.output(21, False)
+
             reqArrX = flatList([0x7e, txByteArray1, 0x7e])               
          
-            rxByteArray1 = spi.xfer(reqArrX)
+            rxByteArray1 = spi.xfer2(reqArrX)
 
             #time.sleep(0.200)                           # waits 100 ms for RWA to process
             
             #txByteArray2 = [0x7e] * (2*rplN2 + 3)    
-            #rxByteArray2 = spi.xfer(txByteArray2)
+            #rxByteArray2 = spi.xfer2(txByteArray2)
             
             print('txByteArray1: ', [hex(x) for x in txByteArray1])
             print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
@@ -1061,6 +1067,7 @@ while True:
             print(" ")
 
             spi.close()
+            GPIO.output(21, True)
 
             spiAvail = True
 
