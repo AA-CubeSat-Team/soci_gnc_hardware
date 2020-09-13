@@ -249,14 +249,14 @@ def spiTransfer(reqArr1,rplN1):
     
     print('request')
     print('reqArrX: ', [hex(x) for x in reqArrX])
-    slvEmpArr = spi.xfer2(reqArrX)
+    slvEmpArr = spi.xfer(reqArrX)
     print('slvEmpArr: ', [hex(x) for x in slvEmpArr])
 
     time.sleep(0.200)                           # waits 200 ms for RWA to process
     
     print('reply')
     print('msrEmpArr: ', [hex(x) for x in msrEmpArr])   
-    rplArrX = spi.xfer2(msrEmpArr)
+    rplArrX = spi.xfer(msrEmpArr)
     print('rplArrX: ', [hex(x) for x in rplArrX])
 
     rplArrH = xorSwitch(rplArrX, "rplMode") 
@@ -1047,12 +1047,12 @@ while True:
             
             reqArrX = flatList([0x7e, txByteArray1, 0x7e])               
          
-            rxByteArray1 = spi.xfer2(reqArrX)
+            rxByteArray1 = spi.xfer(reqArrX)
 
             #time.sleep(0.200)                           # waits 100 ms for RWA to process
             
             #txByteArray2 = [0x7e] * (2*rplN2 + 3)    
-            #rxByteArray2 = spi.xfer2(txByteArray2)
+            #rxByteArray2 = spi.xfer(txByteArray2)
             
             print('txByteArray1: ', [hex(x) for x in txByteArray1])
             print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
