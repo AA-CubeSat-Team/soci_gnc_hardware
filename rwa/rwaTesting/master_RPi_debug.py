@@ -19,12 +19,6 @@ import RPi.GPIO as GPIO
 spi = spidev.SpiDev()       # enables spi, creates "spi" object
 bus = 0
 
-device = 0      # slave select pin
-spi.open(bus, device)       # opens connection on specified bus, device
-spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
-spi.mode = 0b00            # sets SPI mode to 0 (look up online)
-
-
 # ENABLE GPIO INITIALIZATION
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(25, GPIO.OUT)
@@ -243,6 +237,11 @@ def spiTransfer(reqArr1,rplN1):
     global spiAvail
     spiAvail = False
 
+    device = 0      # slave select pin
+    spi.open(bus, device)       # opens connection on specified bus, device
+    spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
+    spi.mode = 0b00            # sets SPI mode to 0 (look up online)
+
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
@@ -275,6 +274,8 @@ def spiTransfer(reqArr1,rplN1):
         bytOld = bytNew
 
     rplArr1 = rplArrH[idxStart:(idxEnd+1)] 
+
+    spi.close()
 
     spiAvail = True
     return rplArr1 
