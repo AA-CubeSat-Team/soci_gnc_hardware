@@ -237,7 +237,7 @@ def spiTransfer(reqArr1,rplN1):
     global spiAvail
     spiAvail = False
 
-    device = 0      # slave select pin
+    device = 1      # slave select pin
     spi.open(bus, device)       # opens connection on specified bus, device
     spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
     spi.mode = 0b00            # sets SPI mode to 0 (look up online)
