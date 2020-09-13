@@ -29,9 +29,12 @@ spi.mode = 0b00             # sets SPI mode to 0 (look up online)
 
 # ENABLE GPIO INITIALIZATION
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(25, GPIO.OUT)
 
+GPIO.setup(25, GPIO.OUT)
 GPIO.output(25, True)       # sets ENABLE to high - 3.3V
+
+GPIO.setup(21, GPIO.OUT)
+GPIO.output(21, True)
 
 
 # INA219 INITIALIZATION
@@ -244,6 +247,7 @@ spiAvail = True
 def spiTransfer(reqArr1,rplN1):
     global spiAvail
     spiAvail = False
+    GPIO.output(21, False)
 
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
@@ -275,6 +279,7 @@ def spiTransfer(reqArr1,rplN1):
 
     rplArr1 = rplArrH[idxStart:(idxEnd+1)] 
 
+    GPIO.output(21, True)
     spiAvail = True
     return rplArr1 
 
@@ -1098,6 +1103,7 @@ while True:
             #rplN2 = int(input("enter expected reply length (bytes): \n"))
 
             spiAvail = False
+            GPIO.output(21, False)
             
             reqArrX = flatList([0x7e, txByteArray1, 0x7e])               
          
@@ -1114,6 +1120,7 @@ while True:
             print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
             print(" ")
 
+            GPIO.output(21, True)
             spiAvail = True
 
 
