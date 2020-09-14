@@ -311,7 +311,6 @@ def pullSensors():
             continue         
 
         if runSensors == 2:     # checks RW status and runs INA219 sensor
-            autoWait()
             print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
             print(rwStatusArr)
@@ -375,9 +374,6 @@ global autoAvail
 autoAvail = True
 
 def processAuto(comID1,data1,data2):
-    global autoAvail
-    autoAvail = False
-
     spiWait()
     print(comID1,data1,data2)
 
@@ -543,18 +539,7 @@ def processAuto(comID1,data1,data2):
 
         outputArr1 = [checkArr[0], checkArr[1], versionMajor, versionBuildNumber, uid1, uid2, uid3]
 
-    autoAvail = True
     return outputArr1
-
-def autoWait():
-    global autoAvail
-
-    while True:
-        if autoAvail == True:
-            return
-        if autoAvail == False:
-            continue
-    return
 
 
 # SPI USER MECHANISM
@@ -840,11 +825,9 @@ while True:
 
                     if nominalState == True:
                         print("speedInp: ", speedInp)
-                        autoWait()
                         processAuto(6, speedInp, 10)
                         time.sleep(5)
 
-                autoWait()
                 processAuto(0, speedInp, 10)
 
                 time.sleep(2)
