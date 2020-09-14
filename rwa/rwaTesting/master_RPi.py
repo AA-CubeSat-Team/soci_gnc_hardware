@@ -822,7 +822,7 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 2.5
+                samplePeriod = 0.5
                 runSensors = 2
 
                 for speedInp in range(10000, 70000, 10000):
@@ -835,7 +835,7 @@ while True:
                         processAuto(6, speedInp, 10)
                         time.sleep(5)
 
-                processAuto(0, speedInp, 10)
+                processAuto(6, 0, 10)
 
                 time.sleep(2)
 
