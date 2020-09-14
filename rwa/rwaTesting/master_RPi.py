@@ -579,27 +579,8 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
         lastResetStatus = int(rplArr[2])
-        if lastResetStatus == 0b00000000:
-            lastResetStatusTxt = 'cleared'
-        if lastResetStatus == 0b00000001:
-            lastResetStatusTxt = 'pin reset'
-        if lastResetStatus == 0b00000010:
-            lastResetStatusTxt = 'POR/PDR/BOR reset'
-        if lastResetStatus == 0b00000100:
-            lastResetStatusTxt = 'software reset'
-        if lastResetStatus == 0b00001000:
-            lastResetStatusTxt = 'independent watchdog reset'
-        if lastResetStatus == 0b00010000:
-            lastResetStatusTxt = 'window watchdog reset'
-        if lastResetStatus == 0b00100000:
-            lastResetStatusTxt = 'low power reset'
-        if lastResetStatus == 0b01000000:
-            lastResetStatusTxt = 'cleared'
-        if lastResetStatus == 0b10000000:
-            lastResetStatusTxt = 'cleared'
-        else:
-            lastResetStatusTxt = 'ISSUE'
-        print("\nlast reset status: ", lastResetStatus, '\t- ', lastResetStatusTxt)     
+        print("\nlast reset status: ", lastResetStatus, '\t- ', textGen('lastResetStatus',lastResetStatus0 
+   
 
     if comID1 == 3:
         print('clear last reset status')
