@@ -250,14 +250,14 @@ def spiTransfer(reqArr1,rplN1):
     print('transfer attempt')
     while True:
         if spiAvail == True:
-            print('avail = ',spiAvail)
+            #print('avail = ',spiAvail)
             break
         if spiAvail == False:
-            print('avail = ',spiAvail)
+            #print('avail = ',spiAvail)
             continue
 
     spiAvail = False
-    print('avail = ',spiAvail)
+    #print('avail = ',spiAvail)
     GPIO.output(21, False)
     print('transfer start')
 
@@ -292,7 +292,7 @@ def spiTransfer(reqArr1,rplN1):
     print('transfer complete')
     GPIO.output(21, True)
     spiAvail = True
-    print('avail = ',spiAvail)
+    #print('avail = ',spiAvail)
     return rplArr1 
 
 
