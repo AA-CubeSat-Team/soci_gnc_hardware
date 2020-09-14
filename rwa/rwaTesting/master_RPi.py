@@ -251,7 +251,7 @@ def spiTransfer(reqArr1,rplN1):
     while True:
         if spiAvail == True:
             print('avail = true')
-            return
+            break
         if spiAvail == False:
             print('avail = false')
             continue
