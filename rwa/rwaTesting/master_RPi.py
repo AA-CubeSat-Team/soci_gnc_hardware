@@ -387,10 +387,10 @@ def fixIssue(runIssue):                                     # will need to be ad
             print("cleared last reset status")
 
             gLRS = processAuto(2, 0, 0)
-            if gLRS[2] == 6 or gLRS[2] == 7:
+            if gLRS[2] == 0 or gLRS[2] == 6 or gLRS[2] == 7:
                 nominalState = True
                 print("cleared last reset status")
-            if gLRS[2] != 6 and gLRS[2] != 7:
+            if gLRS[2] != 0 or gLRS[2] != 6 and gLRS[2] != 7:
                 print("failed to clear last reset status")
 
 
