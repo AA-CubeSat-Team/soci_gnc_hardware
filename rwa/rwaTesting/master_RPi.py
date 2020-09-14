@@ -831,9 +831,9 @@ while True:
                         processAuto(6, speedInp, 10)
                         time.sleep(5)
 
+                print("idling motor")
                 processAuto(6, 0, 10)
-
-                time.sleep(2)
+                time.sleep(5)
 
                 runSensors = 0
                 print("test complete")
@@ -851,7 +851,7 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.1
+                samplePeriod = 0.2
                 runSensors = 2
 
                 while True:
@@ -863,6 +863,10 @@ while True:
                         speedInp = input("enter a speed [-65000:65000, 0.1 RPM]:\n")
                         speedInp = int(speedInp)
                         processAuto(6,speedInp,0)
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(5)
 
                 runSensors = 0
                 print("test complete")
@@ -880,7 +884,7 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.1
+                samplePeriod = 0.2
                 runSensors = 2
 
                 for speedInp in range(10000, 70000, 5000):
@@ -902,6 +906,10 @@ while True:
                         print("speedInp: ", speedInp)
                         processAuto(6, speedInp, 0)
                         time.sleep(1)
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(5)
 
                 runSensors = 0
                 print("test complete")
