@@ -783,7 +783,7 @@ while True:
 
         while True: 
             print("\nenter a test mode:")
-            print("1 - autp debug")
+            print("0 - aut0 debug")
             print("1 - manual speed")
             print("2 - step speed")
             print("3 - ramp speed")
