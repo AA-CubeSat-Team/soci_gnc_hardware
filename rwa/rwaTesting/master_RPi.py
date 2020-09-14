@@ -244,17 +244,13 @@ def csvAdd(outputArr1):
 global spiAvail
 spiAvail = True
 
+lock = Lock()
+
 def spiTransfer(reqArr1,rplN1):
     global spiAvail
 
     print('transfer attempt: ',reqArr1[0])
-    while True:
-        if spiAvail == True:
-            #print('avail = ',spiAvail)
-            break
-        if spiAvail == False:
-            #print('avail = ',spiAvail)
-            continue
+    lock.acquire()
 
     spiAvail = False
     #print('avail = ',spiAvail)
@@ -290,6 +286,8 @@ def spiTransfer(reqArr1,rplN1):
     rplArr1 = rplArrH[idxStart:(idxEnd+1)] 
 
     print('transfer complete')
+    lock.release()
+
     GPIO.output(21, True)
     spiAvail = True
     #print('avail = ',spiAvail)
@@ -818,7 +816,7 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.5
+                samplePeriod = 0.1
                 runSensors = 2
 
                 for speedInp in range(10000, 70000, 10000):
