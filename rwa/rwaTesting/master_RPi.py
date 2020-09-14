@@ -247,6 +247,7 @@ spiAvail = True
 def spiTransfer(reqArr1,rplN1):
     global spiAvail
 
+    print('transfer attempt')
     while True:
         if spiAvail == True:
             return
@@ -255,6 +256,7 @@ def spiTransfer(reqArr1,rplN1):
 
     spiAvail = False
     GPIO.output(21, False)
+    print('transfer start')
 
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
@@ -284,6 +286,7 @@ def spiTransfer(reqArr1,rplN1):
 
     rplArr1 = rplArrH[idxStart:(idxEnd+1)] 
 
+    print('transfer complete')
     GPIO.output(21, True)
     spiAvail = True
     return rplArr1 
@@ -373,7 +376,7 @@ autoAvail = True
 def processAuto(comID1,data1,data2):
     global spiAvail
 
-    print(spiAvail, comID1,data1,data2)
+    print(spiAvail,comID1,data1,data2)
 
     if comID1 == 1:
         payloadArr = flatList([comID1])
