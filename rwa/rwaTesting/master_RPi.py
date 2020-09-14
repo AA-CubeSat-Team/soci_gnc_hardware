@@ -241,18 +241,11 @@ def csvAdd(outputArr1):
 
 
 # SPI FUNCTION
-global spiAvail
-spiAvail = True
-
 lock = threading.Lock()
 
 def spiTransfer(reqArr1,rplN1):
-    global spiAvail
-
     lock.acquire()
 
-    spiAvail = False
-    #print('avail = ',spiAvail)
     GPIO.output(21, False)
 
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
@@ -264,7 +257,7 @@ def spiTransfer(reqArr1,rplN1):
     #print('reqArrX: ', [hex(x) for x in reqArrX])
     slvEmpArr = spi.xfer2(reqArrX)
 
-    time.sleep(0.200)                           # waits 200 ms for RWA to process
+    time.sleep(0.200)                                   # try decreasing wait time 
     
     #print('reply') 
     rplArrX = spi.xfer2(msrEmpArr)
@@ -283,11 +276,10 @@ def spiTransfer(reqArr1,rplN1):
 
     rplArr1 = xorSwitch(rplArrCrop, "rplMode") 
 
-    lock.release()
-
     GPIO.output(21, True)
-    spiAvail = True
-    #print('avail = ',spiAvail)
+
+    lock.release()
+    
     return rplArr1 
 
 
@@ -309,9 +301,9 @@ def pullSensors():
         if runSensors == 0:
             continue         
 
-        if runSensors == 2:     # checks RW status and runs INA219 sensor
+        if runSensors == 1:     
             time.sleep(0.01)
-            print("sensor pull")
+            #print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
             
             #tempArr = processAuto(8, 0, 0)
@@ -326,6 +318,7 @@ def pullSensors():
 
             outputArr2 = flatList([rwStatusArr, ina219Arr])
             csvAdd(outputArr2)
+            print('outputArr: ', outputArr2)
 
         time.sleep(samplePeriod)
         
@@ -336,7 +329,7 @@ pullSensorsThr = threading.Thread(target = pullSensors)
 global nominalState
 nominalState = True
 
-def fixIssue(runIssue):                                     # will need to be adjusted to fit CDH error processes
+def fixIssue(runIssue):                            # will need to be adjusted to fit CDH error processes
     global lastResetStatus2
     global nominalState
 
@@ -377,7 +370,7 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -387,7 +380,7 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 1 + 4
+        rplN = 1 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -399,7 +392,7 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -409,24 +402,22 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 10 + 4
+        rplN = 10 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
-        print('rplArr: ', [hex(x) for x in rplArr])
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
         refSpeed = int.from_bytes(bytes(bytearray(rplArr[6:10])), byteorder='little', signed=True)
         rwState = rplArr[10]
         clcModeS = rplArr[11]
 
         outputArr1 = [checkArr[0], checkArr[1], currSpeed, refSpeed, rwState, clcModeS]
-        print('outputArr1: ', outputArr1)
 
     if comID1 == 5:
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -442,7 +433,7 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1, speedArr, rampTimeArr])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -455,7 +446,7 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1, clcModeArr])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -465,7 +456,7 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 4 + 4
+        rplN = 4 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -477,7 +468,7 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 79 + 4
+        rplN = 79 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -515,7 +506,7 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -525,7 +516,7 @@ def processAuto(comID1,data1,data2):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 20 + 4
+        rplN = 20 + 6
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
@@ -547,7 +538,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -556,7 +547,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 1 + 4
+        rplN = 1 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -569,7 +560,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -578,7 +569,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 10 + 4
+        rplN = 10 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -596,7 +587,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -613,7 +604,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1, speedArr, rampTimeArr])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -626,7 +617,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1, clcModeArr])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -635,7 +626,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 4 + 4
+        rplN = 4 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -647,7 +638,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 79 + 4
+        rplN = 79 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -689,7 +680,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 0 + 4
+        rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -698,7 +689,7 @@ def processUser(comID1):
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
         
-        rplN = 20 + 4
+        rplN = 20 + 6
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
@@ -783,7 +774,7 @@ while True:
 
     if opMode == 1:
         print("\nAUTO TEST OP MODE")
-        print("enter '99' to return to op mode select")
+        print("enter 'zz' to return to op mode select")
 
         while True: 
             print("\nenter a test mode:")
@@ -797,7 +788,7 @@ while True:
             testMode = input("\n")
             testMode = int(testMode)
 
-            if testMode == 99:
+            if testMode == 'zz':
                 break
 
             if testMode == 0:
@@ -814,7 +805,7 @@ while True:
                 time0 = time.time()
 
                 samplePeriod = 0.1
-                runSensors = 2
+                runSensors = 1
 
                 for speedInp in range(10000, 70000, 10000):
                     if nominalState == False:
@@ -847,7 +838,11 @@ while True:
                 time0 = time.time()
 
                 samplePeriod = 0.2
-                runSensors = 2
+                runSensors = 1
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
 
                 while True:
                     if nominalState == False:
@@ -857,11 +852,11 @@ while True:
                     if nominalState == True:
                         speedInp = input("enter a speed [-65000:65000, 0.1 RPM]:\n")
                         speedInp = int(speedInp)
-                        processAuto(6,speedInp,0)
+                        processAuto(6,speedInp,10)
 
                 print("idling motor")
                 processAuto(6, 0, 10)
-                time.sleep(5)
+                time.sleep(10)
 
                 runSensors = 0
                 print("test complete")
@@ -880,7 +875,7 @@ while True:
                 time0 = time.time()
 
                 samplePeriod = 0.1
-                runSensors = 2
+                runSensors = 1
 
                 print("idling motor")
                 processAuto(6, 0, 10)
@@ -926,8 +921,12 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.02
-                runSensors = 2
+                samplePeriod = 0.05
+                runSensors = 1
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
 
                 for speedInp in range(10000, 65500, 500):
                     if nominalState == False:
@@ -936,7 +935,7 @@ while True:
 
                     if nominalState == True:
                         print("speedInp: ", speedInp)
-                        processAuto(6, speedInp, 0)
+                        processAuto(6, speedInp, 10)
                         time.sleep(0.1)
 
                 for speedInp in range(65000, 9500, -500):
@@ -946,8 +945,12 @@ while True:
 
                     if nominalState == True:
                         print("speedInp: ", speedInp)
-                        processAuto(6, speedInp, 0)
+                        processAuto(6, speedInp, 10)
                         time.sleep(0.1)
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
 
                 runSensors = 0
                 print("test complete")
@@ -966,9 +969,13 @@ while True:
                 time0 = time.time()
 
                 samplePeriod = 0.1
-                runSensors = 2
+                runSensors = 1
 
                 baseSpeed = 10000
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
 
                 for inpSpeed in [10500, 12500, 15000, 20000, 30000, 40000, 50000, 60000, 65000]:
                     if nominalState == False:
@@ -976,12 +983,16 @@ while True:
                         break
 
                     if nominalState == True:
-                        processAuto(6, baseSpeed, 0)
+                        processAuto(6, baseSpeed, 10)
                         print("baseSpeed: ", baseSpeed)
                         time.sleep(5)
-                        processAuto(6, inpSpeed, 0)
+                        processAuto(6, inpSpeed, 10)
                         print("inpSpeed: ", inpSpeed)
                         time.sleep(5)
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
 
                 runSensors = 0
                 print("test complete")
@@ -1000,11 +1011,15 @@ while True:
                 time0 = time.time()
 
                 samplePeriod = 0.1
-                runSensors = 2
+                runSensors = 1
 
                 baseSpeed = 10000
 
-                for rampTime1 in [0, 10, 10**2, 10**3, 10**4]:
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
+
+                for rampTime1 in [10, 10**2, 10**3, 10**4]:
                     if nominalState == False:
                         print("nominalState: ", nominalState)
                         break
@@ -1019,6 +1034,10 @@ while True:
                         print("neg baseSpeed: ", -1*baseSpeed)
                         print("ramp time: ", rampTime1)
                         time.sleep((rampTime1*10**-3) + 3)
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
 
                 runSensors = 0
                 print("test complete")
@@ -1037,7 +1056,11 @@ while True:
                 time0 = time.time()
 
                 samplePeriod = 0.2
-                runSensors = 2
+                runSensors = 1
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
 
                 for speedInp in [1000, 5000, 10000, 30000, 65000]:
                     if nominalState == False:
@@ -1046,7 +1069,7 @@ while True:
 
                     if nominalState == True:
                         print("speedInp: ", speedInp)
-                        processAuto(6, speedInp, 0)
+                        processAuto(6, speedInp, 10)
                         time.sleep(30)
 
                 for speedInp in [-1000, -5000, -10000, -30000, -65000]:
@@ -1056,8 +1079,12 @@ while True:
 
                     if nominalState == True:
                         print("speedInp: ", speedInp)
-                        processAuto(6, speedInp, 0)
+                        processAuto(6, speedInp, 10)
                         time.sleep(30)
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
 
                 runSensors = 0
                 print("test complete")
@@ -1067,13 +1094,13 @@ while True:
 
     if opMode == 2:
         print("\nUSER INPUT OP MODE")
-        print("enter '99' to return to mode select")
+        print("enter 'zz' to return to mode select")
 
         while True: 
             comID = input("\nenter a command ID:\n")
             comID = int(comID)
 
-            if comID == 99:
+            if comID == 'zz':
                 break
 
             processUser(comID)
@@ -1102,26 +1129,24 @@ while True:
 
             #rplN2 = int(input("enter expected reply length (bytes): \n"))
 
-            spiAvail = False
             GPIO.output(21, False)
             
             reqArrX = flatList([0x7e, txByteArray1, 0x7e])               
          
             rxByteArray1 = spi.xfer2(reqArrX)
 
-            #time.sleep(0.200)                           # waits 100 ms for RWA to process
+            #time.sleep(0.200)                           
             
             #txByteArray2 = [0x7e] * (2*rplN2 + 3)    
             #rxByteArray2 = spi.xfer2(txByteArray2)
             
             print('txByteArray1: ', [hex(x) for x in txByteArray1])
             print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
-            print('txByteArray2: ', [hex(x) for x in txByteArray2])
-            print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
+            #print('txByteArray2: ', [hex(x) for x in txByteArray2])
+            #print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
             print(" ")
 
             GPIO.output(21, True)
-            spiAvail = True
 
 
 
