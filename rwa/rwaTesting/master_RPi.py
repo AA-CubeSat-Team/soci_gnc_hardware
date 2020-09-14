@@ -395,7 +395,6 @@ def processAuto(comID1,data1,data2):
         
         rplN = 1 + 4
         rplArr = spiTransfer(reqArr,rplN)
-        print('rplArr: ',rplArr)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
         lastResetStatus = rplArr[2]  
