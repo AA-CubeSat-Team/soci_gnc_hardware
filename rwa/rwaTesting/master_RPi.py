@@ -246,6 +246,13 @@ spiAvail = True
 
 def spiTransfer(reqArr1,rplN1):
     global spiAvail
+
+    while True:
+        if spiAvail == True:
+            return
+        if spiAvail == False:
+            continue
+
     spiAvail = False
     GPIO.output(21, False)
 
@@ -280,16 +287,6 @@ def spiTransfer(reqArr1,rplN1):
     GPIO.output(21, True)
     spiAvail = True
     return rplArr1 
-
-def spiWait():
-    global spiAvail
-
-    while True:
-        if spiAvail == True:
-            return
-        if spiAvail == False:
-            continue
-    return
 
 
 # BACKGROUND SENSOR THREAD
@@ -375,8 +372,7 @@ autoAvail = True
 
 def processAuto(comID1,data1,data2):
     global spiAvail
-    
-    spiWait()
+
     print(spiAvail, comID1,data1,data2)
 
     if comID1 == 1:
