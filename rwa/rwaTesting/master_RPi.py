@@ -772,21 +772,21 @@ def processUser(comID1):
 # FIELD VALUE NAMING FUNCTION
 def textGen(type1, value1):
     if type1 == 'lastResetStatus':
-        if value1 = 0:
+        if value1 == 0:
             txt1 = 'pin reset'
-        if value1 = 1:
+        if value1 == 1:
             txt1 = 'POR/PDR/BOR reset'
-        if value1 = 2:
+        if value1 == 2:
             txt1 = 'software reset'
-        if value1 = 3:
+        if value1 == 3:
             txt1 = 'independent watchdog reset'
-        if value1 = 4:
+        if value1 == 4:
             txt1 = 'window watchdog reset'
-        if value1 = 5:
+        if value1 == 5:
             txt1 = 'low power reset'
-        if value1 = 6:
+        if value1 == 6:
             txt1 = 'cleared'
-        if value1 = 7:
+        if value1 == 7:
             txt1 = 'cleared'
         else:
             txt1 = 'ISSUE'
