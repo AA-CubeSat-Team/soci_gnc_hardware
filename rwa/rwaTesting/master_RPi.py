@@ -272,10 +272,8 @@ def spiTransfer(reqArr1,rplN1):
     rplArrX = spi.xfer2(msrEmpArr)
     print('rplArrX: ', [hex(x) for x in rplArrX])
 
-    rplArrH = xorSwitch(rplArrX, "rplMode") 
-
     bytOld = 0x7e
-    for idx, byt in enumerate(rplArrH):
+    for idx, byt in enumerate(rplArrX):
         bytNew = byt
         if (bytOld == 0x7e) & (bytNew != 0x7e):
             idxStart = idx
@@ -283,7 +281,9 @@ def spiTransfer(reqArr1,rplN1):
             idxEnd = idx - 1
         bytOld = bytNew
 
-    rplArr1 = rplArrH[idxStart:(idxEnd+1)] 
+    rplArrCrop = rplArrX[idxStart:(idxEnd+1)] 
+
+    rplArr1 = xorSwitch(rplArrCrop, "rplMode") 
 
     print('transfer complete')
     lock.release()
