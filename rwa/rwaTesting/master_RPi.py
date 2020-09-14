@@ -419,6 +419,7 @@ def processAuto(comID1,data1,data2):
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
+        print(rplArr)
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
         refSpeed = int.from_bytes(bytes(bytearray(rplArr[6:10])), byteorder='little', signed=True)
         rwState = rplArr[10]
