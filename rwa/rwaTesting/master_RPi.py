@@ -367,7 +367,13 @@ def fixIssue(runIssue):                                     # will need to be ad
 
 
 # SPI AUTO MECHANISM
+global autoAvail
+autoAvail = True
+
 def processAuto(comID1,data1,data2):
+    global autoAvail
+    autoAvail = False
+
     spiWait()
     print(comID1,data1,data2)
 
@@ -533,7 +539,18 @@ def processAuto(comID1,data1,data2):
 
         outputArr1 = [checkArr[0], checkArr[1], versionMajor, versionBuildNumber, uid1, uid2, uid3]
 
+    autoAvail = True
     return outputArr1
+
+def autoWait():
+    global autoAvail
+
+    while True:
+        if autoAvail == True:
+            return
+        if autoAvail == False:
+            continue
+    return
 
 
 # SPI USER MECHANISM
@@ -783,7 +800,7 @@ while True:
 
         while True: 
             print("\nenter a test mode:")
-            print("0 - aut0 debug")
+            print("0 - auto debug")
             print("1 - manual speed")
             print("2 - step speed")
             print("3 - ramp speed")
@@ -819,9 +836,11 @@ while True:
 
                     if nominalState == True:
                         print("speedInp: ", speedInp)
+                        autoWait()
                         processAuto(6, speedInp, 0)
                         time.sleep(5)
 
+                autoWait()
                 processAuto(0, speedInp, 0)
 
                 time.sleep(2)
