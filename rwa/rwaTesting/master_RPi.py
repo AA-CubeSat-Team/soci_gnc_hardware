@@ -783,6 +783,7 @@ while True:
 
         while True: 
             print("\nenter a test mode:")
+            print("1 - autp debug")
             print("1 - manual speed")
             print("2 - step speed")
             print("3 - ramp speed")
@@ -794,6 +795,39 @@ while True:
 
             if testMode == 99:
                 break
+
+            if testMode == 0:
+                print("\nDEBUG AUTO TEST MODE\n")
+                nominalState = True
+
+                folderName = "debugAutoDir"
+                fileName = "debugAutoTest"
+                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
+                csvStart(folderName, fileName, header)
+                folderName2 = folderName
+                fileName2 = fileName
+
+                time0 = time.time()
+
+                samplePeriod = 2.5
+                runSensors = 2
+
+                for speedInp in range(10000, 70000, 10000):
+                    if nominalState == False:
+                        print("nominalState: ", nominalState)
+                        break
+
+                    if nominalState == True:
+                        print("speedInp: ", speedInp)
+                        processAuto(6, speedInp, 0)
+                        time.sleep(5)
+
+                processAuto(0, speedInp, 0)
+
+                time.sleep(2)
+
+                runSensors = 0
+                print("test complete")
 
             if testMode == 1:
                 print("\nMANUAL SPEED TEST MODE\n") 
