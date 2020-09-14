@@ -837,7 +837,7 @@ while True:
                 time0 = time.time()
 
                 samplePeriod = 0.1
-                runSensors = 0
+                runSensors = 2
 
                 for speedInp in range(10000, 70000, 5000):
                     if nominalState == False:
