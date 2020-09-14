@@ -374,8 +374,10 @@ global autoAvail
 autoAvail = True
 
 def processAuto(comID1,data1,data2):
+    global spiAvail
+    
     spiWait()
-    print(comID1,data1,data2)
+    print(spiAvail, comID1,data1,data2)
 
     if comID1 == 1:
         payloadArr = flatList([comID1])
