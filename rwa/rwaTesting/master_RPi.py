@@ -253,18 +253,12 @@ def spiTransfer(reqArr1,rplN1):
 
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
     reqArrX = xorSwitch(reqArrH, "reqMode")               
-    
-    #print('request')
-    #print('reqArrX: ', [hex(x) for x in reqArrX])
-    slvEmpArr = spi.xfer2(reqArrX)
-    #print('slvEmpArr: ', [hex(x) for x in slvEmpArr])
 
-    time.sleep(0.200)                           # waits 100 ms for RWA to process
-    
-    #print('reply')
-    #print('msrEmpArr: ', [hex(x) for x in msrEmpArr])   
+    slvEmpArr = spi.xfer2(reqArrX)
+
+    time.sleep(0.200)                           
+
     rplArrX = spi.xfer2(msrEmpArr)
-    #print('rplArrX: ', [hex(x) for x in rplArrX])
 
     rplArrH = xorSwitch(rplArrX, "rplMode") 
 
@@ -328,10 +322,11 @@ def pullSensors():
         if runSensors == 2:     # checks RW status, last reset status, and runs INA219 sensor
             print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
-            lastResetStatusArr = processAuto(2, 0, 0)
+            print(rwStatusArr)
+            #lastResetStatusArr = processAuto(2, 0, 0)
             
-            rwState2 = rwStatusArr[4]
-            lastResetStatus2 = lastResetStatusArr[2]
+            #rwState2 = rwStatusArr[4]
+            #lastResetStatus2 = lastResetStatusArr[2]
 
             #if rwState2 == 0:
              #   nominalState = False
