@@ -304,38 +304,14 @@ def pullSensors():
 
     while True:
         if runSensors == 0:
-            continue
+            continue         
 
-        if runSensors == 1:     # checks RW status (currSpeed, refSpeed, state, clcMode) and last reset status
-            rwStatusArr = processAuto(4, 0, 0)
-            lastResetStatusArr = processAuto(2, 0, 0)
-            rwState2 = rwStatusArr[4]
-            lastResetStatus2 = lastResetStatusArr[2]
-
-            if rwState2 == 0:
-                nominalState = False
-                fixIssue(1)
-            if lastResetStatus2 != 6 and lastResetStatus2 != 7:
-                nominalState = False
-                fixIssue(2)          
-
-        if runSensors == 2:     # checks RW status, last reset status, and runs INA219 sensor
+        if runSensors == 2:     # checks RW status and runs INA219 sensor
             print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
             print(rwStatusArr)
-            #lastResetStatusArr = processAuto(2, 0, 0)
             
-            rwState2 = rwStatusArr[4]
-            #lastResetStatus2 = lastResetStatusArr[2]
-
-            if rwState2 == 0:
-                nominalState = False
-                fixIssue(1)
-            #if lastResetStatus2 != 6 and lastResetStatus2 != 7:
-                #nominalState = False
-                #fixIssue(2)
-            
-            # tempArr = processAuto(8, 0, 0)
+            #tempArr = processAuto(8, 0, 0)
 
             voltage = ina219.bus_voltage
             voltage = round(voltage, 3)
@@ -392,6 +368,7 @@ def fixIssue(runIssue):                                     # will need to be ad
 # SPI AUTO MECHANISM
 def processAuto(comID1,data1,data2):
     spiWait()
+    print(comID1,data1,data2)
 
     if comID1 == 1:
         payloadArr = flatList([comID1])
@@ -452,7 +429,6 @@ def processAuto(comID1,data1,data2):
 
     if comID1 == 6:
         speed = data1
-        print(speed)
         speedArr = list(bytearray((speed).to_bytes(4, byteorder='little', signed=True)))
 
         rampTime = data2
