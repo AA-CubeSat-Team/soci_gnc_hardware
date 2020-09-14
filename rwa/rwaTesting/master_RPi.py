@@ -579,6 +579,8 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
         lastResetStatus = rplArr[2]
+        if lastResetStatus == 0b00000000:
+            lastResetStatusTxt = 'cleared'
         if lastResetStatus == 0b00000001:
             lastResetStatusTxt = 'pin reset'
         if lastResetStatus == 0b00000010:
@@ -771,6 +773,8 @@ def processUser(comID1):
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 lastResetStatus0Arr = processAuto(2, 0, 0)
 lastResetStatus0 = lastResetStatus0Arr[2]
+if lastResetStatus0 == 0b00000000:
+    lastResetStatus0Txt = 'cleared'
 if lastResetStatus0 == 0b00000001:
     lastResetStatus0Txt = 'pin reset'
 if lastResetStatus0 == 0b00000010:
@@ -789,11 +793,13 @@ if lastResetStatus0 == 0b10000000:
     lastResetStatus0Txt = 'cleared'
 else:
     lastResetStatus0Txt = 'ISSUE'
-print("\nlast reset status: ", lastResetStatus0, '\t-\t', lastResetStatus0Txt) 
+print("\nlast reset status: ", lastResetStatus0, '\t- ', lastResetStatus0Txt) 
 processAuto(3, 0, 0)
 print("cleared last reset status")
 lastResetStatus0Arr = processAuto(2, 0, 0)
 lastResetStatus0 = lastResetStatus0Arr[2]
+if lastResetStatus0 == 0b00000000:
+    lastResetStatus0Txt = 'cleared'
 if lastResetStatus0 == 0b00000001:
     lastResetStatus0Txt = 'pin reset'
 if lastResetStatus0 == 0b00000010:
@@ -812,7 +818,7 @@ if lastResetStatus0 == 0b10000000:
     lastResetStatus0Txt = 'cleared'
 else:
     lastResetStatus0Txt = 'ISSUE'
-print("\nlast reset status: ", lastResetStatus0, '\t-\t', lastResetStatus0Txt) 
+print("\nlast reset status: ", lastResetStatus0, '\t- ', lastResetStatus0Txt) 
 
 rwID = input("\nenter which reaction wheel is in use (0071, 0072, 0109, 0110):\n\n")
 
