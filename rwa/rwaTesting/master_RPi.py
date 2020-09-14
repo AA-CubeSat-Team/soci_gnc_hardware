@@ -841,11 +841,11 @@ while True:
                     if nominalState == True:
                         print("speedInp: ", speedInp)
                         autoWait()
-                        processAuto(6, speedInp, 0)
+                        processAuto(6, speedInp, 10)
                         time.sleep(5)
 
                 autoWait()
-                processAuto(0, speedInp, 0)
+                processAuto(0, speedInp, 10)
 
                 time.sleep(2)
 
