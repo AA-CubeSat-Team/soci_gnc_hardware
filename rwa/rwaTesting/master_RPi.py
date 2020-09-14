@@ -318,7 +318,6 @@ def pullSensors():
             time.sleep(0.01)
             print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
-            print(rwStatusArr)
             
             #tempArr = processAuto(8, 0, 0)
 
@@ -419,13 +418,14 @@ def processAuto(comID1,data1,data2):
         rplArr = spiTransfer(reqArr,rplN)
         checkArr = autoResults(reqArr, rplArr, rplN)
 
-        print(rplArr)
+        print('rplArr: ', [hex(x) for x in rplArr])
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
         refSpeed = int.from_bytes(bytes(bytearray(rplArr[6:10])), byteorder='little', signed=True)
         rwState = rplArr[10]
         clcModeS = rplArr[11]
 
         outputArr1 = [checkArr[0], checkArr[1], currSpeed, refSpeed, rwState, clcModeS]
+        print('outputArr1: ', outputArr1)
 
     if comID1 == 5:
         payloadArr = flatList([comID1])
