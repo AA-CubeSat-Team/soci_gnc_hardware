@@ -578,7 +578,7 @@ def processUser(comID1):
         rplArr = spiTransfer(reqArr,rplN)
         userResults(reqArr, rplArr, rplN)
 
-        lastResetStatus = int(rplArr[2])
+        lastResetStatus = rplArr[2]
         print("\nlast reset status: ", lastResetStatus, '\t- ', textGen('lastResetStatus',lastResetStatus0))
    
 
@@ -605,27 +605,9 @@ def processUser(comID1):
         refSpeed = int.from_bytes(bytes(bytearray(rplArr[6:10])), byteorder='little', signed=True)
         print("ref speed (0.1 RPM): ", refSpeed)
         state = rplArr[10]
-        if state == 0:
-            stateTxt = 'error'
-        if state == 1:
-            stateTxt = 'idle'
-        if state == 2:
-            stateTxt = 'coasting'
-        if state == 3:
-            stateTxt = 'running, speed stable'
-        if state == 4:
-            stateTxt = 'running, speed changing'
-        else:
-            stateTxt = 'ISSUE'
-        print("state: ", state, '\t- ', stateTxt)
+        print("state: ", state, '\t- ', textGen('state',state))
         clcModeS = rplArr[11]
-        if clcModeS == 0:
-            clcModeSTxt = 'low current mode (0.3 A)'
-        if clcModeS == 1:
-            clcModeSTxt = 'high current mode (0.6 A)'
-        else:
-            clcModeSTxt = 'ISSUE'
-        print("clc mode: ", clcModeS, '\t- ', clcModeSTxt)
+        print("clc mode: ", clcModeS, '\t- ', textGen('clcMode',clcModeS))
 
     if comID1 == 5:
         print('initialize reaction wheel controller')
@@ -769,6 +751,24 @@ def textGen(type1, value1):
             txt1 = 'cleared'
         if value1 == 7:
             txt1 = 'cleared'
+
+    if type1 == 'state':
+        if value1 == 0:
+            txt1 = 'error'
+        if value1 == 1:
+            txt1 = 'idle'
+        if value1 == 2:
+            txt1 = 'coasting'
+        if value1 == 3:
+            txt1 = 'running, speed stable'
+        if value1 == 4:
+            txt1 = 'running, speed changing'
+
+    if type1 == 'clcMode':
+        if value1 == 0:
+            txt1 = 'low current mode (0.3 A)'
+        if value1 == 1:
+            txt1 = 'high current mode (0.6 A)'
 
     return txt1
           
