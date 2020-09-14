@@ -315,6 +315,7 @@ def pullSensors():
             continue         
 
         if runSensors == 2:     # checks RW status and runs INA219 sensor
+            time.sleep(0.01)
             print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
             print(rwStatusArr)
