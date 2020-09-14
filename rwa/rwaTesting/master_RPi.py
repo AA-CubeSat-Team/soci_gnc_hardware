@@ -753,7 +753,7 @@ def processUser(comID1):
 # FIELD VALUE NAMING FUNCTION
 def textGen(type1, value1):
     if type1 == 'lastResetStatus':
-        if value1 == 0:
+        if value1 == '0':
             txt1 = 'pin reset'
         if value1 == 1:
             txt1 = 'POR/PDR/BOR reset'
@@ -773,8 +773,7 @@ def textGen(type1, value1):
             txt1 = 'ISSUE'
 
     return txt1
-        
-    
+          
 
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 lastResetStatus0Arr = processAuto(2, 0, 0)
@@ -784,7 +783,7 @@ processAuto(3, 0, 0)
 print("cleared last reset status")
 lastResetStatus0Arr = processAuto(2, 0, 0)
 lastResetStatus0 = int(lastResetStatus0Arr[2])
-print("\nlast reset status: ", lastResetStatus0, '\t- ', textGen('lastResetStatus',lastResetStatus0)) 
+print("last reset status: ", lastResetStatus0, '\t- ', textGen('lastResetStatus',lastResetStatus0)) 
 
 rwID = input("\nenter which reaction wheel is in use (0071, 0072, 0109, 0110):\n\n")
 
