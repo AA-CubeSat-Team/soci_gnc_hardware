@@ -584,24 +584,24 @@ def processUser(comID1):
         userResults(reqArr, rplArr, rplN)
 
         lastResetStatus = rplArr[2]
-        if lastResetStatus == 0:
-            lastResetStatusTxt = 'pin reset'
-        if lastResetStatus == 1:
-            lastResetStatusTxt = 'POR/PDR/BOR reset'
-        if lastResetStatus == 2:
-            lastResetStatusTxt = 'software reset'
-        if lastResetStatus == 3:
-            lastResetStatusTxt = 'independent watchdog reset'
-        if lastResetStatus == 4:
-            lastResetStatusTxt = 'window watchdog reset'
-        if lastResetStatus == 5:
-            lastResetStatusTxt = 'low power reset'
-        if lastResetStatus == 6:
-            lastResetStatusTxt = 'cleared'
-        if lastResetStatus == 7:
-            lastResetStatusTxt = 'cleared'
+        if lastResetStatus0 == 0b00000001:
+            lastResetStatus0Txt = 'pin reset'
+        if lastResetStatus0 == 0b00000010:
+            lastResetStatus0Txt = 'POR/PDR/BOR reset'
+        if lastResetStatus0 == 0b00000100:
+            lastResetStatus0Txt = 'software reset'
+        if lastResetStatus0 == 0b00001000:
+            lastResetStatus0Txt = 'independent watchdog reset'
+        if lastResetStatus0 == 0b00010000:
+            lastResetStatus0Txt = 'window watchdog reset'
+        if lastResetStatus0 == 0b00100000:
+            lastResetStatus0Txt = 'low power reset'
+        if lastResetStatus0 == 0b01000000:
+            lastResetStatus0Txt = 'cleared'
+        if lastResetStatus0 == 0b10000000:
+            lastResetStatus0Txt = 'cleared'
         else:
-            lastResetStatusTxt = 'ISSUE'
+            lastResetStatus0Txt = 'ISSUE'
         print("\nlast reset status: ", lastResetStatus, '\t- ', lastResetStatusTxt)     
 
     if comID1 == 3:
@@ -775,21 +775,21 @@ def processUser(comID1):
 
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 lastResetStatus0 = processAuto(2, 0, 0)
-if lastResetStatus0 == 0:
+if lastResetStatus0 == 0b00000001:
     lastResetStatus0Txt = 'pin reset'
-if lastResetStatus0 == 1:
+if lastResetStatus0 == 0b00000010:
     lastResetStatus0Txt = 'POR/PDR/BOR reset'
-if lastResetStatus0 == 2:
+if lastResetStatus0 == 0b00000100:
     lastResetStatus0Txt = 'software reset'
-if lastResetStatus0 == 3:
+if lastResetStatus0 == 0b00001000:
     lastResetStatus0Txt = 'independent watchdog reset'
-if lastResetStatus0 == 4:
+if lastResetStatus0 == 0b00010000:
     lastResetStatus0Txt = 'window watchdog reset'
-if lastResetStatus0 == 5:
+if lastResetStatus0 == 0b00100000:
     lastResetStatus0Txt = 'low power reset'
-if lastResetStatus0 == 6:
+if lastResetStatus0 == 0b01000000:
     lastResetStatus0Txt = 'cleared'
-if lastResetStatus0 == 7:
+if lastResetStatus0 == 0b10000000:
     lastResetStatus0Txt = 'cleared'
 else:
     lastResetStatus0Txt = 'ISSUE'
@@ -798,21 +798,21 @@ print("last reset status: ",lastResetStatus0[2])
 processAuto(3, 0, 0)
 print("cleared last reset status")
 lastResetStatus0 = processAuto(2, 0, 0)
-if lastResetStatus0 == 0:
+if lastResetStatus0 == 0b00000001:
     lastResetStatus0Txt = 'pin reset'
-if lastResetStatus0 == 1:
+if lastResetStatus0 == 0b00000010:
     lastResetStatus0Txt = 'POR/PDR/BOR reset'
-if lastResetStatus0 == 2:
+if lastResetStatus0 == 0b00000100:
     lastResetStatus0Txt = 'software reset'
-if lastResetStatus0 == 3:
+if lastResetStatus0 == 0b00001000:
     lastResetStatus0Txt = 'independent watchdog reset'
-if lastResetStatus0 == 4:
+if lastResetStatus0 == 0b00010000:
     lastResetStatus0Txt = 'window watchdog reset'
-if lastResetStatus0 == 5:
+if lastResetStatus0 == 0b00100000:
     lastResetStatus0Txt = 'low power reset'
-if lastResetStatus0 == 6:
+if lastResetStatus0 == 0b01000000:
     lastResetStatus0Txt = 'cleared'
-if lastResetStatus0 == 7:
+if lastResetStatus0 == 0b10000000:
     lastResetStatus0Txt = 'cleared'
 else:
     lastResetStatus0Txt = 'ISSUE'
