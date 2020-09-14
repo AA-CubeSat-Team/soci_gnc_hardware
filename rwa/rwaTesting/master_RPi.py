@@ -244,7 +244,7 @@ def csvAdd(outputArr1):
 global spiAvail
 spiAvail = True
 
-lock = Lock()
+lock = threading.Lock()
 
 def spiTransfer(reqArr1,rplN1):
     global spiAvail
