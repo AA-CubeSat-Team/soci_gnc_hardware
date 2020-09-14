@@ -232,7 +232,7 @@ def csvAdd(outputArr1):
     timeELA1 = time.time() - time0
     timeELA1 = round(timeELA1, 3)
 
-    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1, fileNameG, "RW" + rwID, timeStart1.strftime("%Y%m%d%H%M%S")])         
+    row1 = flatList([qq, timeGMT1, timeELA1, outputArr1, fileNameG, "RW0-" + rwID, timeStart1.strftime("%Y%m%d%H%M%S")])         
 
     file = open(absFilePath, 'a', newline ='')      # open(..'a'..) appends existing CSV file
     with file:   
@@ -249,13 +249,11 @@ lock = threading.Lock()
 def spiTransfer(reqArr1,rplN1):
     global spiAvail
 
-    print('transfer attempt: ',reqArr1[0])
     lock.acquire()
 
     spiAvail = False
     #print('avail = ',spiAvail)
     GPIO.output(21, False)
-    print('transfer start')
 
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
@@ -263,14 +261,14 @@ def spiTransfer(reqArr1,rplN1):
     reqArrX = xorSwitch(reqArrH, "reqMode")               
 
     #print('request')
-    print('reqArrX: ', [hex(x) for x in reqArrX])
+    #print('reqArrX: ', [hex(x) for x in reqArrX])
     slvEmpArr = spi.xfer2(reqArrX)
 
     time.sleep(0.200)                           # waits 200 ms for RWA to process
     
     #print('reply') 
     rplArrX = spi.xfer2(msrEmpArr)
-    print('rplArrX: ', [hex(x) for x in rplArrX])
+    #print('rplArrX: ', [hex(x) for x in rplArrX])
 
     bytOld = 0x7e
     for idx, byt in enumerate(rplArrX):
@@ -285,7 +283,6 @@ def spiTransfer(reqArr1,rplN1):
 
     rplArr1 = xorSwitch(rplArrCrop, "rplMode") 
 
-    print('transfer complete')
     lock.release()
 
     GPIO.output(21, True)
@@ -882,8 +879,12 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.2
+                samplePeriod = 0.1
                 runSensors = 2
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(10)
 
                 for speedInp in range(10000, 70000, 5000):
                     if nominalState == False:
@@ -893,7 +894,7 @@ while True:
                     if nominalState == True:
                         print("speedInp: ", speedInp)
                         processAuto(6, speedInp, 10)
-                        time.sleep(1)
+                        time.sleep(2.5)
 
                 for speedInp in range(65000, 5000, -5000):
                     if nominalState == False:
@@ -903,11 +904,11 @@ while True:
                     if nominalState == True:
                         print("speedInp: ", speedInp)
                         processAuto(6, speedInp, 10)
-                        time.sleep(1)
+                        time.sleep(2.5)
 
                 print("idling motor")
                 processAuto(6, 0, 10)
-                time.sleep(5)
+                time.sleep(10)
 
                 runSensors = 0
                 print("test complete")
