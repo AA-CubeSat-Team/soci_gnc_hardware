@@ -452,6 +452,7 @@ def processAuto(comID1,data1,data2):
 
     if comID1 == 6:
         speed = data1
+        print(speed)
         speedArr = list(bytearray((speed).to_bytes(4, byteorder='little', signed=True)))
 
         rampTime = data2
