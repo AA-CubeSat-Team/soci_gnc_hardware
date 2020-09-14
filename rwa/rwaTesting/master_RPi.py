@@ -247,7 +247,7 @@ spiAvail = True
 def spiTransfer(reqArr1,rplN1):
     global spiAvail
 
-    print('transfer attempt')
+    print('transfer attempt: ',reqArr1[0])
     while True:
         if spiAvail == True:
             #print('avail = ',spiAvail)
@@ -266,13 +266,13 @@ def spiTransfer(reqArr1,rplN1):
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
     reqArrX = xorSwitch(reqArrH, "reqMode")               
 
-    print('request')
+    #print('request')
     print('reqArrX: ', [hex(x) for x in reqArrX])
     slvEmpArr = spi.xfer2(reqArrX)
 
     time.sleep(0.200)                           # waits 200 ms for RWA to process
     
-    print('reply') 
+    #print('reply') 
     rplArrX = spi.xfer2(msrEmpArr)
     print('rplArrX: ', [hex(x) for x in rplArrX])
 
@@ -379,10 +379,6 @@ global autoAvail
 autoAvail = True
 
 def processAuto(comID1,data1,data2):
-    global spiAvail
-
-    print(spiAvail,comID1,data1,data2)
-
     if comID1 == 1:
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
