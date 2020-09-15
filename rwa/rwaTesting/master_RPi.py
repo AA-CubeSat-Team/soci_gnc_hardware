@@ -271,6 +271,7 @@ def spiTransfer(reqArr1,rplN1):
         spiErrorFlag = 'spiError'
 
         GPIO.output(25, False)                          # reboots RW0
+        time.sleep(2)
         GPIO.output(25, True)
 
         lock.release()
