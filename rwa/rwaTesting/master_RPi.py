@@ -316,8 +316,6 @@ def pullSensors():
             time.sleep(0.01)
             #print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
-            if rplArr == 'spiError':
-                return
             
             #tempArr = processAuto(8, 0, 0)
 
@@ -386,7 +384,8 @@ def processAuto(comID1,data1,data2):
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -398,7 +397,8 @@ def processAuto(comID1,data1,data2):
         rplN = 1 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]  
@@ -412,7 +412,8 @@ def processAuto(comID1,data1,data2):
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -424,7 +425,8 @@ def processAuto(comID1,data1,data2):
         rplN = 10 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
@@ -441,7 +443,8 @@ def processAuto(comID1,data1,data2):
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -459,7 +462,8 @@ def processAuto(comID1,data1,data2):
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -474,7 +478,8 @@ def processAuto(comID1,data1,data2):
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -486,7 +491,8 @@ def processAuto(comID1,data1,data2):
         rplN = 4 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         mcuTemp = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
@@ -500,7 +506,8 @@ def processAuto(comID1,data1,data2):
         rplN = 79 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]
@@ -540,7 +547,8 @@ def processAuto(comID1,data1,data2):
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -552,7 +560,8 @@ def processAuto(comID1,data1,data2):
         rplN = 20 + 6
         rplArr = spiTransfer(reqArr,rplN)
         if rplArr == 'spiError':
-            return
+            outputArr1 = 'spiError'
+            return outputArr1
         checkArr = autoResults(reqArr, rplArr)
 
         versionMajor = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=False)
