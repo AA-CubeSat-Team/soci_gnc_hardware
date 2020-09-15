@@ -273,8 +273,8 @@ def spiTransfer(reqArr1,rplN1):
         print('SPI error')
         print('reqArr1: ',[hex(x) for x in reqArr1])
         print('reqArrX: ',[hex(x) for x in reqArrX])
-        print('slvEmpArr: ',[hex(x) for x in slvEmpArr])
-        print('msrEmpArr: ',[hex(x) for x in msrEmpArr])
+        #print('slvEmpArr: ',[hex(x) for x in slvEmpArr])
+        #print('msrEmpArr: ',[hex(x) for x in msrEmpArr])
         print('rplArrX: ',[hex(x) for x in rplArrX])
         lock.release()
         return spiErrorFlag
