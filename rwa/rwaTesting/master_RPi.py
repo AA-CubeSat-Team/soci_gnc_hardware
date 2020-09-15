@@ -1252,7 +1252,8 @@ while True:
 
             
             
-            txByteArray1 = flatList([0x7e, txByteArray1, 0x7e])               
+            txByteArray1 = flatList([0x7e, txByteArray1, 0x7e]) 
+            print('txByteArray1: ', [hex(x) for x in txByteArray1])              
          
             GPIO.output(21, False)
             rxByteArray1 = spi.xfer2(txByteArray1)
@@ -1263,7 +1264,6 @@ while True:
             #txByteArray2 = [0x7e] * (2*rplN2 + 3)    
             #rxByteArray2 = spi.xfer2(txByteArray2)
             
-            print('txByteArray1: ', [hex(x) for x in txByteArray1])
             print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
             #print('txByteArray2: ', [hex(x) for x in txByteArray2])
             #print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
