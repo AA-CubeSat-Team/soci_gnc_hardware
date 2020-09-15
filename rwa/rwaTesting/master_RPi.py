@@ -399,10 +399,11 @@ def processAuto(comID1,data1,data2):
         reqArr = crcAppend(payloadArr)
         
         rplN = 1 + 6
-        rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError':
-            outputArr1 = 'spiError'
-            return outputArr1
+        
+        rplArr = 'spiError'
+        while rplArr == 'spiError':
+            rplArr = spiTransfer(reqArr,rplN)
+        
         checkArr = autoResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]  
@@ -427,10 +428,11 @@ def processAuto(comID1,data1,data2):
         reqArr = crcAppend(payloadArr)
         
         rplN = 10 + 6
-        rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError':
-            outputArr1 = 'spiError'
-            return outputArr1
+        
+        rplArr = 'spiError'
+        while rplArr == 'spiError':
+            rplArr = spiTransfer(reqArr,rplN)
+        
         checkArr = autoResults(reqArr, rplArr)
 
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
