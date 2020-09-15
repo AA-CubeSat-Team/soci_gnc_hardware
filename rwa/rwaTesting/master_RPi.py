@@ -17,24 +17,24 @@ import RPi.GPIO as GPIO
 
 # SPI INITIALIZATION
 bus = 0
-device = 0      # slave select pin
+device = 0                  # slave select pin (not used)
 
 spi = spidev.SpiDev()       # enables spi, creates "spi" object
 
 spi.open(bus, device)       # opens connection on specified bus, device
 
 spi.max_speed_hz = 244000   # sets master freq at 244 kHz, must be (150:300) kHz for RWA
-spi.mode = 0b00             # sets SPI mode to 0 (look up online)
+spi.mode = 0b00             # sets clock polarity to 0, sets clock phase to 0
 
 
 # ENABLE GPIO INITIALIZATION
 GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(25, GPIO.OUT)
-GPIO.output(25, True)       # sets ENABLE to high - 3.3V
+GPIO.output(25, True)       # sets ENABLE to high - +3.3V
 
 GPIO.setup(21, GPIO.OUT)
-GPIO.output(21, True)
+GPIO.output(21, True)       # sets NSS to high - +3.3V
 
 
 # INA219 INITIALIZATION
@@ -263,7 +263,7 @@ def spiTransfer(reqArr1,rplN1):
     
     #print('reply') 
     rplArrX = spi.xfer2(msrEmpArr)
-    #print('rplArrX: ', [hex(x) for x in rplArrX])
+    print('rplArrX: ', [hex(x) for x in rplArrX])
 
     bytOld = 0x7e
     for idx, byt in enumerate(rplArrX):
