@@ -248,8 +248,7 @@ lock = threading.Lock()
 
 def spiTransfer(reqArr1,rplN1):
     lock.acquire()
-
-    GPIO.output(21, False)
+    
 
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
@@ -258,26 +257,21 @@ def spiTransfer(reqArr1,rplN1):
 
     #print('request')
     #print('reqArrX: ', [hex(x) for x in reqArrX])
+    GPIO.output(21, False)
     slvEmpArr = spi.xfer2(reqArrX)
-    
     GPIO.output(21, True)
     
     time.sleep(0.200)                                   # try decreasing wait time 
     
-    GPIO.output(21, False)
-    
     #print('reply') 
+    GPIO.output(21, False)
     rplArrX = spi.xfer2(msrEmpArr)
-    print('rplArrX: ', [hex(x) for x in rplArrX])
+    GPIO.output(21, True)
+    #print('rplArrX: ', [hex(x) for x in rplArrX])
 
     if rplArrX[0] != 0x7e:
         print('SPI error')
         spiErrorFlag = 'spiError'
-
-        #GPIO.output(25, False)                          # reboots RW0
-        time.sleep(1)
-        #GPIO.output(25, True)
-
         lock.release()
         return spiErrorFlag
 
@@ -297,9 +291,8 @@ def spiTransfer(reqArr1,rplN1):
     rplArr1 = xorSwitch(rplArrCrop, "rplMode") 
 
     GPIO.output(21, True)
-
     lock.release()
-    
+
     return rplArr1 
 
 
@@ -1212,11 +1205,13 @@ while True:
 
             #rplN2 = int(input("enter expected reply length (bytes): \n"))
 
-            GPIO.output(21, False)
+            
             
             reqArrX = flatList([0x7e, txByteArray1, 0x7e])               
          
+            GPIO.output(21, False)
             rxByteArray1 = spi.xfer2(reqArrX)
+            GPIO.output(21, True)
 
             #time.sleep(0.200)                           
             
@@ -1229,7 +1224,7 @@ while True:
             #print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
             print(" ")
 
-            GPIO.output(21, True)
+            
 
 
 
