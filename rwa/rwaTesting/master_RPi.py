@@ -252,11 +252,8 @@ def spiTransfer(reqArr1,rplN1):
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
-    reqArrX = xorSwitch(reqArrH, "reqMode")  
-    print('reqArrX: ',[hex(x) for x in reqArrX])             
+    reqArrX = xorSwitch(reqArrH, "reqMode")               
 
-    #print('request')
-    #print('reqArrX: ', [hex(x) for x in reqArrX])
     GPIO.output(21, False)
     spiTx = list(reqArrX)
     spiRx = spi.xfer2(spiTx)
@@ -265,7 +262,6 @@ def spiTransfer(reqArr1,rplN1):
     
     time.sleep(0.200)                                   # try decreasing wait time 
     
-    #print('reply') 
     GPIO.output(21, False)
     spiTx = msrEmpArr
     spiRx = spi.xfer2(spiTx)
@@ -275,17 +271,13 @@ def spiTransfer(reqArr1,rplN1):
 
     if not reqArr1[0] in rplArrX:
         spiErrorFlag = 'spiError'
-        print('^^^^^^^^^^^^^^^^^^^^^SPI error')
-        #print('reqArr1: ',[hex(x) for x in reqArr1])
-        #print('reqArrH: ',[hex(x) for x in reqArrH])
-        #print('reqArrX: ',[hex(x) for x in reqArrX])
+        print('^^^^^^^^^^^^^^^^^^^^^SPI error^^^^^^^^^^^^^^^^^^^^^')
+        print('reqArrX: ',[hex(x) for x in reqArrX])
         #print('slvEmpArr: ',[hex(x) for x in slvEmpArr])
         #print('msrEmpArr: ',[hex(x) for x in msrEmpArr])
-        #print('rplArrX: ',[hex(x) for x in rplArrX])
+        print('rplArrX: ',[hex(x) for x in rplArrX])
         lock.release()
         return spiErrorFlag
-
-
 
     bytOld = 0x7e
     idxStart = 0
