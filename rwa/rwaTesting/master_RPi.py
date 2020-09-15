@@ -124,7 +124,7 @@ def userResults(reqArr1, rplArr1):
 
     print("\nreqArr:", [hex(x) for x in reqArr1])
     print("rplArr:", [hex(x) for x in rplArr1])
-     print('rpl data length: ',len(rplArr1)-4, ' bytes')
+    print('rpl data length: ',len(rplArr1)-4, ' bytes')
 
     if slvCRC == corrCRC:
         print("REPLY CRC: TRUE")
