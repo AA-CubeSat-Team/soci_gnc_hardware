@@ -259,8 +259,12 @@ def spiTransfer(reqArr1,rplN1):
     #print('request')
     #print('reqArrX: ', [hex(x) for x in reqArrX])
     slvEmpArr = spi.xfer2(reqArrX)
-
+    
+    GPIO.output(21, True)
+    
     time.sleep(0.200)                                   # try decreasing wait time 
+    
+    GPIO.output(21, False)
     
     #print('reply') 
     rplArrX = spi.xfer2(msrEmpArr)
