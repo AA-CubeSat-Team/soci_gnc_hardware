@@ -264,7 +264,7 @@ def spiTransfer(reqArr1,rplN1):
     
     #print('reply') 
     rplArrX = spi.xfer2(msrEmpArr)
-    print('rplArrX: ', [hex(x) for x in rplArrX])
+    #print('rplArrX: ', [hex(x) for x in rplArrX])
 
     if rplArrX[0] != 0x7e:
         print('SPI error')
@@ -1117,14 +1117,14 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.2
+                samplePeriod = 0.1
                 runSensors = 1
 
                 print("idling motor")
                 processAuto(6, 0, 10)
-                time.sleep(10)
+                time.sleep(20)
 
-                for speedInp in [1000, 5000, 10000, 30000, 65000]:
+                for speedInp in [3000, 40000, 65000]:
                     if nominalState == False:
                         print("nominalState: ", nominalState)
                         break
@@ -1132,9 +1132,9 @@ while True:
                     if nominalState == True:
                         print("speedInp: ", speedInp)
                         processAuto(6, speedInp, 10)
-                        time.sleep(30)
+                        time.sleep(120)
 
-                for speedInp in [-1000, -5000, -10000, -30000, -65000]:
+                for speedInp in [-3000, -40000, -65000]:
                     if nominalState == False:
                         print("nominalState: ", nominalState)
                         break
@@ -1142,11 +1142,11 @@ while True:
                     if nominalState == True:
                         print("speedInp: ", speedInp)
                         processAuto(6, speedInp, 10)
-                        time.sleep(30)
+                        time.sleep(120)
 
                 print("idling motor")
                 processAuto(6, 0, 10)
-                time.sleep(10)
+                time.sleep(20)
 
                 runSensors = 0
                 print("test complete")
