@@ -260,7 +260,7 @@ def spiTransfer(reqArr1,rplN1):
     GPIO.output(21, True)
     slvEmpArr = list(spiRx)
     
-    time.sleep(0.200)                                   
+    time.sleep(0.050)                                   
     
     spiTx = msrEmpArr
     GPIO.output(21, False)
@@ -1224,9 +1224,9 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0
+                samplePeriod = 0.02
                 runSensors = 1
-                # spiTrasnfer waiting period = 0.200 s
+                # spiTransfer waiting period = 0.050 s
 
                 for speedInp in [5000, 25000, 45000, 65000]:
                     if nominalState == False:
