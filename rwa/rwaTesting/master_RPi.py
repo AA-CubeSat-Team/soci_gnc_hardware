@@ -269,6 +269,10 @@ def spiTransfer(reqArr1,rplN1):
     if rplArrX[0] != 0x7e:
         print('SPI error')
         spiErrorFlag = 'spiError'
+
+        GPIO.output(25, False)                          # reboots RW0
+        GPIO.output(25, True)
+
         lock.release()
         return spiErrorFlag
 
