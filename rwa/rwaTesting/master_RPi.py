@@ -248,7 +248,7 @@ lock = threading.Lock()
 
 def spiTransfer(reqArr1,rplN1):
     lock.acquire()
-    print('----SPI start')
+
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
