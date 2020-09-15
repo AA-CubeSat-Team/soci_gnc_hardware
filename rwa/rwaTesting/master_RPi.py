@@ -264,7 +264,7 @@ def spiTransfer(reqArr1,rplN1):
     
     #print('reply') 
     rplArrX = spi.xfer2(msrEmpArr)
-    #print('rplArrX: ', [hex(x) for x in rplArrX])
+    print('rplArrX: ', [hex(x) for x in rplArrX])
 
     if rplArrX[0] != 0x7e:
         print('SPI error')
@@ -1124,7 +1124,7 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(2)
 
-                for speedInp in [3000, 40000, 65000]:
+                for speedInp in [65000]:
                     if nominalState == False:
                         print("nominalState: ", nominalState)
                         break
