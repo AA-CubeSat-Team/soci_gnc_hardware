@@ -268,6 +268,7 @@ def spiTransfer(reqArr1,rplN1):
     if rplArrX[0] != 0x7e:
         print('SPI error')
         spiErrorFlag = 'spiError'
+        lock.release()
         return spiErrorFlag
 
     bytOld = 0x7e
