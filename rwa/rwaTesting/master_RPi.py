@@ -788,10 +788,11 @@ while True:
             print("5 - zero crossing")
             print("6 - fixed RPM noise")
             testMode = input("\n")
-            testMode = int(testMode)
 
             if testMode == 'zz':
                 break
+
+            testMode = int(testMode)
 
             if testMode == 0:
                 print("\nDEBUG AUTO TEST MODE\n")
@@ -842,6 +843,8 @@ while True:
                 samplePeriod = 0.2
                 runSensors = 1
 
+                print("enter 'zz' to return to test mode select")
+
                 print("idling motor")
                 processAuto(6, 0, 10)
                 time.sleep(10)
@@ -853,6 +856,10 @@ while True:
 
                     if nominalState == True:
                         speedInp = input("enter a speed [-65000:65000, 0.1 RPM]:\n")
+
+                        if testMode == 'zz':
+                            break
+
                         speedInp = int(speedInp)
                         processAuto(6,speedInp,10)
 
@@ -1100,10 +1107,11 @@ while True:
 
         while True: 
             comID = input("\nenter a command ID:\n")
-            comID = int(comID)
-
+            
             if comID == 'zz':
                 break
+
+            comID = int(comID)
 
             processUser(comID)
             
