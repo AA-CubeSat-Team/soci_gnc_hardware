@@ -266,6 +266,8 @@ def spiTransfer(reqArr1,rplN1):
     print('rplArrX: ', [hex(x) for x in rplArrX])
 
     bytOld = 0x7e
+    idxStart = 0
+    idxEnd = 2*rplN1 + 3
     for idx, byt in enumerate(rplArrX):
         bytNew = byt
         if (bytOld == 0x7e) & (bytNew != 0x7e):
