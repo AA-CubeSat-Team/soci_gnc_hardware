@@ -1257,10 +1257,10 @@ while True:
 
             
             
-            reqArrX = flatList([0x7e, txByteArray1, 0x7e])               
+            txByteArray1 = flatList([0x7e, txByteArray1, 0x7e])               
          
             GPIO.output(21, False)
-            rxByteArray1 = spi.xfer2(reqArrX)
+            rxByteArray1 = spi.xfer2(txByteArray1)
             GPIO.output(21, True)
 
             #time.sleep(0.200)                           
