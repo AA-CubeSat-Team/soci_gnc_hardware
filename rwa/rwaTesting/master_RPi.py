@@ -119,7 +119,7 @@ def userResults(reqArr1, rplArr1, rplN1):
 
     slvCRC = [rplArr1[-2],rplArr1[-1]]
 
-    rplArrCorr = crcAppend(rplArr1[0:(rplN1-2)])
+    rplArrCorr = crcAppend(rplArr1[0:-2])
     corrCRC = [rplArrCorr[-2],rplArrCorr[-1]]
 
     print("\nreqArr:", [hex(x) for x in reqArr1])
