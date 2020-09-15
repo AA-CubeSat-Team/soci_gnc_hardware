@@ -282,7 +282,7 @@ def spiTransfer(reqArr1,rplN1):
         bytOld = bytNew
 
     rplArrCrop = rplArrX[idxStart:(idxEnd+1)] 
-    print('rplArr length (bytes): ',len(rplArrCrop))
+    print('rpl data length (bytes): ',len(rplArrCrop)-4)
 
     rplArr1 = xorSwitch(rplArrCrop, "rplMode") 
 
