@@ -249,7 +249,6 @@ lock = threading.Lock()
 def spiTransfer(reqArr1,rplN1):
     lock.acquire()
     
-
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
@@ -272,8 +271,10 @@ def spiTransfer(reqArr1,rplN1):
     if not reqArr1[0] in rplArrX:
         spiErrorFlag = 'spiError'
         print('SPI error')
-        print('reqArrX: ',reqArrX)
-        print('rplArrX: ',rplArrX)
+        print('reqArrX: ',[hex(x) for x in reqArrX])
+        print('slvEmpArr: ',[hex(x) for x in slvEmpArr])
+        print('msrEmpArr: ',[hex(x) for x in msrEmpArr])
+        print('rplArrX: ',[hex(x) for x in rplArrX])
         lock.release()
         return spiErrorFlag
 
