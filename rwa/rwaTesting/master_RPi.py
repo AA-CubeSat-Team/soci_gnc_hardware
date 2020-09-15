@@ -1224,7 +1224,7 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.02
+                samplePeriod = 0
                 runSensors = 1
                 # spiTrasnfer waiting period = 0.200 s
 
