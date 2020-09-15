@@ -256,7 +256,7 @@ def spiTransfer(reqArr1,rplN1):
 
     spiTx = list(reqArrX)
     GPIO.output(21, False)
-    spiRx = spi.xfer2(spiTx)
+    spiRx = spi.xfer(spiTx)
     GPIO.output(21, True)
     slvEmpArr = list(spiRx)
     
@@ -264,7 +264,7 @@ def spiTransfer(reqArr1,rplN1):
     
     spiTx = msrEmpArr
     GPIO.output(21, False)
-    spiRx = spi.xfer2(spiTx)
+    spiRx = spi.xfer(spiTx)
     GPIO.output(21, True)
     rplArrX = spiRx 
     
