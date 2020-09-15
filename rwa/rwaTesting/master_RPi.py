@@ -293,7 +293,6 @@ def spiTransfer(reqArr1,rplN1):
 
     rplArr1 = xorSwitch(rplArrCrop, "rplMode") 
 
-    GPIO.output(21, True)
     lock.release()
 
     return rplArr1 
