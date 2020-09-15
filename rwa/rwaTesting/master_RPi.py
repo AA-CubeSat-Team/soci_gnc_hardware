@@ -1226,6 +1226,7 @@ while True:
 
                 samplePeriod = 0.02
                 runSensors = 1
+                # spiTrasnfer waiting period = 0.200 s
 
                 for speedInp in [5000, 25000, 45000, 65000]:
                     if nominalState == False:
