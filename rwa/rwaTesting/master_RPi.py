@@ -267,7 +267,6 @@ def spiTransfer(reqArr1,rplN1):
     spiRx = spi.xfer2(spiTx)
     rplArrX = spiRx 
     GPIO.output(21, True)
-    print('rplArrX: ', [hex(x) for x in rplArrX])
 
     if not reqArr1[0] in rplArrX:
         spiErrorFlag = 'spiError'
