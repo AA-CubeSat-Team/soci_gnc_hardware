@@ -256,7 +256,7 @@ def spiTransfer(reqArr1,rplN1):
 
     spiTx = list(reqArrX)
     GPIO.output(21, False)
-    spiRx = spi.xfer(spiTx)
+    spiRx = spi.xfer2(spiTx)
     GPIO.output(21, True)
     slvEmpArr = list(spiRx)
     
@@ -264,7 +264,7 @@ def spiTransfer(reqArr1,rplN1):
     
     spiTx = msrEmpArr
     GPIO.output(21, False)
-    spiRx = spi.xfer(spiTx)
+    spiRx = spi.xfer2(spiTx)
     GPIO.output(21, True)
     rplArrX = spiRx 
     
@@ -858,6 +858,7 @@ while True:
             print("5 - zero crossing")
             print("6 - fixed RPM noise")
             print("7 - current")
+            print("8 - rapid command")
             testMode = input("\n")
 
             if testMode == 'zz':
@@ -1206,6 +1207,39 @@ while True:
                 print("idling motor")
                 processAuto(6, 0, 10)
                 time.sleep(10)
+
+                runSensors = 0
+                print("test complete")
+
+            if testMode == 8:
+                print("\nRAPID command TEST MODE\n")
+                nominalState = True
+
+                folderName = "debugAutoDir"
+                fileName = "debugAutoTest"
+                header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
+                csvStart(folderName, fileName, header)
+                folderName2 = folderName
+                fileName2 = fileName
+
+                time0 = time.time()
+
+                samplePeriod = 0.1
+                runSensors = 1
+
+                for speedInp in range(10000, 70000, 10000):
+                    if nominalState == False:
+                        print("nominalState: ", nominalState)
+                        break
+
+                    if nominalState == True:
+                        print("speedInp: ", speedInp)
+                        processAuto(6, speedInp, 10)
+                        time.sleep(5)
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(5)
 
                 runSensors = 0
                 print("test complete")
