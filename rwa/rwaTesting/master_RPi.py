@@ -1256,7 +1256,7 @@ while True:
          
             spiTx = list(txByteArray1)
             GPIO.output(21, False)
-            spiRx = spi.xfer2(spiTx)
+            spiRx = spi.xfer(spiTx)
             GPIO.output(21, True)
             rxByteArray1 = list(spiRx)
             
@@ -1264,7 +1264,7 @@ while True:
             
             spiTx = list(txByteArray2)
             GPIO.output(21, False)
-            spiRx = spi.xfer2(spiTx)
+            spiRx = spi.xfer(spiTx)
             GPIO.output(21, True)
             rxByteArray2 = list(spiRx)
             
