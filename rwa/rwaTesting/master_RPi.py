@@ -263,7 +263,7 @@ def spiTransfer(reqArr1,rplN1):
     
     #print('reply') 
     rplArrX = spi.xfer2(msrEmpArr)
-    print('rplArrX: ', [hex(x) for x in rplArrX])
+    #print('rplArrX: ', [hex(x) for x in rplArrX])
 
     bytOld = 0x7e
     idxStart = 0
