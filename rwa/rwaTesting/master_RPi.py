@@ -258,8 +258,9 @@ def spiTransfer(reqArr1,rplN1):
 
     #print('request')
     #print('reqArrX: ', [hex(x) for x in reqArrX])
+    reqArrXfer = reqArrX
     GPIO.output(21, False)
-    slvEmpArr = spi.xfer2(reqArrX)
+    slvEmpArr = spi.xfer2(reqArrXfer)
     GPIO.output(21, True)
     
     time.sleep(0.200)                                   # try decreasing wait time 
@@ -268,7 +269,7 @@ def spiTransfer(reqArr1,rplN1):
     GPIO.output(21, False)
     rplArrX = spi.xfer2(msrEmpArr)
     GPIO.output(21, True)
-    #print('rplArrX: ', [hex(x) for x in rplArrX])
+    print('rplArrX: ', [hex(x) for x in rplArrX])
 
     if not reqArr1[0] in rplArrX:
         spiErrorFlag = 'spiError'
