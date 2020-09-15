@@ -381,7 +381,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -393,7 +393,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 1 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -407,7 +407,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -419,7 +419,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 10 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -436,7 +436,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -454,7 +454,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -469,7 +469,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -481,7 +481,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 4 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -495,7 +495,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 79 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -535,7 +535,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -547,7 +547,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 20 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         checkArr = autoResults(reqArr, rplArr)
 
@@ -571,7 +571,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -582,7 +582,7 @@ def processUser(comID1):
         
         rplN = 1 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -597,7 +597,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -608,7 +608,7 @@ def processUser(comID1):
         
         rplN = 10 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -628,7 +628,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -647,7 +647,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -662,7 +662,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -673,7 +673,7 @@ def processUser(comID1):
         
         rplN = 4 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -687,7 +687,7 @@ def processUser(comID1):
         
         rplN = 79 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -731,7 +731,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
@@ -742,7 +742,7 @@ def processUser(comID1):
         
         rplN = 20 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError'
+        if rplArr == 'spiError':
             return
         userResults(reqArr, rplArr)
 
