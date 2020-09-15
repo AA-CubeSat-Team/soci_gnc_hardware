@@ -252,7 +252,9 @@ def spiTransfer(reqArr1,rplN1):
     msrEmpArr = [0x7e] * (2*rplN1 + 3) 
 
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
-    reqArrX = xorSwitch(reqArrH, "reqMode")               
+    print('reqArrH: ',[hex(x) for x in reqArrH])
+    reqArrX = xorSwitch(reqArrH, "reqMode")  
+    print('reqArrX: ',[hex(x) for x in reqArrX])             
 
     #print('request')
     #print('reqArrX: ', [hex(x) for x in reqArrX])
@@ -272,16 +274,15 @@ def spiTransfer(reqArr1,rplN1):
         spiErrorFlag = 'spiError'
         print('SPI error')
         #print('reqArr1: ',[hex(x) for x in reqArr1])
-        print('reqArrH: ',[hex(x) for x in reqArrH])
-        print('reqArrX: ',[hex(x) for x in reqArrX])
+        #print('reqArrH: ',[hex(x) for x in reqArrH])
+        #print('reqArrX: ',[hex(x) for x in reqArrX])
         #print('slvEmpArr: ',[hex(x) for x in slvEmpArr])
         #print('msrEmpArr: ',[hex(x) for x in msrEmpArr])
         #print('rplArrX: ',[hex(x) for x in rplArrX])
         lock.release()
         return spiErrorFlag
 
-    print('reqArrH: ',[hex(x) for x in reqArrH])
-    print('reqArrX: ',[hex(x) for x in reqArrX])
+
 
     bytOld = 0x7e
     idxStart = 0
