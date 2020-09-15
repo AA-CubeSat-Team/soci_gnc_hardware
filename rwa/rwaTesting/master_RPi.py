@@ -254,20 +254,20 @@ def spiTransfer(reqArr1,rplN1):
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
     reqArrX = xorSwitch(reqArrH, "reqMode")               
 
-    GPIO.output(21, False)
     spiTx = list(reqArrX)
+    GPIO.output(21, False)
     spiRx = spi.xfer2(spiTx)
-    slvEmpArr = list(spiRx)
     GPIO.output(21, True)
+    slvEmpArr = list(spiRx)
     
     time.sleep(0.200)                                   # try decreasing wait time 
     
-    GPIO.output(21, False)
     spiTx = msrEmpArr
+    GPIO.output(21, False)
     spiRx = spi.xfer2(spiTx)
-    rplArrX = spiRx 
     GPIO.output(21, True)
-
+    rplArrX = spiRx 
+    
     if (reqArr1[0] not in rplArrX) or (rplArrX[0:4] != 4*[0x7e]):
         spiErrorFlag = 'spiError'
         print('---- ---- ---- ---- SPI error ---- ---- ---- ----')
@@ -1247,20 +1247,20 @@ while True:
             rplN2 = int(input("enter expected reply length (bytes): \n")) 
             txByteArray2 = [0x7e] * (2*rplN2 + 6)             
          
-            GPIO.output(21, False)
             spiTx = list(txByteArray1)
-            spiRx = spi.xfer2(spiTx)
-            rxByteArray1 = list(spiRx)
-            GPIO.output(21, True)
-
-            time.sleep(0.200)                           
-
             GPIO.output(21, False)
-            spiTx = list(txByteArray2)
             spiRx = spi.xfer2(spiTx)
-            rxByteArray2 = list(spiRx)
             GPIO.output(21, True)
-
+            rxByteArray1 = list(spiRx)
+            
+            time.sleep(0.200)                           
+            
+            spiTx = list(txByteArray2)
+            GPIO.output(21, False)
+            spiRx = spi.xfer2(spiTx)
+            GPIO.output(21, True)
+            rxByteArray2 = list(spiRx)
+            
             print('txByteArray1: ', [hex(x) for x in txByteArray1])
             print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
             print('txByteArray2: ', [hex(x) for x in txByteArray2])
