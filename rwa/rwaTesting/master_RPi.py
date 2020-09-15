@@ -257,16 +257,19 @@ def spiTransfer(reqArr1,rplN1):
 
     #print('request')
     #print('reqArrX: ', [hex(x) for x in reqArrX])
-    reqArrXfer = reqArrX
     GPIO.output(21, False)
-    slvEmpArr = spi.xfer2(reqArrXfer)
+    spiTx = reqArrX
+    spiRx = spi.xfer2(spiTx)
+    slvEmpArr = spiRx 
     GPIO.output(21, True)
     
     time.sleep(0.200)                                   # try decreasing wait time 
     
     #print('reply') 
     GPIO.output(21, False)
-    rplArrX = spi.xfer2(msrEmpArr)
+    spiTx = msrEmpArr
+    spiRx = spi.xfer2(spiTx)
+    rplArrX = spiRx 
     GPIO.output(21, True)
     print('rplArrX: ', [hex(x) for x in rplArrX])
 
@@ -1252,18 +1255,19 @@ while True:
 
             
             
-            txByteArray1 = flatList([0x7e, txByteArray1, 0x7e]) 
-            print('txByteArray1: ', [hex(x) for x in txByteArray1])              
+            txByteArray1 = flatList([0x7e, txByteArray1, 0x7e])               
          
             GPIO.output(21, False)
-            rxByteArray1 = spi.xfer2(txByteArray1)
+            spiTx = txByteArray1
+            spiRx = spi.xfer2(spiTx)
+            rxByteArray1 = spiRx
             GPIO.output(21, True)
 
             #time.sleep(0.200)                           
             
             #txByteArray2 = [0x7e] * (2*rplN2 + 3)    
             #rxByteArray2 = spi.xfer2(txByteArray2)
-            
+            print('txByteArray1: ', [hex(x) for x in txByteArray1])
             print('rxByteArray1: ', [hex(x) for x in rxByteArray1])
             #print('txByteArray2: ', [hex(x) for x in txByteArray2])
             #print('rxByteArray2: ', [hex(x) for x in rxByteArray2])
