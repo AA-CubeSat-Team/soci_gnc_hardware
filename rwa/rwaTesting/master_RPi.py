@@ -249,10 +249,10 @@ lock = threading.Lock()
 def spiTransfer(reqArr1,rplN1):
     lock.acquire()
 
-    msrEmpArr = [0x7e] * (2*rplN1 + 3) 
-
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
-    reqArrX = xorSwitch(reqArrH, "reqMode")               
+    reqArrX = xorSwitch(reqArrH, "reqMode")  
+
+    msrEmpArr = [0x7e] * (2*rplN1 + 3)              
 
     spiTx = list(reqArrX)
     GPIO.output(21, False)
@@ -267,7 +267,6 @@ def spiTransfer(reqArr1,rplN1):
     spiRx = spi.xfer(spiTx)
     GPIO.output(21, True)
     rplArrX = spiRx 
-    print('rplArrX: ',[hex(x) for x in rplArrX])
     
     if (reqArr1[0] not in rplArrX) or (rplArrX[0:4] != 4*[0x7e]):
         spiErrorFlag = 'spiError'
@@ -291,11 +290,9 @@ def spiTransfer(reqArr1,rplN1):
         bytOld = bytNew
 
     rplArrCrop = rplArrX[idxStart:(idxEnd+1)] 
-
     rplArr1 = xorSwitch(rplArrCrop, "rplMode") 
 
     lock.release()
-
     return rplArr1 
 
 
