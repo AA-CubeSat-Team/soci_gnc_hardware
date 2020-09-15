@@ -270,7 +270,7 @@ def spiTransfer(reqArr1,rplN1):
 
     if not reqArr1[0] in rplArrX:
         spiErrorFlag = 'spiError'
-        print('^^^^^^^^^^^^^^^^^^^^^SPI error^^^^^^^^^^^^^^^^^^^^^')
+        print('---- ---- ---- ---- SPI error ---- ---- ---- ----')
         print('reqArrX: ',[hex(x) for x in reqArrX])
         #print('slvEmpArr: ',[hex(x) for x in slvEmpArr])
         #print('msrEmpArr: ',[hex(x) for x in msrEmpArr])
