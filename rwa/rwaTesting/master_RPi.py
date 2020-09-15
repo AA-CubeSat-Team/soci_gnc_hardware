@@ -857,7 +857,7 @@ while True:
                     if nominalState == True:
                         speedInp = input("enter a speed [-65000:65000, 0.1 RPM]:\n")
 
-                        if testMode == 'zz':
+                        if speedInp == 'zz':
                             break
 
                         speedInp = int(speedInp)
