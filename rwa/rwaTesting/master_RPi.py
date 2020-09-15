@@ -825,9 +825,9 @@ def textGen(type1, value1):
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 print('\n')
 
-processUser(2, 0, 0)
-processUser(3, 0, 0)
-processUser(2, 0, 0)
+processUser(2)
+processUser(3)
+processUser(2)
 
 rwID = input("\nenter which reaction wheel is in use (0071, 0072, 0109, 0110):\n\n")
 
