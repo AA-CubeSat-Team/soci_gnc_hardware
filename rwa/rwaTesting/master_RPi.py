@@ -1215,8 +1215,8 @@ while True:
                 print("\nRAPID command TEST MODE\n")
                 nominalState = True
 
-                folderName = "debugAutoDir"
-                fileName = "debugAutoTest"
+                folderName = "rapidComDir"
+                fileName = "rapidComTest"
                 header = ["entry","timeGMT","timeELA_s","CRC","exec","currSpeed_01_RPM","refSpeed_01_RPM","state","clcMode","voltage_V","current_mA","power_mW"]
                 csvStart(folderName, fileName, header)
                 folderName2 = folderName
@@ -1224,10 +1224,10 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.1
+                samplePeriod = 0.02
                 runSensors = 1
 
-                for speedInp in range(10000, 70000, 10000):
+                for speedInp in [5000, 25000, 45000, 65000]:
                     if nominalState == False:
                         print("nominalState: ", nominalState)
                         break
@@ -1235,11 +1235,11 @@ while True:
                     if nominalState == True:
                         print("speedInp: ", speedInp)
                         processAuto(6, speedInp, 10)
-                        time.sleep(5)
+                        time.sleep(10)
 
                 print("idling motor")
                 processAuto(6, 0, 10)
-                time.sleep(5)
+                time.sleep(15)
 
                 runSensors = 0
                 print("test complete")
