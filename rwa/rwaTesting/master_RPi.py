@@ -1245,7 +1245,7 @@ while True:
             txByteArray1 = flatList([0x7e, txByteArray1, 0x7e])  
 
             rplN2 = int(input("enter expected reply length (bytes): \n")) 
-            txByteArray2 = [0x7e] * (2*rplN2 + 3)             
+            txByteArray2 = [0x7e] * (2*rplN2 + 6)             
          
             GPIO.output(21, False)
             spiTx = list(txByteArray1)
