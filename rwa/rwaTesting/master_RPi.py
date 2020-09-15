@@ -316,6 +316,8 @@ def pullSensors():
             time.sleep(0.01)
             #print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
+            if rplArr == 'spiError':
+                return
             
             #tempArr = processAuto(8, 0, 0)
 
