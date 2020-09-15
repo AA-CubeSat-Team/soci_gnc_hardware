@@ -271,10 +271,10 @@ def spiTransfer(reqArr1,rplN1):
     if (reqArr1[0] not in rplArrX) or (rplArrX[0:4] != 4*[0x7e]):
         spiErrorFlag = 'spiError'
         print('---- ---- ---- ---- SPI error ---- ---- ---- ----')
-        print('reqArrX: ',[hex(x) for x in reqArrX])
+        #print('reqArrX: ',[hex(x) for x in reqArrX])
         #print('slvEmpArr: ',[hex(x) for x in slvEmpArr])
         #print('msrEmpArr: ',[hex(x) for x in msrEmpArr])
-        print('rplArrX: ',[hex(x) for x in rplArrX])
+        #print('rplArrX: ',[hex(x) for x in rplArrX])
         lock.release()
         return spiErrorFlag
 
