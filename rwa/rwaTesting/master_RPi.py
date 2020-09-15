@@ -258,9 +258,9 @@ def spiTransfer(reqArr1,rplN1):
     #print('request')
     #print('reqArrX: ', [hex(x) for x in reqArrX])
     GPIO.output(21, False)
-    spiTx = reqArrX
+    spiTx = list(reqArrX)
     spiRx = spi.xfer2(spiTx)
-    slvEmpArr = spiRx 
+    slvEmpArr = list(spiRx)
     GPIO.output(21, True)
     
     time.sleep(0.200)                                   # try decreasing wait time 
@@ -1258,9 +1258,9 @@ while True:
             txByteArray1 = flatList([0x7e, txByteArray1, 0x7e])               
          
             GPIO.output(21, False)
-            spiTx = txByteArray1
+            spiTx = list(txByteArray1)
             spiRx = spi.xfer2(spiTx)
-            rxByteArray1 = spiRx
+            rxByteArray1 = list(spiRx)
             GPIO.output(21, True)
 
             #time.sleep(0.200)                           
