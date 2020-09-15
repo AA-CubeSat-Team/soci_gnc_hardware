@@ -825,14 +825,9 @@ def textGen(type1, value1):
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 print('\n')
 
-lastResetStatus0Arr = processAuto(2, 0, 0)
-lastResetStatus0 = int(lastResetStatus0Arr[2])
-print("last reset status: ", lastResetStatus0, '\t- ', textGen('lastResetStatus',lastResetStatus0)) 
-processAuto(3, 0, 0)
-print("cleared last reset status")
-lastResetStatus0Arr = processAuto(2, 0, 0)
-lastResetStatus0 = int(lastResetStatus0Arr[2])
-print("last reset status: ", lastResetStatus0, '\t- ', textGen('lastResetStatus',lastResetStatus0)) 
+processUser(2, 0, 0)
+processUser(3, 0, 0)
+processUser(2, 0, 0)
 
 rwID = input("\nenter which reaction wheel is in use (0071, 0072, 0109, 0110):\n\n")
 
