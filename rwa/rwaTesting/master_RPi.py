@@ -265,6 +265,11 @@ def spiTransfer(reqArr1,rplN1):
     rplArrX = spi.xfer2(msrEmpArr)
     #print('rplArrX: ', [hex(x) for x in rplArrX])
 
+    if rplArrX[0] != 0x7e:
+        print('SPI error')
+        spiErrorFlag = 'spiError'
+        return spiErrorFlag
+
     bytOld = 0x7e
     idxStart = 0
     idxEnd = 2*rplN1 + 3
@@ -376,6 +381,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -386,6 +393,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 1 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]  
@@ -398,6 +407,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -408,6 +419,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 10 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
@@ -423,6 +436,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -439,6 +454,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -452,6 +469,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -462,6 +481,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 4 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         mcuTemp = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
@@ -474,6 +495,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 79 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]
@@ -512,6 +535,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
@@ -522,6 +547,8 @@ def processAuto(comID1,data1,data2):
         
         rplN = 20 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         checkArr = autoResults(reqArr, rplArr)
 
         versionMajor = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=False)
@@ -544,6 +571,8 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
     if comID1 == 2:
@@ -553,6 +582,8 @@ def processUser(comID1):
         
         rplN = 1 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]
@@ -566,6 +597,8 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
     if comID1 == 4:
@@ -575,6 +608,8 @@ def processUser(comID1):
         
         rplN = 10 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
@@ -593,6 +628,8 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
     if comID1 == 6:
@@ -610,6 +647,8 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
     if comID1 == 7:
@@ -623,6 +662,8 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
     if comID1 == 8:
@@ -632,6 +673,8 @@ def processUser(comID1):
         
         rplN = 4 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
         mcuTemp = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
@@ -644,6 +687,8 @@ def processUser(comID1):
         
         rplN = 79 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]
@@ -686,6 +731,8 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
     if comID1 == 11:
@@ -695,6 +742,8 @@ def processUser(comID1):
         
         rplN = 20 + 6
         rplArr = spiTransfer(reqArr,rplN)
+        if rplArr == 'spiError'
+            return
         userResults(reqArr, rplArr)
 
         versionMajor = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=False)
