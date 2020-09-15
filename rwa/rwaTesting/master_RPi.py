@@ -260,7 +260,7 @@ def spiTransfer(reqArr1,rplN1):
     GPIO.output(21, True)
     slvEmpArr = list(spiRx)
     
-    time.sleep(0.100)                                   # try decreasing wait time 
+    time.sleep(0.200)                                   # try decreasing wait time 
     
     spiTx = msrEmpArr
     GPIO.output(21, False)
@@ -464,10 +464,11 @@ def processAuto(comID1,data1,data2):
         reqArr = crcAppend(payloadArr)
         
         rplN = 0 + 6
-        rplArr = spiTransfer(reqArr,rplN)
-        if rplArr == 'spiError':
-            outputArr1 = 'spiError'
-            return outputArr1
+
+        rplArr = 'spiError'
+        while rplArr == 'spiError':
+            rplArr = spiTransfer(reqArr,rplN)
+        
         checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
