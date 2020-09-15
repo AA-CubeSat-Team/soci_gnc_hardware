@@ -556,7 +556,7 @@ def processUser(comID1):
         userResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]
-        print("\nlast reset status: ", lastResetStatus, '\t- ', textGen('lastResetStatus',lastResetStatus)
+        print("\nlast reset status: ", lastResetStatus, '\t- ', textGen('lastResetStatus',lastResetStatus))
    
 
     if comID1 == 3:
