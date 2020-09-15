@@ -1107,12 +1107,12 @@ while True:
                         processAuto(6, baseSpeed, rampTime1)
                         print("pos baseSpeed: ", baseSpeed)
                         print("ramp time: ", rampTime1)
-                        time.sleep((rampTime1*10**-3) + 3)
+                        time.sleep(20)
 
                         processAuto(6, -1*baseSpeed, rampTime1)
                         print("neg baseSpeed: ", -1*baseSpeed)
                         print("ramp time: ", rampTime1)
-                        time.sleep((rampTime1*10**-3) + 3)
+                        time.sleep(20)
 
                 print("idling motor")
                 processAuto(6, 0, 10)
