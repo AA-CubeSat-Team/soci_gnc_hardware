@@ -270,9 +270,9 @@ def spiTransfer(reqArr1,rplN1):
         print('SPI error')
         spiErrorFlag = 'spiError'
 
-        GPIO.output(25, False)                          # reboots RW0
-        time.sleep(2)
-        GPIO.output(25, True)
+        #GPIO.output(25, False)                          # reboots RW0
+        time.sleep(1)
+        #GPIO.output(25, True)
 
         lock.release()
         return spiErrorFlag
