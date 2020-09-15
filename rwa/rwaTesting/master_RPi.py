@@ -260,7 +260,7 @@ def spiTransfer(reqArr1,rplN1):
     GPIO.output(21, True)
     slvEmpArr = list(spiRx)
     
-    time.sleep(0.200)                                   # try decreasing wait time 
+    time.sleep(0.200)                                   
     
     spiTx = msrEmpArr
     GPIO.output(21, False)
