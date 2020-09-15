@@ -434,7 +434,8 @@ def processAuto(comID1,data1,data2):
         while rplArr == 'spiError':
             a = a + 1
             rplArr = spiTransfer(reqArr,rplN)
-        print('attempts: ',a)
+        if a > 1:
+            print('attempts: ',a)
         
         checkArr = autoResults(reqArr, rplArr)
 
