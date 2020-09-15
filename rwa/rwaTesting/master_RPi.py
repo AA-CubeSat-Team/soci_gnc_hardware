@@ -268,9 +268,6 @@ def spiTransfer(reqArr1,rplN1):
     GPIO.output(21, True)
     #print('rplArrX: ', [hex(x) for x in rplArrX])
 
-    print('reqArrH: ',[hex(x) for x in reqArrH])
-    print('reqArrX: ',[hex(x) for x in reqArrX])
-
     if not reqArr1[0] in rplArrX:
         spiErrorFlag = 'spiError'
         print('SPI error')
@@ -282,6 +279,9 @@ def spiTransfer(reqArr1,rplN1):
         #print('rplArrX: ',[hex(x) for x in rplArrX])
         lock.release()
         return spiErrorFlag
+
+    print('reqArrH: ',[hex(x) for x in reqArrH])
+    print('reqArrX: ',[hex(x) for x in reqArrX])
 
     bytOld = 0x7e
     idxStart = 0
