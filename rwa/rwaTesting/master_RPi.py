@@ -89,13 +89,13 @@ def crcAppend(payloadArr1):
 
 
 # CRC CHECK FUNCTION
-def autoResults(reqArr1, rplArr1, rplN1):
+def autoResults(reqArr1, rplArr1):
     if len(rplArr1) < 4:                       # 4 bytes is shortest correct reply package
         return
 
     slvCRC = [rplArr1[-2],rplArr1[-1]]
 
-    rplArrCorr = crcAppend(rplArr1[0:(rplN1-2)])
+    rplArrCorr = crcAppend(rplArr1[0:-2])
     corrCRC = [rplArrCorr[-2],rplArrCorr[-1]]
 
     checkArr1 = [0, 0]
@@ -113,7 +113,7 @@ def autoResults(reqArr1, rplArr1, rplN1):
 
 
 # CRC CHECK FUNCTION
-def userResults(reqArr1, rplArr1, rplN1):
+def userResults(reqArr1, rplArr1):
     if len(rplArr1) < 4:                       # 4 bytes is shortest correct reply package
         return
 
@@ -376,7 +376,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
 
@@ -386,7 +386,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 1 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]  
 
@@ -398,7 +398,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
 
@@ -408,7 +408,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 10 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
         refSpeed = int.from_bytes(bytes(bytearray(rplArr[6:10])), byteorder='little', signed=True)
@@ -423,7 +423,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
 
@@ -439,7 +439,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
 
@@ -452,7 +452,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
 
@@ -462,7 +462,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 4 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         mcuTemp = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
 
@@ -474,7 +474,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 79 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]
         mcuTemp = int.from_bytes(bytes(bytearray(rplArr[3:7])), byteorder='little', signed=True)
@@ -512,7 +512,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         outputArr1 = [checkArr[0], checkArr[1]]
 
@@ -522,7 +522,7 @@ def processAuto(comID1,data1,data2):
         
         rplN = 20 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        checkArr = autoResults(reqArr, rplArr, rplN)
+        checkArr = autoResults(reqArr, rplArr)
 
         versionMajor = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=False)
         versionBuildNumber = int.from_bytes(bytes(bytearray(rplArr[6:10])), byteorder='little', signed=False)      
@@ -544,7 +544,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
     if comID1 == 2:
         print('get last reset status')
@@ -553,7 +553,7 @@ def processUser(comID1):
         
         rplN = 1 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]
         print("\nlast reset status: ", lastResetStatus, '\t- ', textGen('lastResetStatus',lastResetStatus0))
@@ -566,7 +566,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
     if comID1 == 4:
         print('get reaction wheel status')
@@ -575,7 +575,7 @@ def processUser(comID1):
         
         rplN = 10 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
         print("\ncurr speed (0.1 RPM): ", currSpeed)
@@ -593,7 +593,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
     if comID1 == 6:
         print('set reference speed')
@@ -610,7 +610,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
     if comID1 == 7:
         print('set current limit mode')
@@ -623,7 +623,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
     if comID1 == 8:
         print('get temperature')
@@ -632,7 +632,7 @@ def processUser(comID1):
         
         rplN = 4 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
         mcuTemp = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
         print("\nmcu temp (C): ", mcuTemp)
@@ -644,7 +644,7 @@ def processUser(comID1):
         
         rplN = 79 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
         lastResetStatus = rplArr[2]
         print("\nlast reset status: ", lastResetStatus)
@@ -686,7 +686,7 @@ def processUser(comID1):
         
         rplN = 0 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
     if comID1 == 11:
         print('get system information')
@@ -695,7 +695,7 @@ def processUser(comID1):
         
         rplN = 20 + 6
         rplArr = spiTransfer(reqArr,rplN)
-        userResults(reqArr, rplArr, rplN)
+        userResults(reqArr, rplArr)
 
         versionMajor = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=False)
         print("version major: ", versionMajor)
