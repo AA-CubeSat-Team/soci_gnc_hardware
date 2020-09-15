@@ -1135,9 +1135,9 @@ while True:
 
                 print("idling motor")
                 processAuto(6, 0, 10)
-                time.sleep(2)
+                time.sleep(30)
 
-                for speedInp in [65000]:
+                for speedInp in [3000, 40000, 65000]:
                     if nominalState == False:
                         print("nominalState: ", nominalState)
                         break
@@ -1145,7 +1145,11 @@ while True:
                     if nominalState == True:
                         print("speedInp: ", speedInp)
                         processAuto(6, speedInp, 10)
-                        time.sleep(12)
+                        time.sleep(120)
+
+                print("idling motor")
+                processAuto(6, 0, 10)
+                time.sleep(30)
 
                 for speedInp in [-3000, -40000, -65000]:
                     if nominalState == False:
@@ -1155,11 +1159,11 @@ while True:
                     if nominalState == True:
                         print("speedInp: ", speedInp)
                         processAuto(6, speedInp, 10)
-                        time.sleep(12)
+                        time.sleep(120)
 
                 print("idling motor")
                 processAuto(6, 0, 10)
-                time.sleep(2)
+                time.sleep(30)
 
                 runSensors = 0
                 print("test complete")
