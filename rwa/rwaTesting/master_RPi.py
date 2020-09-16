@@ -1098,7 +1098,7 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(10)
 
-                for rampTime1 in [10, 10**2, 10**3, 10**4]:
+                for rampTime1 in [10]:
                     if nominalState == False:
                         print("nominalState: ", nominalState)
                         break
