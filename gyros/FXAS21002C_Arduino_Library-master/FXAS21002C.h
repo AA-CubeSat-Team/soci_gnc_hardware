@@ -102,7 +102,7 @@ class FXAS21002C
 
 	
 	// output data rate
-	int getODR(void);
+	double getODR(void);
 
 	//Calibrate
 	void calibrate();

@@ -133,7 +133,7 @@ float FXAS21002C::sensitivity(void)
 }
 
 // returns the current output data rate as a int (Hz)
-int FXAS21002C::getODR(void)
+double FXAS21002C::getODR(void)
 {
 	switch (gyroODR)
 	{
