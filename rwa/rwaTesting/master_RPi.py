@@ -248,6 +248,7 @@ lock = threading.Lock()
 
 def spiTransfer(reqArr1,rplN1):
     lock.acquire()
+    global msTimeoutG
 
     reqArrH = flatList([0x7e, reqArr1, 0x7e]) 
     reqArrX = xorSwitch(reqArrH, "reqMode")  
@@ -260,7 +261,7 @@ def spiTransfer(reqArr1,rplN1):
     GPIO.output(21, True)
     slvEmpArr = list(spiRx)
     
-    time.sleep(0.100)                                   
+    time.sleep(msTimeoutG / 1000)                                   
     
     spiTx = msrEmpArr
     GPIO.output(21, False)
@@ -297,24 +298,24 @@ def spiTransfer(reqArr1,rplN1):
 
 
 # BACKGROUND SENSOR THREAD
-global runSensors
-global samplePeriod
+global runSensors2 
+global samplePeriod2
 global folderName2
 global fileName2
 
 def pullSensors():             
-    global runSensors
-    global samplePeriod
+    global runSensors2 
+    global samplePeriod2
     global folderName2
     global fileName2
     global lastResetStatus2
     global nominalState
 
     while True:
-        if runSensors == 0:
+        if runSensors2  == 0:
             continue         
 
-        if runSensors == 1:     
+        if runSensors2  == 1:     
             time.sleep(0.01)
             #print("sensor pull")
             rwStatusArr = processAuto(4, 0, 0)
@@ -333,7 +334,7 @@ def pullSensors():
             csvAdd(outputArr2)
             print('outputArr: ', outputArr2)
 
-        time.sleep(samplePeriod)
+        time.sleep(samplePeriod2)
         
     return 
 pullSensorsThr = threading.Thread(target = pullSensors)
@@ -427,15 +428,29 @@ def processAuto(comID1,data1,data2):
         
         rplN = 10 + 6
         
-        a = 0
-        rplArr = 'spiError'
-        while rplArr == 'spiError':
-            a = a + 1
-            rplArr = spiTransfer(reqArr,rplN)
-        if a > 1:
-            print('attempts: ',a)
+        #a = 0
+        #rplArr = 'spiError'
+        #while rplArr == 'spiError':
+        #    a = a + 1
+        #    rplArr = spiTransfer(reqArr,rplN)
+        #if a > 1:
+        #    print('attempts: ',a)
+
+        rplArr = spiTransfer(reqArr,rplN)
+
+        if rplArr == 'spiError':
+            xferFail = xferFail + 1
+            return
         
         checkArr = autoResults(reqArr, rplArr)
+
+        if checkArr[0] == 0:
+            xferFail = xferFail + 1
+            return
+
+        if rplArr != 'spiError' and checkArr[0] != 0::
+            xferPass = xferPass + 1
+            return
 
         currSpeed = int.from_bytes(bytes(bytearray(rplArr[2:6])), byteorder='little', signed=True)
         refSpeed = int.from_bytes(bytes(bytearray(rplArr[6:10])), byteorder='little', signed=True)
@@ -830,8 +845,8 @@ processUser(2)
 
 rwID = input("\nenter which reaction wheel is in use (0071, 0072, 0109, 0110):\n\n")
 
-samplePeriod = 1
-runSensors = 0
+samplePeriod2 = 1
+runSensors2  = 0
 pullSensorsThr.start()
 
 while True: 
@@ -877,8 +892,8 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.1
-                runSensors = 1
+                samplePeriod2 = 0.1
+                runSensors2  = 1
 
                 for speedInp in range(10000, 70000, 10000):
                     if nominalState == False:
@@ -894,7 +909,7 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(5)
 
-                runSensors = 0
+                runSensors2  = 0
                 print("test complete")
 
             if testMode == 1:
@@ -910,8 +925,8 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.2
-                runSensors = 1
+                samplePeriod2 = 0.2
+                runSensors2  = 1
 
                 print("enter 'zz' to return to test mode select")
 
@@ -937,7 +952,7 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(10)
 
-                runSensors = 0
+                runSensors2  = 0
                 print("test complete")
 
             if testMode == 2:
@@ -953,8 +968,8 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.1
-                runSensors = 1
+                samplePeriod2 = 0.1
+                runSensors2  = 1
 
                 print("idling motor")
                 processAuto(6, 0, 10)
@@ -984,7 +999,7 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(10)
 
-                runSensors = 0
+                runSensors2  = 0
                 print("test complete")
 
             if testMode == 3:
@@ -1000,8 +1015,8 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.05
-                runSensors = 1
+                samplePeriod2 = 0.05
+                runSensors2  = 1
 
                 print("idling motor")
                 processAuto(6, 0, 10)
@@ -1031,7 +1046,7 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(10)
 
-                runSensors = 0
+                runSensors2  = 0
                 print("test complete")
                 
             if testMode == 4:
@@ -1047,8 +1062,8 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.1
-                runSensors = 1
+                samplePeriod2 = 0.1
+                runSensors2  = 1
 
                 baseSpeed = 10000
 
@@ -1073,7 +1088,7 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(10)
 
-                runSensors = 0
+                runSensors2  = 0
                 print("test complete")
 
             if testMode == 5:
@@ -1089,8 +1104,8 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.1
-                runSensors = 1
+                samplePeriod2 = 0.1
+                runSensors2  = 1
 
                 baseSpeed = 10000
 
@@ -1118,7 +1133,7 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(10)
 
-                runSensors = 0
+                runSensors2  = 0
                 print("test complete")
 
             if testMode == 6:
@@ -1134,8 +1149,8 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.1
-                runSensors = 1
+                samplePeriod2 = 0.1
+                runSensors2  = 1
 
                 print("idling motor")
                 processAuto(6, 0, 10)
@@ -1169,7 +1184,7 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(30)
 
-                runSensors = 0
+                runSensors2  = 0
                 print("test complete")
 
             if testMode == 7:
@@ -1185,8 +1200,8 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.2
-                runSensors = 1
+                samplePeriod2 = 0.2
+                runSensors2  = 1
 
                 print("idling motor")
                 processAuto(6, 0, 10)
@@ -1206,11 +1221,11 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(10)
 
-                runSensors = 0
+                runSensors2  = 0
                 print("test complete")
 
             if testMode == 8:
-                print("\nRAPID command TEST MODE\n")
+                print("\nRAPID COMMAND TEST MODE\n")
                 nominalState = True
 
                 folderName = "rapidComDir"
@@ -1222,8 +1237,8 @@ while True:
 
                 time0 = time.time()
 
-                samplePeriod = 0.02
-                runSensors = 1
+                samplePeriod2 = 0.02
+                runSensors2  = 1
                 # spiTransfer waiting period = 0.050 s
 
                 for speedInp in [5000, 25000, 45000, 65000]:
@@ -1240,7 +1255,39 @@ while True:
                 processAuto(6, 0, 10)
                 time.sleep(15)
 
-                runSensors = 0
+                runSensors2  = 0
+                print("test complete")
+
+            if testMode == 9:
+                print("\nTIMEOUT TEST MODE\n")
+                nominalState = True
+
+                folderName = "timeoutDir"
+                fileName = "timeoutTest"
+                header = ["entry","timeGMT","timeELA_s", "samplePeriod_ms", "msTimeoutG_ms", "xferTotal", "xferPass", "xferFail"]
+                csvStart(folderName, fileName, header)
+                folderName2 = folderName
+                fileName2 = fileName
+
+                samplePeriod = 100      # milliseconds
+
+                global msTimeoutG       # milliseconds
+                global xferTotal
+                global xferPass
+                global xferFail
+
+                for msTimeoutG in [10, 20, 30, 40, 50, 75, 100, 150, 200]:
+                    xferTotal = 0
+                    xferPass = 0
+                    xferFail = 0
+
+                    time0 = time.time()
+                    while time.time() < time0 + 20:
+                        processAuto(4,0,0)
+                        time.sleep(samplePeriod / 1000)
+                        
+                    csvAdd(samplePeriod, msTimeoutG, xferTotal, xferPass, xferFail)
+
                 print("test complete")
 
             time.sleep(1)
