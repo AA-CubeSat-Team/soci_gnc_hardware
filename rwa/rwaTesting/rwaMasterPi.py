@@ -839,6 +839,8 @@ def textGen(type1, value1):
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 print('\n')
 
+msTimeoutG = 100
+
 processUser(2)
 processUser(3)
 processUser(2)
