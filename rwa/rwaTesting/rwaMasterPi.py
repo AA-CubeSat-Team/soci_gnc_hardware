@@ -839,6 +839,7 @@ def textGen(type1, value1):
 # MAIN --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 print('\n')
 
+global msTimeoutG       # milliseconds
 msTimeoutG = 100
 
 processUser(2)
@@ -1273,7 +1274,6 @@ while True:
 
                 samplePeriod = 100      # milliseconds
 
-                global msTimeoutG       # milliseconds
                 global xferTotal
                 global xferPass
                 global xferFail
