@@ -448,7 +448,7 @@ def processAuto(comID1,data1,data2):
             xferFail = xferFail + 1
             return
 
-        if rplArr != 'spiError' and checkArr[0] != 0::
+        if rplArr != 'spiError' and checkArr[0] != 0:
             xferPass = xferPass + 1
             return
 
