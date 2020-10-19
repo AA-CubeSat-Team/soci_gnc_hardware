@@ -1292,7 +1292,7 @@ while True:
 
                     print('msTimeoutG: ',msTimeoutG)
                     time0 = time.time()
-                    while time.time() < time0 + 20:
+                    while time.time() < time0 + 5:
                         processAuto(4,0,0)
                         xferTotal = xferTotal + 1
                         time.sleep(samplePeriod / 1000)
