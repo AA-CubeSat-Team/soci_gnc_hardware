@@ -1290,6 +1290,7 @@ while True:
                     xferPass = 0
                     xferFail = 0
 
+                    print('msTimeoutG: ',msTimeoutG)
                     time0 = time.time()
                     while time.time() < time0 + 20:
                         processAuto(4,0,0)
