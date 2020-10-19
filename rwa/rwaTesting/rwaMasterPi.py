@@ -1299,7 +1299,7 @@ while True:
                     print('xferTotal: ', xferTotal) 
                     print('xferPass: ', xferPass)
                     print('xferFail: ', xferFail)  
-                    csvAdd(samplePeriod, msTimeoutG, xferTotal, xferPass, xferFail)
+                    csvAdd([samplePeriod, msTimeoutG, xferTotal, xferPass, xferFail])
 
                 print("test complete")
 
