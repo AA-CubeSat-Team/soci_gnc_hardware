@@ -380,6 +380,10 @@ global autoAvail
 autoAvail = True
 
 def processAuto(comID1,data1,data2):
+    global xferTotal
+    global xferPass
+    global xferFail
+
     if comID1 == 1:
         payloadArr = flatList([comID1])
         reqArr = crcAppend(payloadArr)
