@@ -263,11 +263,11 @@ def spiTransfer(reqArr1,rplN1):
     
     time.sleep(msTimeoutG / 1000)                                   
     
-    spiTx = msrEmpArr
+    spiTx = list(msrEmpArr)
     GPIO.output(21, False)
     spiRx = spi.xfer(spiTx)
     GPIO.output(21, True)
-    rplArrX = spiRx 
+    rplArrX = list(spiRx)
     
     if (reqArr1[0] not in rplArrX) or (rplArrX[0:4] != 4*[0x7e]):
         spiErrorFlag = 'spiError'
