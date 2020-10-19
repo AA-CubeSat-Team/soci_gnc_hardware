@@ -1284,8 +1284,8 @@ while True:
                 fileName2 = fileName
 
                 samplePeriod = 100      # milliseconds
-
-                for msTimeoutG in [10, 20, 30, 40, 50, 75, 100, 150, 200]:
+#10, 20, 30, 40, 50, 
+                for msTimeoutG in [75, 100, 150, 200]:
                     xferTotal = 0
                     xferPass = 0
                     xferFail = 0
