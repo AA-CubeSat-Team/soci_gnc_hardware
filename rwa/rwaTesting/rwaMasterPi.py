@@ -1284,8 +1284,12 @@ while True:
                     time0 = time.time()
                     while time.time() < time0 + 20:
                         processAuto(4,0,0)
+                        xferTotal = xferTotal + 1
                         time.sleep(samplePeriod / 1000)
-                        
+                    
+                    print('xferTotal: ', xferTotal) 
+                    print('xferPass: ', xferPass)
+                    print('xferFail: ', xferFail)  
                     csvAdd(samplePeriod, msTimeoutG, xferTotal, xferPass, xferFail)
 
                 print("test complete")
