@@ -842,6 +842,13 @@ print('\n')
 global msTimeoutG       # milliseconds
 msTimeoutG = 100
 
+global xferTotal
+global xferPass
+global xferFail
+xferTotal = 0
+xferPass = 0
+xferFail = 0
+
 processUser(2)
 processUser(3)
 processUser(2)
@@ -1273,10 +1280,6 @@ while True:
                 fileName2 = fileName
 
                 samplePeriod = 100      # milliseconds
-
-                global xferTotal
-                global xferPass
-                global xferFail
 
                 for msTimeoutG in [10, 20, 30, 40, 50, 75, 100, 150, 200]:
                     xferTotal = 0
