@@ -5,7 +5,7 @@ FXAS21002C sensor = FXAS21002C(GFSR_250DPS, GODR_200HZ, GBW_L1);
 long intt;
 double i = 0;
 double ODR;
-double testtime = 10;
+double testtime = 20;
 boolean testing = 0;
 
 void setup() {
@@ -18,6 +18,7 @@ void setup() {
   Serial.print(ODR);
   Serial.println(" Hz");
   sensor.setConfigures();
+  sensor.calibrate();
   sensor.active();
   delay(500);
   sensor.readTempData();
@@ -51,7 +52,6 @@ void loop() {
 
   i=i+1;
 
-  Serial.println(i);
   // Query the sensor
   sensor.readGyroData();
   Serial.print(" ");
