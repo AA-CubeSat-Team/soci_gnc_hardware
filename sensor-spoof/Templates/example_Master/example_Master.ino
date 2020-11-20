@@ -1,21 +1,38 @@
 // Master Code Arduino Uno
 
 #include <Wire.h>
+#define SLAVE_ADDR 4
+#define ANSWERSIZE 2
 
+String sentence = "abcdefghijklmnopqrstuvwxyz123456";
 void setup()
 {
   Wire.begin(); // join i2c bus (address optional for master)
+  Serial.begin(9600);
 }
 
 byte x = 0;
 
 void loop()
 {
-  Wire.beginTransmission(4); // transmit to device #4
-  Wire.write("x is ");        // sends five bytes
-  Wire.write(x);              // sends one byte  
-  Wire.endTransmission();    // stop transmitting
+  delay(100);
+  Wire.beginTransmission(SLAVE_ADDR);
+  char test[sentence.length()];
+  sentence.toCharArray(test, sentence.length());
 
-  x++;
-  delay(500);
+  int size = sentence.length();
+  Serial.println(size);
+  for (int i = 0; i < size; i++) {
+    Wire.write(test[i]);  // the data that is being sent
+  }
+  
+  Wire.endTransmission();
+
+  Wire.requestFrom(SLAVE_ADDR,ANSWERSIZE);
+  String response = "";
+  while(Wire.available()) {
+    char b = Wire.read();
+    response += b;
+  }
+//  Serial.println(response);
 }
