@@ -1,28 +1,38 @@
-// Slave Code (Arduino Due)
-
 #include <Wire.h>
+#define SLAVE_ADDR 4
+#define ANSWERSIZE 2
 
-void setup()
-{
-  Wire.begin(4);                // join i2c bus with address #4
-  Wire.onReceive(receiveEvent); // register event
-  Serial.begin(9600);           // start serial for output
+String answer = "Wo";
+void setup() {
+  // put your setup code here, to run once:
+  Wire.begin(SLAVE_ADDR); //Runs in SLAVE mode
+  Wire.onRequest(requestEvent); 
+  Wire.onReceive(receiveEvent);
+
+  Serial.begin(9600);
+  Serial.println("I2C Test");
 }
 
-void loop()
-{
-  delay(100);
-}
-
-// function that executes whenever data is received from master
-// this function is registered as an event, see setup()
-void receiveEvent(int howMany)
-{
-  while(1 < Wire.available()) // loop through all but the last
-  {
-    char c = Wire.read(); // receive byte as a character
-    Serial.print(c);         // print the character
+// This method takes bytes from the master
+void receiveEvent(int numBytes) { // from Arduino Master 1
+  String response = "";
+  while(Wire.available()) {
+    char b = Wire.read();
+    response += b;
   }
-  int x = Wire.read();    // receive byte as an integer
-  Serial.println(x);         // print the integer
+    Serial.println(response);
+    Serial.println(numBytes);
+}
+
+// This method sends back information to the master on request
+void requestEvent(){ // from Arduino Master 2
+  byte response[ANSWERSIZE];
+  for(byte i=0;i<ANSWERSIZE;i++) {
+    response[i] = (byte)answer.charAt(i);
+  }
+  Wire.write(response,sizeof(response));
+}
+
+void loop() {
+
 }
