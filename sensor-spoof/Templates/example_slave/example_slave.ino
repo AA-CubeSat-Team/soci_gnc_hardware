@@ -6,7 +6,7 @@ extern TwoWire Wire1;
 String answer = "Wo";
 void setup() {
   // put your setup code here, to run once:
-  Wire1.begin(); //Runs in SLAVE mode
+  Wire1.begin(SLAVE_ADDR); //Runs in SLAVE mode
   Wire1.onRequest(requestEvent); 
   Wire1.onReceive(receiveEvent);
 

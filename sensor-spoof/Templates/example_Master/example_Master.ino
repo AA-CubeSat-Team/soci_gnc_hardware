@@ -4,7 +4,7 @@
 #define SLAVE_ADDR 4
 #define ANSWERSIZE 2
 
-String sentence = "abcdefghijklmnopqrstuvwxyz123456";
+String sentence = "abcdefghijklmnopqrstuvwxyz";
 void setup()
 {
   Wire.begin(); // join i2c bus (address optional for master)
@@ -21,7 +21,6 @@ void loop()
   sentence.toCharArray(test, sentence.length());
 
   int size = sentence.length();
-  Serial.println(size);
   for (int i = 0; i < size; i++) {
     Wire.write(test[i]);  // the data that is being sent
   }
@@ -34,5 +33,5 @@ void loop()
     char b = Wire.read();
     response += b;
   }
-//  Serial.println(response);
+  Serial.println(response);
 }
