@@ -5,7 +5,9 @@
 #define SLAVE_ADDR 4
 #define ANSWERSIZE 5
 
-byte answer;
+String answer = "";
+
+//byte answer;
 
 extern TwoWire Wire1;
 
@@ -23,15 +25,17 @@ void setup() {
 // This method sends back 5 to MasterRight on request
 void requestEvent(){ // from Arduino Master 2
   
-  Wire1.write(answer);
+//  Wire1.write(answer);
 }
 
 // This method takes bytes from the Master Left
 // Should print 1
 void receiveEvent(int numBytes) {
   while(Wire.available()) {
-    answer = Wire.read();
+    char b = Wire.read();
+    answer += b;
   }
+  
   Serial.println(answer);
 }
 
