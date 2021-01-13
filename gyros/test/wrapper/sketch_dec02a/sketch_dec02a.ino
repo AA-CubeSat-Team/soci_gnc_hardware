@@ -53,14 +53,12 @@ double i = 0;
 double testtime = 20000;
 boolean testing = 0;
 GyroFSR FSR = GFSR_250DPS;
-GyroODR ODR = GODR_200HZ;
+GyroODR ODR = GODR_12_5HZ;
 GyroBW BW = GBW_L1;
 double odrValue;
 float tempData;
-float tempData0;
 float gyroX, gyroY, gyroZ;
 float gBias[3] = {0,0,0};
-float gTempBiasCoes[3] = {0.02, 0.02, 0.01};
 byte address = 0x20;
 
 void setup() {
@@ -68,19 +66,17 @@ void setup() {
   Wire.begin();
 
   odrValue = getODR();
-//  Serial.println("Gyroscope FXAS2100c");
-//  Serial.print("Output data rate: ");
-//  Serial.print(odrValue);
-//  Serial.println(" Hz");
+  Serial.println("Gyroscope FXAS2100c");
+  Serial.print("Output data rate: ");
+  Serial.print(odrValue);
+  Serial.println(" Hz");
   setConfigures();
-  calibrate();
   active();
   delay(500);
   readTempData();
-  tempData0 = tempData;
-//  Serial.print("Temperature: ");
-//  Serial.print(tempData);
-//  Serial.println(" Degree");
+  Serial.print("Temperature: ");
+  Serial.print(tempData);
+  Serial.println(" Degree");
 }
 
 void loop() {
@@ -89,21 +85,21 @@ void loop() {
   }
   
   if (!(testing)){
-    int j = 1;
-    while(j){
-      if(Serial.available())  {
-        String value = Serial.readStringUntil('\n');
-        Serial.println(value);
-        if(value=="start") {
-            i = 0;
-            testtime = testtime;
-            j = 0;
-            testing = 1;
-            delay(2000);
-          }
-        }
+  int j = 1;
+  while(j){
+    if(Serial.available())  {
+      String value = Serial.readStringUntil('\n');
+      Serial.println(value);
+      if(value=="start") {
+          i = 0;
+          testtime = testtime;
+          j = 0;
+          testing = 1;
+          delay(2000);
       }
+    }
   }
+}
   intt = micros();
 
   i=i+1;
@@ -117,7 +113,7 @@ void loop() {
   Serial.print(" ");
   Serial.println((float)gyroZ,7);
 
-  while(micros()-intt<1.0/odrValue*1e6){
+  while(micros()-intt<1.0/(ODR)*1e6){
   }
 }
 
@@ -206,54 +202,13 @@ void setConfigures()
 // Reads the gyroscope data
 void readGyroData()
 {
-  readTempData();
-  float tempDelta = tempData - tempData0;
   uint8_t rawData[6];  // x/y/z gyro register data stored here
   readRegs(FXAS21002C_H_OUT_X_MSB, 6, &rawData[0]);  // Read the six raw data registers into data array
-  gyroX = ((int16_t)(((int16_t)rawData[0]) << 8 | ((int16_t) rawData[1])))*sensitivity()-gBias[0]+gTempBiasCoes[0]*tempDelta;
-  gyroY = ((int16_t)(((int16_t)rawData[2]) << 8 | ((int16_t) rawData[3])))*sensitivity()-gBias[1]+gTempBiasCoes[1]*tempDelta;
-  gyroZ = ((int16_t)(((int16_t)rawData[4]) << 8 | ((int16_t) rawData[5])))*sensitivity()-gBias[2]+gTempBiasCoes[2]*tempDelta;
+  gyroX = ((int16_t)(((int16_t)rawData[0]) << 8 | ((int16_t) rawData[1])))*sensitivity()-gBias[0];
+  gyroY = ((int16_t)(((int16_t)rawData[2]) << 8 | ((int16_t) rawData[3])))*sensitivity()-gBias[1];
+  gyroZ = ((int16_t)(((int16_t)rawData[4]) << 8 | ((int16_t) rawData[5])))*sensitivity()-gBias[2];
 }
 
-// Calibrate the sensor
-void calibrate()
-{
-  int32_t gyro_bias[3] = {0, 0, 0};
-  uint16_t ii, fcount = 3*odrValue;
-  int16_t temp[3];
-
-  active();  // Set to active to start collecting data
-  double intt = micros();
-  double waitt = 0;
-  uint8_t rawData[6];
-  for(ii = 0; ii < fcount+60; ii++)
-  {
-  readRegs(FXAS21002C_H_OUT_X_MSB, 6, &rawData[0]);
-  temp[0] = ((int16_t)( ((int16_t) rawData[0]) << 8 | ((int16_t) rawData[1])));
-  temp[1] = ((int16_t)( ((int16_t) rawData[2]) << 8 | ((int16_t) rawData[3])));
-  temp[2] = ((int16_t)( ((int16_t) rawData[4]) << 8 | ((int16_t) rawData[5])));
-
-  if (ii>60) {
-  gyro_bias[0] += (int32_t) temp[0];
-  gyro_bias[1] += (int32_t) temp[1];
-  gyro_bias[2] += (int32_t) temp[2];
-  }
-  waitt = waitt + 1.0/(odrValue)*1e6;
-    while(micros()-intt<waitt){
-    }
-  }
-
-  gyro_bias[0] /= (int32_t) fcount; // get average values
-  gyro_bias[1] /= (int32_t) fcount;
-  gyro_bias[2] /= (int32_t) fcount;
-
-  gBias[0] = (float)gyro_bias[0]*(float) sensitivity(); // get average values
-  gBias[1] = (float)gyro_bias[1]*(float) sensitivity(); // get average values
-  gBias[2] = (float)gyro_bias[2]*(float) sensitivity(); // get average values
-
-  ready();  // Set to ready
-
-}
 // return the sensitivity of the senosr depending on the value of the full-scale range
 float sensitivity(void)
 {
