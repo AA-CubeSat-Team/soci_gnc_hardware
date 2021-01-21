@@ -64,56 +64,25 @@ byte address = 0x20;
 void setup() {
   Serial.begin(115200);
   Wire.begin();
-
-  odrValue = getODR();
-  Serial.println("Gyroscope FXAS2100c");
-  Serial.print("Output data rate: ");
-  Serial.print(odrValue);
-  Serial.println(" Hz");
-  setConfigures();
-  active();
-  delay(500);
-  readTempData();
-  Serial.print("Temperature: ");
-  Serial.print(tempData);
-  Serial.println(" Degree");
 }
 
 void loop() {
-  if (i == floor(testtime*ODR)){
-    testing = 0;
+  double referenceSensitivity = 7.8125e-3;
+  Serial.print("Reference sensitivity: ");
+  Serial.println(referenceSensitivity, 7);
+
+  setConfigures();
+  
+  double readSensitivity = sensitivity();
+  Serial.print("Read sensitivity: ");
+  Serial.println(readSensitivity, 7);
+  if (readSensitivity == referenceSensitivity) {
+    Serial.println("Pass");
+  } else {
+    Serial.println("Fail");
   }
   
-  if (!(testing)){
-  int j = 1;
-  while(j){
-    if(Serial.available())  {
-      String value = Serial.readStringUntil('\n');
-      Serial.println(value);
-      if(value=="start") {
-          i = 0;
-          testtime = testtime;
-          j = 0;
-          testing = 1;
-          delay(2000);
-      }
-    }
-  }
-}
-  intt = micros();
-
-  i=i+1;
-
-  // Query the sensor
-  readGyroData();
-  Serial.print(" ");
-  Serial.print((float)gyroX,7);
-  Serial.print(" ");
-  Serial.print((float)gyroY,7);
-  Serial.print(" ");
-  Serial.println((float)gyroZ,7);
-
-  while(micros()-intt<1.0/(ODR)*1e6){
+  while(1){
   }
 }
 
@@ -128,11 +97,13 @@ void writeReg(byte reg, byte value)
 
 // writes a signle field which has last digit at bit 'bit' in registration 'reg' with value 'value'.
 // e.g. in CTRL_REG0, bandwidth setting is at bits 7:6, so parameter bit would be 6.
-void writeField(byte reg, byte bit, byte value)
+void writeField(byte reg, byte bit, int numBit, byte value)
 {
   byte c = readReg(reg);
-  writeReg(FXAS21002C_H_CTRL_REG1, c & ~(0x00<<bit));
-  writeReg(FXAS21002C_H_CTRL_REG1, c |   (value<<bit));
+  for (int i = 0; i < numBit; i++) {
+    c &= ~(1 << (bit + i));
+  }
+  writeReg(reg, c |   (value<<bit));
 }
 
 // Reads register 'reg' and return it as a byte.
@@ -174,29 +145,29 @@ void readTempData()
 // It must be in standby for modifying most registers
 void standby()
 {
-  writeField(FXAS21002C_H_CTRL_REG1, 0, 0x00);
+  writeField(FXAS21002C_H_CTRL_REG1, 0, 2, 0x00);
 }
 
 // Sets the FXAS21000 to active mode.
 // Needs to be in this mode to output data
 void ready()
 {
-  writeField(FXAS21002C_H_CTRL_REG1, 0, 0x01);
+  writeField(FXAS21002C_H_CTRL_REG1, 0, 2, 0x01);
 }
 
 // Puts the FXAS21002C into active mode.
 // Needs to be in this mode to output data.
 void active()
 {
-  writeField(FXAS21002C_H_CTRL_REG1, 0, 0x02);
+  writeField(FXAS21002C_H_CTRL_REG1, 0, 2, 0x02);
 }
 
 // sets up basic configures, full-scale rage, cut-off frequency and output data rate.
 void setConfigures()
 {
   standby();
-  writeReg(FXAS21002C_H_CTRL_REG0, (BW<<6) | FSR);
-  writeReg(FXAS21002C_H_CTRL_REG1, ODR << 2);
+  writeField(FXAS21002C_H_CTRL_REG0, 0, 2, FSR);
+  writeField(FXAS21002C_H_CTRL_REG1, 2, 3, ODR);
 }
 
 // Reads the gyroscope data
@@ -241,7 +212,7 @@ double getODR(void)
     case  GODR_400HZ:
         return 400;
     case  GODR_200HZ:
-        return 200;
+        return 200;   
     case  GODR_100HZ:
       return 100;
     case  GODR_50HZ:
@@ -258,6 +229,7 @@ double getODR(void)
 void reset(){
   writeReg(FXAS21002C_H_CTRL_REG1, 0x20); // set reset bit to 1 to assert software reset to zero at end of boot process
   delay(100);
-while(!(readReg(FXAS21002C_H_INT_SRC_FLAG) & 0x08))  { // wait for boot end flag to be set
-}
+  
+  while(!(readReg(FXAS21002C_H_INT_SRC_FLAG) & 0x08))  { // wait for boot end flag to be set
+  }
 }
