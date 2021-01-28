@@ -4,7 +4,7 @@
 #define SLAVE_ADDR 4
 #define ANSWERSIZE 5
 
-char test[] = "123456789123456789123456789\0";
+int num = 5.2;
 void setup()
 {
   Wire.begin(); // join i2c bus (address optional for master)
@@ -14,23 +14,7 @@ void setup()
 void loop()
 {
   delay(100);
-//  char test[sentence.length() + 1];
-//  sentence.toCharArray(test, sentence.length() + 1);
-  int size = sizeof(test);
-  for (int i = 0; i < size; i++) {
-    if (i % 32 == 0) {
-      Wire.beginTransmission(SLAVE_ADDR);
-    }
-    Wire.write(test[i]);
-    if (i % 32 == 31 || i == size - 1) {      
-      Wire.endTransmission();
-    }
-  } 
+  Wire.beginTransmission(SLAVE_ADDR);
+  Wire.write(num);
+  Wire.endTransmission();
 }
-//void loop()
-//{
-//  delay(100);
-//  Wire.beginTransmission(SLAVE_ADDR);
-//  Wire.write(5);
-//  Wire.endTransmission();
-//}

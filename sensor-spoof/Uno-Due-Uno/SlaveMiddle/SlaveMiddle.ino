@@ -5,9 +5,7 @@
 #define SLAVE_ADDR 4
 #define ANSWERSIZE 5
 
-String answer = "";
-
-//byte answer;
+int num = 0;
 
 extern TwoWire Wire1;
 
@@ -19,26 +17,20 @@ void setup() {
   // SDA and SCL
   Wire.begin(SLAVE_ADDR);
   Wire.onReceive(receiveEvent);
+  
   Serial.begin(9600);
 }
 
 // This method sends back 5 to MasterRight on request
 void requestEvent(){ // from Arduino Master 2
-  
-//  Wire1.write(answer);
+  Wire1.write(num);
 }
 
 // This method takes bytes from the Master Left
 // Should print 1
 void receiveEvent(int numBytes) {
-  while(Wire.available()) {
-    char b = Wire.read();
-    answer += b;
-  }
-  
-  Serial.println(answer);
+  num = Wire.read();
 }
 
 void loop() {
-
 }

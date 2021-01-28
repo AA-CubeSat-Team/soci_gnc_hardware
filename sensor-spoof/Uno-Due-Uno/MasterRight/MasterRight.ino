@@ -14,7 +14,7 @@ void loop()
 {
   delay(100);
   Wire.requestFrom(SLAVE_ADDR,1);
-  byte response; 
+  int response; 
   while(Wire.available()) {
     response = Wire.read();
   }
