@@ -1,10 +1,12 @@
-// Master Code Arduino Uno
-// Sends 5 to Arduino Due
+// Master Code Arduino Uno Left
+// Sends value to Arduino Due (the middle slave)
+
 #include <Wire.h>
 #define SLAVE_ADDR 4
-#define ANSWERSIZE 5
+// the address of slave in the middle through which data will be transferred
+#define ANSWERSIZE num
 
-int num = 5.2;
+int num;
 void setup()
 {
   Wire.begin(); // join i2c bus (address optional for master)
@@ -14,7 +16,8 @@ void setup()
 void loop()
 {
   delay(100);
-  Wire.beginTransmission(SLAVE_ADDR);
+  //opens communication with middle slave
+  Wire.beginTransmission(SLAVE_ADDR); 
   Wire.write(num);
   Wire.endTransmission();
 }

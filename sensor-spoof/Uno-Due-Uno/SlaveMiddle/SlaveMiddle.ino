@@ -1,13 +1,13 @@
 // Slave Code Arduino Due
-// Takes 5 from MasterLeft and sends it to MasterRight
+// Takes int from MasterLeft and sends it to MasterRight
 
 #include <Wire.h>
 #define SLAVE_ADDR 4
-#define ANSWERSIZE 5
+#define ANSWERSIZE num
 
-int num = 0;
+int num;
 
-extern TwoWire Wire1;
+extern TwoWire Wire1; // required for i2c 
 
 void setup() {
   // SDA1 and SCL1
@@ -27,7 +27,7 @@ void requestEvent(){ // from Arduino Master 2
 }
 
 // This method takes bytes from the Master Left
-// Should print 1
+// Should print integer from MasterLeft
 void receiveEvent(int numBytes) {
   num = Wire.read();
 }

@@ -1,8 +1,8 @@
-// Master Code Arduino Uno
-// Should output 5 from Master Left 
+// Master Code Arduino Uno Right
+// Should output value from Master Left 
 #include <Wire.h>
 #define SLAVE_ADDR 4
-#define ANSWERSIZE 5
+#define ANSWERSIZE num
 
 void setup()
 {
@@ -13,11 +13,11 @@ void setup()
 void loop()
 {
   delay(100);
-  Wire.requestFrom(SLAVE_ADDR,1);
-  int response; 
+  Wire.requestFrom(SLAVE_ADDR,1); //pulls data from available wire from slave
+  int response; //integer passed from masterleft
   while(Wire.available()) {
     response = Wire.read();
   }
-  Serial.print("Expected: 5; Actual: ");
+  Serial.print("Value from MasterLeft: ");
   Serial.println(response);
 }
