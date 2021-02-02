@@ -92,7 +92,7 @@ def readData(commandCode):
     return readVals
 
 #defining some bytes that will be repeatedly used    
-addressByte = b'\x01'
+addressByte = b'\x60'
 lengthByte = b'\x01'
 
 #writes angle command bytes to sun sensor, checks for proper response, then calls readData and prints out the data

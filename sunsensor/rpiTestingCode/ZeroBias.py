@@ -91,7 +91,7 @@ def readData(commandCode):
         return [-1000, -1000, -1000, -1000]
     return readVals
     
-addressByte = b'\x01'
+addressByte = b'\x60'
 lengthByte = b'\x01'
 def getAngles():
     #write address byte

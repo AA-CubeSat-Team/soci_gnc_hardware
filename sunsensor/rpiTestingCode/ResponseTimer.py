@@ -23,7 +23,7 @@ def timer(comm, numReads):
         commByte = b'\x01'
         checkSum = b'\x02'
         #these next two bytes are the same for all commands
-        addressByte = b'\x01'
+        addressByte = b'\x60'
         lengthByte = b'\x01'
         #check if the user wants filtered voltage
         if comm == "F":
