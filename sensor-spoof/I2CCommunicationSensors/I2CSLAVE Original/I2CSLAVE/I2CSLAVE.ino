@@ -1,5 +1,5 @@
 #include <Wire.h>
-#define SLAVE_ADDR 9
+#define SLAVE_ADDR 4
 #define ANSWERSIZE 5
 
 String answer = "Hello";
@@ -15,7 +15,8 @@ void setup() {
 
 void receiveEvent() {
     while (Wire.available()) {
-    byte x = Wire.read();
+    int x = Wire.read();
+    Serial.println(x,HEX);
   }   
 }
 

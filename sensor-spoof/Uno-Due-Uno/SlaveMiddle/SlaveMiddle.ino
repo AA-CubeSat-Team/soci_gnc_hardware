@@ -1,18 +1,19 @@
 // Slave Code Arduino Due
-// Takes int from MasterLeft and sends it to MasterRight
+// Outline Structure for Sensor Spoof
+// Takes data from MasterLeft(Simulink) and sends it to MasterRight(OBC)
 
 #include <Wire.h>
-#define SLAVE_ADDR 4
-#define ANSWERSIZE num
+#define SLAVE_ADDR 4 // Dependent on sensor
 
-int num;
+int num; // Global Variable
 
-extern TwoWire Wire1; // required for i2c 
+extern TwoWire WireRequest; // WireRequest - required for SDA1/SCL1 port
+                            // Wire        - used for regular i2c port
 
 void setup() {
   // SDA1 and SCL1
-  Wire1.begin(SLAVE_ADDR); //Runs in SLAVE mode
-  Wire1.onRequest(requestEvent); 
+  WireRequest.begin(SLAVE_ADDR); //Runs in SLAVE mode
+  WireRequest.onRequest(requestEvent); 
 
   // SDA and SCL
   Wire.begin(SLAVE_ADDR);
@@ -21,13 +22,14 @@ void setup() {
   Serial.begin(9600);
 }
 
-// This method sends back 5 to MasterRight on request
-void requestEvent(){ // from Arduino Master 2
-  Wire1.write(num);
+// This method is called when OBC requests data from the sensor.
+// It sends the value held in the global variable.
+void requestEvent(){ 
+  WireRequest.write(num);
 }
 
-// This method takes bytes from the Master Left
-// Should print integer from MasterLeft
+// This method is called when Simulink is sending data to the sensor.
+// It stores the data in a global variable.
 void receiveEvent(int numBytes) {
   num = Wire.read();
 }
