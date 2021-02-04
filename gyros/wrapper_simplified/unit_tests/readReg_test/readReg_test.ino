@@ -44,7 +44,7 @@ void loop() {
   Serial.print("Reference indentifier: ");
   Serial.println(referenceIndentifier);  
   uint8_t readIndentifier;
-  readReg(0x0C, readIndentifier);
+  readReg(0x0C, &readIndentifier);
   Serial.print("Read indentifier: ");
   Serial.println(readIndentifier);
   if (readIndentifier == referenceIndentifier) {
@@ -58,13 +58,13 @@ void loop() {
 }
 
 // Reads register 'reg' and return it as a byte.
-void readReg(uint8_t reg, uint8_t &value)
+void readReg(uint8_t reg, uint8_t *value)
 {
   Wire.beginTransmission(address);
   Wire.write(reg);
   Wire.endTransmission(false);
   Wire.requestFrom(address, (uint8_t)1);
-  value = Wire.read();
+  *value = Wire.read();
 }
 
 // Reads 'counts' number of values from registration
@@ -99,7 +99,7 @@ void writeReg(uint8_t reg, uint8_t value)
 void writeField(uint8_t reg, int bit, int numBit, uint8_t value)
 {
   uint8_t c;
-  readReg(reg, c);
+  readReg(reg, &c);
   for (int i = 0; i < numBit; i++) {
     c &= ~(1 << (bit + i));
   }
@@ -107,11 +107,11 @@ void writeField(uint8_t reg, int bit, int numBit, uint8_t value)
 }
 
 // Reads the temperature data
-void readTempData(int8_t &tempData)
+void readTempData(int8_t *tempData)
 {
   uint8_t rawTempData;
-  readReg(FXAS21002C_H_TEMP, rawTempData);
-  tempData = (int8_t) rawTempData;
+  readReg(FXAS21002C_H_TEMP, &rawTempData);
+  *tempData = (int8_t) rawTempData;
 }
 
 // Puts the FXAS21002C into standby mode.
@@ -144,7 +144,7 @@ void setConfigures()
 // Reads the gyroscope data
 void readGyroData(float &gyroX, float &gyroY, float &gyroZ, int8_t &tempData, int8_t tempData0)
 {
-  readTempData(tempData);
+  readTempData(&tempData);
   int8_t tempDelta = tempData - tempData0;
   uint8_t rawData[6];  // x/y/z gyro register data stored here
   readRegs(FXAS21002C_H_OUT_X_MSB, 6, &rawData[0]);  // Read the six raw data registers into data array
@@ -204,8 +204,8 @@ void reset(){
   delay(100);
 
   uint8_t flag;
-  readReg(FXAS21002C_H_INT_SRC_FLAG, flag);
+  readReg(FXAS21002C_H_INT_SRC_FLAG, &flag);
   while(!(flag & 0x08))  { // wait for boot end flag to be set
-      readReg(FXAS21002C_H_INT_SRC_FLAG, flag);
+      readReg(FXAS21002C_H_INT_SRC_FLAG, &flag);
   }
 }
