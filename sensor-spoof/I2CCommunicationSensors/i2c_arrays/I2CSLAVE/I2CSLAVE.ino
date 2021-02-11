@@ -3,7 +3,7 @@
 #define ANSWERSIZE 5
 
 char t[10]; //empty array where to put the data going to the master
-int pulse[12]={245,255,265,275,285,295,305,315,325,335,345,355}; //Store random data to send to Master
+float pulse[12]={245,255,265,275,285,295,305,315,325,335,345,355}; //Store random data to send to Master
 
 volatile int Address = 10; // variable used by the master to sent data to the slave
 

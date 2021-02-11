@@ -2,11 +2,11 @@
 #define SLAVE_ADDR 9
 #define ANSWERSIZE 5
 
-int start = 0;
-int d; 
+float start = 0;
+float d; 
 int Address;           //Store the array address
 char t[10]={};     //create a array to receive the incoming data from the slave
-int pulse[12]={};
+float pulse[12]={};
 
 void setup() {
   Wire.begin();
@@ -20,9 +20,9 @@ void loop(){
 
     Address = i;
     Serial.println("I send");
-    Serial.println(Address);        //Print the array adcress requested by the master
+    Serial.println(Address);        // Print the array adcress requested by the master
    
-    Wire.beginTransmission (SLAVE_ADDR);    //Start I2C communication with the slave
+    Wire.beginTransmission (SLAVE_ADDR);    // Start I2C communication with the slave
     Wire.write (Address);                         
     Wire.endTransmission ();       
    
