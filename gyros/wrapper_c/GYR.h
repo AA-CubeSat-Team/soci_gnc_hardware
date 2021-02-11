@@ -3,7 +3,9 @@
  */
 #ifndef GYR_H_
 #define GYR_H_
-#define COUNT_TEMP_BIAS               1
+
+#define COUNT_TEMP_BIAS               0
+#define FIXED_BIAS                    1
 
 // register addresses FXAS21002C_H_
 #define FXAS21002C_H_OUT_X_MSB        0x01    
@@ -16,7 +18,7 @@
 #define ODR_VALUE                     12.5
 #define ODR_NUM                       0b110 
 #define FSR_VALUE                     250
-#define FSR_NUM                       0b10
+#define FSR_NUM                       0b11
 #define SENSITIVITY                   7.8125e-3
 #define TEMP_BIAS_COE_X               0.02
 #define TEMP_BIAS_COE_Y               0.02

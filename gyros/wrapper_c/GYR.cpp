@@ -5,8 +5,9 @@
  *      Author: Alex Zhen
  */
 #include <Wire.h>
-#include <math.h>
+#if !(FIXED_BIAS)
 #include <Arduino.h>
+#endif
 #include "GYR.h"
 
 int8_t tempData;
@@ -120,6 +121,14 @@ void readGyroData(float *gyroX, float *gyroY, float *gyroZ, int8_t *tempData)
   #endif
 }
 
+#if FIXED_BIAS
+void calibrate(float *gBiasX, float *gBiasY, float *gBiasZ)
+{
+  *gBiasX = -0.565375;
+  *gBiasY = 0.6173333;
+  *gBiasZ = -0.0121667;
+}
+#else
 void calibrate(float *gBiasX, float *gBiasY, float *gBiasZ)
 {
   uint16_t ii, fcount = 5*ODR_VALUE;
@@ -156,6 +165,7 @@ void calibrate(float *gBiasX, float *gBiasY, float *gBiasZ)
 
   ready();
 }
+#endif
 
 void reset(){
   writeReg(FXAS21002C_H_CTRL_REG1, 0b1000000); // set reset bit to 1 to assert software reset to zero at end of boot process
