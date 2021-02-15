@@ -16,7 +16,7 @@ void setup() {
 void receiveEvent() {
     while (Wire.available()) {
     int x = Wire.read();
-    Serial.println(x,HEX);
+    Serial.println(x);
   }   
 }
 
