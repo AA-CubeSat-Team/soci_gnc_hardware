@@ -1,5 +1,6 @@
 // Master Code Arduino Uno Right
 // Should output value from Master Left 
+// 2/16/21
 #include <Wire.h>
 #define SLAVE_ADDR 4
 
