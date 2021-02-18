@@ -14,15 +14,14 @@ int8_t tempData;
 int8_t tempData0;
 float gyroX, gyroY, gyroZ;
 float gBiasX, gBiasY, gBiasZ;
-uint8_t address = 0x20;
 
 // Reads register 'reg' and return it as a byte.
 void readReg(uint8_t reg, uint8_t *value)
 {
-  Wire.beginTransmission(address);
+  Wire.beginTransmission(ADDRESS);
   Wire.write(reg);
   Wire.endTransmission(false);
-  Wire.requestFrom(address, (uint8_t)1);
+  Wire.requestFrom(ADDRESS, (uint8_t)1);
   *value = Wire.read();
 }
 
@@ -32,10 +31,10 @@ void readRegs(uint8_t reg, uint8_t count, uint8_t dest[])
 {
   uint8_t i = 0;
 
-  Wire.beginTransmission(address);
+  Wire.beginTransmission(ADDRESS);
   Wire.write(reg);
   Wire.endTransmission(false);
-  Wire.requestFrom(address, count);
+  Wire.requestFrom(ADDRESS, count);
 
   while (Wire.available()) {
     dest[i++] = Wire.read();
@@ -45,7 +44,7 @@ void readRegs(uint8_t reg, uint8_t count, uint8_t dest[])
 // writes registration 'reg' with value 'value'
 void writeReg(uint8_t reg, uint8_t value)
 {
-  Wire.beginTransmission(address);
+  Wire.beginTransmission(ADDRESS);
   Wire.write(reg);
   Wire.write(value);
   Wire.endTransmission();
@@ -106,7 +105,7 @@ void readGyroData(float *gyroX, float *gyroY, float *gyroZ, int8_t *tempData)
   readTempData(tempData);
   int8_t tempDelta = *tempData - tempData0;
   uint8_t rawData[6];  // x/y/z gyro register data stored here
-  readRegs(FXAS21002C_H_OUT_X_MSB, 6, &rawData[0]);  // Read the six raw data registers into data array
+  readRegs(FXAS21002C_H_OUT_X_MSB, 6, rawData);  // Read the six raw data registers into data array
   *gyroX = ((int16_t)(((int16_t)rawData[0]) << 8 | ((int16_t) rawData[1])));
   *gyroY = ((int16_t)(((int16_t)rawData[2]) << 8 | ((int16_t) rawData[3])));
   *gyroZ = ((int16_t)(((int16_t)rawData[4]) << 8 | ((int16_t) rawData[5])));

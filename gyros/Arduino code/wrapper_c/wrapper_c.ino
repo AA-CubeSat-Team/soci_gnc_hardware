@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "GYR.h"
 
-#define PRINT_INFO                    0
+#define PRINT_INFO                    1
 #define DEBUG                         0
 #define CALIBRATE                     1
 

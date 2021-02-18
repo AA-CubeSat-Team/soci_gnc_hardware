@@ -10,13 +10,14 @@
 // register addresses FXAS21002C_H_
 #define FXAS21002C_H_OUT_X_MSB        0x01    
 #define FXAS21002C_H_CTRL_REG0        0x0D  
+#define FXAS21002C_H_F_SETUP          0x09
 #define FXAS21002C_H_TEMP             0x12
 #define FXAS21002C_H_CTRL_REG1        0x13
 #define FXAS21002C_H_INT_SRC_FLAG     0x0B
 
 // gyro parameters
-#define ODR_VALUE                     12.5
-#define ODR_NUM                       0b110 
+#define ODR_VALUE                     50
+#define ODR_NUM                       0b100 
 #define FSR_VALUE                     250
 #define FSR_NUM                       0b11
 #define SENSITIVITY                   7.8125e-3
@@ -27,25 +28,9 @@
 #define TEMP_SENS_COE_Y               0.0008
 #define TEMP_SENS_COE_Z               0.0001
 
-//// Sensor data
-//float gyroX = 0;
-//float gyroY = 0;
-//float gyroZ = 0;
-//int8_t tempData = 0;
-//int8_t tempData0 = 0;
-//float gBiasX = 0;
-//float gBiasY = 0;
-//float gBiasZ = 0;
-//uint8_t address = 0x20;
-
-//extern tempData;
-//extern tempData0;
-//extern gyroX, gyroY, gyroZ;
-//extern gBiasX, gBiasY, gBiasZ;
-//extern address;
 extern int8_t tempData;
 extern int8_t tempData0;
-extern float gyroX, gyroY, gyroZ;
+extern float gyroX[5], gyroY[5], gyroZ[5];
 extern float gBiasX, gBiasY, gBiasZ;
 extern uint8_t address;
 
@@ -58,7 +43,7 @@ void setConfigures(void);
 void standby(void);
 void active(void);
 void ready(void);
-void readGyroData(float *gyroX, float *gyroY, float *gyroZ, int8_t *tempData);
+void readGyroData(float gyroX[], float gyroY[], float gyroZ[], int8_t *tempData);
 void calibrate(float *gBiasX, float *gBiasY, float *gBiasZ);
 void reset(void);
 #endif
