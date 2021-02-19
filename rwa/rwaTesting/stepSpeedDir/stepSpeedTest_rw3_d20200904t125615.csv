@@ -1,0 +1,4 @@
+entry,timeGMT,timeELA_s,CRC,exec,currSpeed_01_RPM,refSpeed_01_RPM,state,clcMode,voltage_V,current_mA,power_mW,testName,rwID,startTime
+1,19:56:16 GMT,0.323,1,1,9500,10000,4,1,0.892,-0.3,-0.268,stepSpeedTest,RW-3,20200904125615
+2,19:56:16 GMT,0.629,1,1,9500,10000,4,1,0.888,-0.1,-0.089,stepSpeedTest,RW-3,20200904125615
+3,19:56:17 GMT,1.141,0,0,2118033215,2122219134,126,126,0.892,-0.3,-0.268,stepSpeedTest,RW-3,20200904125615

@@ -1,18 +1,8 @@
 
 
-inpString = input("enter hex bytes with no spaces: \n")
+rplArr = 1
+while rplArr == 1:
+    print('transfer attempt')
+    rplArr = 2
 
-inpCharList = list(inpString)
-
-inpLength = len(inpCharList)
-txLength = int(inpLength / 2)
-
-txByteArray = [0] * txLength
-
-for c in range(0, txLength):
-    txByteArray[c] = inpCharList[2*c] + inpCharList[(2*c)+1]
-    txByteArray[c] = int(txByteArray[c],16)
-
-
-
-
+print('transfer complete')
