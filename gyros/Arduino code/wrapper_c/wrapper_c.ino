@@ -1,9 +1,9 @@
 #include <Wire.h>
 #include "GYR.h"
 
-#define PRINT_INFO                    1
+#define PRINT_INFO                    0
 #define DEBUG                         0
-#define CALIBRATE                     1
+#define CALIBRATE                     0
 
 
 // test var
