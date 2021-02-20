@@ -1,0 +1,2 @@
+entry,timeGMT,timeELA_s,samplePeriod_ms,msTimeoutG_ms,xferTotal,xferPass,xferFail,testName,rwID,startTime
+1,22:15:56 GMT,20.042,100,10,158,0,158,timeoutTest,RW0-0110,20201019151536

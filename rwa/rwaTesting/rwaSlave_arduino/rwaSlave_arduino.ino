@@ -67,7 +67,7 @@ void setup (void){
   pinMode(MISO, OUTPUT);
 
   SPCR = SPCR | bit(SPE);           // sets SPE bit in SPCR to 1, enabling SPI
-  SPCR = SPCR | bit(SPIE);          // sets SPIE bit in SPCR to 1, enabling SPI interrupts
+  SPI.attachInterrupt(); 
   
   SPDR = 0;
   flag = false;
