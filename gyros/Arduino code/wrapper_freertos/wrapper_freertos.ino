@@ -1,8 +1,6 @@
 #include <Wire.h>
-#include "GYR.h"
-
-#define PRINT_INFO                    0
-
+#include "gyro_wrap.h"
+#define PRINT_INFO                    1
 
 long intt;
 int i = 0;

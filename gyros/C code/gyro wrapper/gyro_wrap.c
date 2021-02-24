@@ -1,24 +1,39 @@
 /*
- * gyr_wrap.c
+ * gyro_wrap.c
  *
  *  Created on: Feb 17, 2021
  *      Author: Alex Zhen
  */
 
 
-#include <gyro_wrap.h>
+#include "gyro_wrap.h"
+#if !ARDUINO_CODE
+#include <peripherals.h>
+#endif
 
+// register addresses FXAS21002C_H_
+#define GYRO_OUT_X_MSB        0x01
+#define GYRO_CTRL_REG0        0x0D
+#define GYRO_TEMP         0x12
+#define GYRO_CTRL_REG1        0x13
+#define GYRO_INT_SRC_FLAG     0x0B
+
+// gyro parameters
+
+#define GYRO_ODR_NUM        0b110
+#define GYRO_FSR_NUM        0b11
+#define GYRO_SENSITIVITY      7.8125e-3
+#define GYRO_TEMP_0         23
+#define GYRO_ADDRESS        (uint8_t)0x20
 
 // gyroscope struct.
 gyro_t Gyro1;
 
-// i2c stuff
-lpi2c_rtos_handle_t * handle_Gyro1;
-LPI2C_Type * base1 = LPI2C1; // found this from MIMXRT1021.h, not sure if that's the right value to be used.
-lpi2c_master_handle_t handle1; // should this be the i2c1_handler that is talked about in the meeting? do I have to initialize it or it is already there?
-lpi2c_master_config_t * masterConfig_Gyro1;
-
-lpi2c_master_transfer_t * transfer1;
+#if !ARDUINO_CODE
+// i2c stuff, should be defined in peripherals.c?
+lpi2c_rtos_handle_t * gyroHandle1;
+lpi2c_master_transfer_t * gyroTransfer1;
+#endif
 
 
 /*!
@@ -34,11 +49,23 @@ lpi2c_master_transfer_t * transfer1;
  */
 void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
 {
-	Gyro->transfer->direction = kLPI2C_Read;
-	Gyro->transfer->subaddress = reg;
-	Gyro->transfer->data = value;
-	Gyro->transfer->dataSize = valueSize;
-	LPI2C_RTOS_Transfer(Gyro->handle_Gyro, Gyro->transfer);
+#if ARDUINO_CODE
+    (Gyro->gyroWire).beginTransmission(GYRO_ADDRESS);
+    (Gyro->gyroWire).write(reg);
+    (Gyro->gyroWire).endTransmission(false);
+    (Gyro->gyroWire).requestFrom(GYRO_ADDRESS, valueSize);
+    int i = 0;
+    while (Wire.available()) {
+      *(value+i) = Wire.read();
+      i++;
+    }
+#else
+  Gyro->gyroTransfer->direction = kLPI2C_Read;
+  Gyro->gyroTransfer->subaddress = reg;
+  Gyro->gyroTransfer->data = value;
+  Gyro->gyroTransfer->dataSize = valueSize;
+  LPI2C_RTOS_Transfer(Gyro->gyroHandle, Gyro->gyroTransfer);
+#endif
 }
 
 /*!
@@ -54,11 +81,18 @@ void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
  */
 void writeReg(uint8_t reg, uint8_t value, gyro_t * Gyro)
 {
-	Gyro->transfer->direction = kLPI2C_Write;
-	Gyro->transfer->subaddress = reg;
-	*(uint8_t*)(Gyro->transfer->data) = value;
-	Gyro->transfer->dataSize = 1;
-	LPI2C_RTOS_Transfer(Gyro->handle_Gyro, Gyro->transfer);
+#if ARDUINO_CODE
+  (Gyro->gyroWire).beginTransmission(GYRO_ADDRESS);
+  (Gyro->gyroWire).write(reg);
+  (Gyro->gyroWire).write(value);
+  (Gyro->gyroWire).endTransmission();
+#else
+  Gyro->gyroTransfer->direction = kLPI2C_Write;
+  Gyro->gyroTransfer->subaddress = reg;
+  *(uint8_t*)(Gyro->gyroTransfer->data) = value;
+  Gyro->gyroTransfer->dataSize = 1;
+  LPI2C_RTOS_Transfer(Gyro->gyroHandle, Gyro->gyroTransfer);
+#endif
 }
 
 /*!
@@ -66,79 +100,71 @@ void writeReg(uint8_t reg, uint8_t value, gyro_t * Gyro)
  *
  *
  * @param Gyro The gyroscope want to be read.
- * @param handle_Gyro The freertos handle of the gyroscope.
+ * @param gyroHandle The freertos handle of the gyroscope.
  * @param base_Gyro The base of the gyroscope.
  * @param handle_Master The master handle of the gyroscope.
  * @param masterConfig_Gyro The master config. of the gyroscope.
- * @param transfer_Gyro The transfer information of the gyroscope.
+ * @param gyroTransfer The transfer information of the gyroscope.
  * @return void
  *
  */
-void startGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *handle_Gyro, LPI2C_Type * base_Gyro, lpi2c_master_handle_t handle_Master, lpi2c_master_config_t * masterConfig_Gyro, lpi2c_master_transfer_t *transfer)
+#if ARDUINO_CODE
+void startGyro(gyro_t * Gyro)
 {
-	static const float gyroXYZValue[3] = {0, 0, 0};
-	memcpy(Gyro->gyroXYZ,gyroXYZValue, 12); /* Question: do I have to initialize all fields of a structure?
-	 	 	 	 	 	 	 	 	 	Does this way to initialize a structure even works?
-	 	 	 	 	 	 	 	 	 	When is the structure initialized? At line 13 or when the first its field is initialized?
-	 	 	 	 	 	 	 	 	 		*/
-	Gyro->temperature = 23;
-
-
-	uint32_t srcClock_Hz_Gyro = 9600000; // not sure what this value should be
-	LPI2C_MasterGetDefaultConfig(masterConfig_Gyro); // not sure if this is the right way to initialize it, found this function in fsl_lpi2c.h.
-	handle_Gyro->drv_handle = handle_Master;
-	LPI2C_RTOS_Init(handle_Gyro, base_Gyro, masterConfig_Gyro, srcClock_Hz_Gyro); // I guess this is the right way to initialize handle_Gyro?
-	Gyro->handle_Gyro = handle_Gyro;
-
-	transfer->flags = 0;
-	transfer->slaveAddress = GYRO_ADDRESS;
-	transfer->direction = kLPI2C_Read;
-	transfer->subaddress = 0;
-	transfer->subaddressSize = 1;
-	static void * data_temp;
-	transfer->data = data_temp;
-	transfer->dataSize = 1;
-	Gyro->transfer = transfer;
-
-
-#if DIFF_TEMP_BIAS_COE
-	switch (base_Gyro){
-		case LPI2C1:
-			static const gyroBiasValue = {-0.565375, 0.6173333, -0.0121667};
-			static const gyroTempBiasCoeValue = {0.02, 0.02, 0.01};
-			static const gyroTempSensCoeValue = {0.0008, 0.0008, 0.0001};
-			Gyro->gyroBias = gyroBiasValue;
-			Gyro->gyroTempBiasCoe = gyroTempBiasCoeValue;
-			Gyro->gyroTempSensCoe = gyroTempSensCoeValue;
-			break;
-		case LPI2C2:
-			static const gyroBiasValue = {0, 0, 0};
-			static const gyroTempBiasCoeValue = {0, 0, 0};
-			static const gyroTempSensCoeValue = {0, 0, 0};
-			Gyro->gyroBias = gyroBiasValue;
-			Gyro->gyroTempBiasCoe = gyroTempBiasCoeValue;
-			Gyro->gyroTempSensCoe = gyroTempSensCoeValue;
-			break;
-		case LPI2C3:
-			static const gyroBiasValue = {0, 0, 0};
-			static const gyroTempBiasCoeValue = {0, 0, 0};
-			static const gyroTempSensCoeValue = {0, 0, 0};
-			Gyro->gyroBias = gyroBiasValue;
-			Gyro->gyroTempBiasCoe = gyroTempBiasCoeValue;
-			Gyro->gyroTempSensCoe = gyroTempSensCoeValue;
-			break;
-	}
 #else
-	static const float gyroBiasValue[3] = {-0.565375, 0.6173333, -0.0121667};
-	static const float gyroTempBiasCoeValue[3] = {0.02, 0.02, 0.01};
-	static const float gyroTempSensCoeValue[3] = {0.0008, 0.0008, 0.0001};
-	memcpy(Gyro->gyroBias,gyroBiasValue, 12);
-	memcpy(Gyro->gyroTempBiasCoe,gyroTempBiasCoeValue, 12);
-	memcpy(Gyro->gyroTempSensCoe,gyroTempSensCoeValue, 12);
+void startGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle, lpi2c_master_transfer_t *gyroTransfer)
+{
+#endif
+#if !ARDUINO_CODE
+  Gyro->gyroHandle = gyroHandle;
+
+  gyroTransfer->slaveAddress = GYRO_ADDRESS;
+  gyroTransfer->subaddressSize = 1;
+  Gyro->gyroTransfer = gyroTransfer;
 #endif
 
-	writeReg(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
-	writeReg(GYRO_CTRL_REG1, (GYRO_ODR_NUM<<2 | 0b10), Gyro);
+#if DIFF_TEMP_BIAS_COE
+  switch (base_Gyro){
+    case LPI2C1:
+      static const gyroBiasValue = {-0.565375, 0.6173333, -0.0121667};
+      static const gyroTempBiasCoeValue = {0.02, 0.02, 0.01};
+      static const gyroTempSensCoeValue = {0.0008, 0.0008, 0.0001};
+      Gyro->gyroBias = gyroBiasValue;
+      Gyro->gyroTempBiasCoe = gyroTempBiasCoeValue;
+      Gyro->gyroTempSensCoe = gyroTempSensCoeValue;
+      break;
+    case LPI2C2:
+      static const gyroBiasValue = {0, 0, 0};
+      static const gyroTempBiasCoeValue = {0, 0, 0};
+      static const gyroTempSensCoeValue = {0, 0, 0};
+      Gyro->gyroBias = gyroBiasValue;
+      Gyro->gyroTempBiasCoe = gyroTempBiasCoeValue;
+      Gyro->gyroTempSensCoe = gyroTempSensCoeValue;
+      break;
+    case LPI2C3:
+      static const gyroBiasValue = {0, 0, 0};
+      static const gyroTempBiasCoeValue = {0, 0, 0};
+      static const gyroTempSensCoeValue = {0, 0, 0};
+      Gyro->gyroBias = gyroBiasValue;
+      Gyro->gyroTempBiasCoe = gyroTempBiasCoeValue;
+      Gyro->gyroTempSensCoe = gyroTempSensCoeValue;
+      break;
+  }
+#else
+  static const float gyroBiasValue[3] = {-0.565375, 0.6173333, -0.0121667};
+  static const float gyroTempBiasCoeValue[3] = {0.02, 0.02, 0.01};
+  static const float gyroTempSensCoeValue[3] = {0.0008, 0.0008, 0.0001};
+  memcpy(Gyro->gyroBias,gyroBiasValue, 12);
+  memcpy(Gyro->gyroTempBiasCoe,gyroTempBiasCoeValue, 12);
+  memcpy(Gyro->gyroTempSensCoe,gyroTempSensCoeValue, 12);
+#endif
+
+#if ARDUINO_CODE
+    (Gyro->gyroWire).begin();
+#endif
+
+  writeReg(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
+  writeReg(GYRO_CTRL_REG1, (GYRO_ODR_NUM<<2 | 0b10), Gyro);
 }
 
 /*!
@@ -175,11 +201,11 @@ void readGyroData(gyro_t * Gyro)
   int8_t tempDelta = Gyro->temperature - GYRO_TEMP_0;
 #endif
   for (int i = 0; i<3; i++){
-	  Gyro->gyroXYZ[i] = ((int16_t)(((int16_t)rawData[2*i]) << 8 | ((int16_t) rawData[2*i + 1])));
+    Gyro->gyroXYZ[i] = ((int16_t)(((int16_t)rawData[2*i]) << 8 | ((int16_t) rawData[2*i + 1])));
 #if COUNT_TEMP_BIAS
-	  Gyro->gyroXYZ[i] = (Gyro->gyroXYZ[i])*GYRO_SENSITIVITY*(1 + (Gyro->gyroTempSensCoe[i])*(int16_t) tempDelta) - (Gyro->gyroBias[i]) - Gyro->gyroTempBiasCoe[i]*(int16_t) tempDelta;
+    Gyro->gyroXYZ[i] = (Gyro->gyroXYZ[i])*GYRO_SENSITIVITY*(1 + (Gyro->gyroTempSensCoe[i])*(int16_t) tempDelta) - (Gyro->gyroBias[i]) - Gyro->gyroTempBiasCoe[i]*(int16_t) tempDelta;
 #else
-	  Gyro->gyroXYZ[i] = (Gyro->gyroXYZ[i])*GYRO_SENSITIVITY - (Gyro->gyroBias[i]);
+    Gyro->gyroXYZ[i] = (Gyro->gyroXYZ[i])*GYRO_SENSITIVITY - (Gyro->gyroBias[i]);
 #endif
   }
 
