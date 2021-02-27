@@ -109,7 +109,6 @@ def getAngles():
     sleep(0.25)
     #eat the address byte, it's not useful
     ser.read()
-    print(ser.in_waiting)
     commByte = ser.read()
     #check that I receive the right command code
     if commByte == b'\x04':
@@ -119,6 +118,7 @@ def getAngles():
         print(returnedData)
     else:
         print('wrong command code received')
+        print(commByte);
         #reset the input buffer because the rest of the sun sensor's data
         #should be ignored and removed
         ser.reset_input_buffer()     
@@ -131,12 +131,14 @@ def getVoltage():
     ser.write(b'\x02')
     sleep(0.25)
     ser.read()
-    if ser.read() == b'\x01':
+    commByte = ser.read()
+    if commByte == b'\x01':
         returnedData = readData(1)
         print('data received')
         print(returnedData)
     else:
         print('wrong command code received')
+        print(commByte);
         ser.reset_input_buffer()
 
 #similar to getAngle, but for filtered voltage
@@ -148,12 +150,14 @@ def getFilteredVoltage():
     print('command written')
     sleep(0.25)
     ser.read()
-    if ser.read()== b'\x03':
+    commByte = ser.read()
+    if commByte == b'\x03':
         returnedData = readData(3)
         print('data received')
         print(returnedData)
     else:
         print('wrong command code received')
+        print(commByte);
         ser.reset_input_buffer()
 
 sleep(1)
