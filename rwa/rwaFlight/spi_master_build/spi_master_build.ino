@@ -1,18 +1,23 @@
 //SPI MASTER (ARDUINO)
 
-/* testing checklist
+/* testing checklist:
     - signal voltages don't exceed 3.3V
     - wires are connected to correct ports
     - wires do not come into contact (short)
 */
 
+/* issues:
+ * - CRC is producing arbitrary changing values on payload array
+ * - need to split SPI mechanism from payload processing
+ */
+
 #include<SPI.h>
 
 // assigns GPIO pins to be slave-selects
-int SS1 = 1;
-int SS2 = 2;
-int SS3 = 3;
-int SS4 = 4;
+#define SS1 3
+#define SS2 4
+#define SS3 5
+#define SS4 6
 
 byte spi_req1_buf[8] = {0}; // creates request array buffer as global variable
 byte spi_req2_buf[8] = {0}; // need to allocate max possible size of bytes
@@ -86,14 +91,14 @@ unsigned int crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60
                             0x6e17, 0x7E36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
                            };
 
+SPISettings spiSet(200000, MSBFIRST, SPI_MODE0);
+  
 void setup (void) {
   Serial.begin(115200);
-
-//  SPI.begin();
-  SPI.beginTransaction(SPISettings(200000, MSBFIRST, SPI_MODE0));
-
+  
+  SPI.begin();
   pinMode(SS1, OUTPUT);
-  digitalWrite(2, HIGH);
+  digitalWrite(SS1, HIGH);
 
   Serial.println("master setup complete");
 }
@@ -108,30 +113,28 @@ void loop(void) {
   byte req_payload_rw1[7] = {0};
   int req_payload_len_rw1 = 0;
 
-              Serial.print("req_payload_rw1:\t");
-              for (int yy = 0; yy < 7; yy++){
-                Serial.print(req_payload_rw1[yy], HEX);
-                Serial.print(" ");
-              }
-              Serial.println(" ");
-              delay(500);
+//              Serial.print("req_payload_rw1:\t");
+//              for (int yy = 0; yy < 7; yy++){
+//                Serial.print(req_payload_rw1[yy], HEX);
+//                Serial.print("\t");
+//              }
+//              Serial.println(" ");
+//              delay(500);
 
 
 //  payloadWrite_cmd6(&req_payload_rw1[0], &req_payload_len_rw1, new_speed, new_ramp_time);
   payloadWrite_cmd4(&req_payload_rw1[0], &req_payload_len_rw1);
 
-              Serial.print("req_payload_rw1:\t");
-              for (int yy = 0; yy < req_payload_len_rw1; yy++){
-                Serial.print(req_payload_rw1[yy], HEX);
-                Serial.print(" ");
-              }
-              Serial.println(" ");
-              delay(500);
+//              Serial.print("req_payload_rw1:\t");
+//              for (int yy = 0; yy < req_payload_len_rw1; yy++){
+//                Serial.print(req_payload_rw1[yy], HEX);
+//                Serial.print("\t");
+//              }
+//              Serial.println(" ");
+//              delay(500);
               
 
   spiSendReq(&req_payload_rw1[0],req_payload_len_rw1,1);
-  
-  delay(5000);
 }
 
 void payloadWrite_cmd4(byte *req_payload_pt, int *req_payload_len_pt) {
@@ -428,22 +431,23 @@ void spiSendReq(byte *req_payload_pt, int req_payload_len, int rw_id) { //(FIX P
           Serial.print("spi_req_buf (MOSI):\t");
           for (int yy = 0; yy < spi_req_buf_len; yy++) {
             Serial.print(spi_req_buf[yy], HEX);
-            Serial.print(" ");
+            Serial.print("\t");
           }
           Serial.println(" ");
           delay(500);
 
-  digitalWrite(SS_id, LOW);
+  SPI.beginTransaction(spiSet);
+  digitalWrite(SS1, LOW);
   SPI.transfer(spi_req_buf, spi_req_buf_len);
-  digitalWrite(SS_id, HIGH);
+  digitalWrite(SS1, HIGH);
+  SPI.endTransaction();
 
           Serial.print("spi_req_buf (MISO):\t");
           for (int yy = 0; yy < spi_req_buf_len; yy++) {
             Serial.print(spi_req_buf[yy], HEX);
-            Serial.print(" ");
+            Serial.print("\t");
           }
           Serial.println(" ");
-          delay(500);
 
 
   // process reply to detect errors
