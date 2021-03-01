@@ -13,21 +13,17 @@ void setup()
 
 void loop()
 {
-  int response; //integer passed from masterleft
-  Wire.begin();
-  delay(1000);
-  Wire.requestFrom(SLAVE_ADDR1, 1); //pulls data from available wire from slave
-  response = Wire.read();
-  Serial.print("Value from Slave 1: ");
-  Serial.println(response);
-  Wire.endTransmission();
-  
-  delay(1000);
-  Wire.begin();
-  Wire.requestFrom(SLAVE_ADDR2, 1); //pulls data from available wire from slave
-  response = Wire.read();
-  Serial.print("Value from Slave 2: ");
-  Serial.println(response);
-  Wire.endTransmission();
+ int response; //integer passed from masterleft
+ Wire.begin();
+ delay(250);
+ Wire.requestFrom(SLAVE_ADDR1, 1); //pulls data from available wire from slave
+ response = Wire.read();
+ Serial.print("Value from Slave 1: ");
+ Serial.println(response);
+ Wire.endTransmission();
+ delay(250);
+ Wire.beginTransmission(SLAVE_ADDR2);
+ Wire.write(response + 1); //pulls data from available wire from slave
+ Wire.endTransmission();
 
 }
