@@ -27,7 +27,7 @@ void loop()
 // this function is registered as an event, see setup()
 void receiveEvent(int howMany)
 {
-  char data[sizeof(float)];
+  char data[sizeof(double)];
   float y;
   int ii = 0;
   while(Wire.available()) // loop through all but the last

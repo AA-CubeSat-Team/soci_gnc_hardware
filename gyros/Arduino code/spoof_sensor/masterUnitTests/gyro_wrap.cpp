@@ -154,7 +154,7 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle, lpi2c_master_trans
 #if ARDUINO_CODE
     (Gyro->gyroWire).begin();
 #endif
-    Gyro->gyroInitialized = 1;
+    Gyro->gyroInitialized = true;
   }
 }
 
@@ -168,13 +168,9 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle, lpi2c_master_trans
  */
 void startGyro(gyro_t * Gyro)
 {
-  if (Gyro->gyroInitialized){
-        writeReg(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
+  writeReg(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
   writeReg(GYRO_CTRL_REG1, (GYRO_ODR_NUM<<2 | 0b10), Gyro);
-  }
 }
-
-
 /*!
  * @brief Read the temperature of a gyroscope.
  *

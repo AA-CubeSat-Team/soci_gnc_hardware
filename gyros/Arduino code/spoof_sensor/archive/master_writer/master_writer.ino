@@ -26,13 +26,14 @@ void loop()
   int j = 1;
   while (j) {
     while (Serial.available()){
-      y = Serial.parseFloat(SKIP_ALL,'\n');
+//      y = Serial.parseFloat(SKIP_ALL,'\n');
+      y = Serial.read();
       Serial.println(y,6);
       j = 0;
     }
   }
 
-  char data[sizeof(float)];
+  char data[sizeof(double)];
   memcpy(data, &y, sizeof y);
   
   Wire.beginTransmission(4);

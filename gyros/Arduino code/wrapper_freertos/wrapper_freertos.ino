@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include "gyro_wrap.h"
-#define PRINT_INFO                    1
+#define PRINT_INFO                    0
 
 long intt;
 int i = 0;
@@ -18,6 +18,7 @@ void setup() {
   Serial.print(GYRO_FSR_VALUE);
   Serial.println(" Degree/s");
 #endif
+  initGyro(&Gyro1);
   startGyro(&Gyro1);
   delay(500);
   readTempData(&Gyro1);
