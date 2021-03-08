@@ -1,3 +1,6 @@
+#include "SunSensorWrapper.h"
+#include "peripherals.h"
+#include "fsL_lpuart.h"
 #include "fsl_lpuart_freertos.h"
 #include "task.h"
 /* keeps track of number of times getData() is called */
@@ -7,12 +10,12 @@ static int calls = 0;
 static int error;
 
 /* used to make sure that the UART instance is actually initialized */
-int init = 0;
+static int init = 0;
 
 /* command bytes to be issued to sun sensor */
 const uint8_t unFiltVoltsComm[4] = {0x60, 0x01, 0x01, 0x02};
 const uint8_t filtVoltsComm[4] = {0x60, 0x03, 0x01, 0x04};
-const unit8_t anglesComm[4] = {0x60, 0x04, 0x01, 0x05};
+const uint8_t anglesComm[4] = {0x60, 0x04, 0x01, 0x05};
 
 /* delay times in ticks needed */
 const TickType_t xDelay3ms = pdMS_TO_TICKS(3);
@@ -20,22 +23,12 @@ const TickType_t xDelay7ms = pdMS_TO_TICKS(7);
 /* this is the minimum possible time between commands - the typical time is 50 ms, I might want to change this */
 const TickType_t xDelay20ms = pdMS_TO_TICKS(20);
 
-/* needed for LPUART functions */
-uint8_t background_buffer[32];
-lpuart_rtos_handle_t handle;
-struct _lpuart_handle t_handle;
+/* lengths of voltage responses and angle response */
+const int voltRespLength = 20;
+const int angleRespLength = 13;
 
-lpuart_rtos_config_t lpuart_config = {
-   .baudrate = 115200,
-   .parity = kLPUART_ParityDisabled,
-   .stopbits = kLPUART_OneStopBit,
-   .buffer = background_buffer
-   .buffer_size = sizeof(background_buffer),
-   .base = LPUART3, 
-}
-
-/* make a receiver buffer, needs room for at most 20 bytes */
-uint8_t recv_buffer[20];
+/* make a receiver buffer, needs room for at most voltLength bytes*/
+uint8_t recv_buffer[voltLength];
 
 /* function that calculates powers of two, used in the conversion from bytes to a float */
 /* takes the integer exponent of 2 to be used and a pointer to the power of two */
@@ -65,7 +58,7 @@ void pow2(int expon, float* value){
 /* note this has nothing to do with actually turning the sun sensor on */
 void sunSenUARTInit(){
    /* initialize LPUART instance */
-   LPUART_RTOS_Init(&handle, &t_handle, &lpuart_config);
+   LPUART3_init();
    init = 1;
    return;
 }
@@ -155,7 +148,7 @@ void getUnfiltVolts(float* unFiltVolts){
       return;
    }
 	/* issue command to sun sensor */
-   error = LPUART_RTOS_Send(&handle, &unfiltVoltsComm, sizeof(unfiltVoltsComm));
+   error = LPUART_RTOS_Send(&uart3_handle, &unfiltVoltsComm, sizeof(unfiltVoltsComm));
    if(error != kStatus_Success){
       /* might want to include more comprehensive errors */
       *unFiltVolts = -3000.0;
@@ -168,8 +161,8 @@ void getUnfiltVolts(float* unFiltVolts){
    vDelay(xDelay3ms);
    /* this variable can be used to see how many bytes were received */
    size_t numRecvBytes = 0;
-   /* read in response to receiver buffer */
-   error = LPUART_RTOS_Receive(&handle, &recv_buffer, sizeof(recv_buffer), &numRecvBytes);
+   /* read in response to receiver buffer - takes the entire length of the receive buffer */
+   error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, sizeof(recv_buffer), &numRecvBytes);
    if(error != kStatus_Success){
       /* might want to include more comprehensive errors */
       *unFiltVolts = -4000.0;
@@ -201,7 +194,7 @@ void getFiltVolts(float* filtVolts){
       *(filtVolts + 3) = -2000.0;
       return;
    }
-   error = LPUART_RTOS_Send(&handle, &filtVoltsComm, sizeof(filtVoltsComm));
+   error = LPUART_RTOS_Send(&uart3_handle, &filtVoltsComm, sizeof(filtVoltsComm));
    if(error != kStatus_Success){
       /* might want to include more comprehensive errors */
       *filtVolts = -3000.0;
@@ -212,7 +205,8 @@ void getFiltVolts(float* filtVolts){
    }
    vDelay(xDelay3ms);
    size_t numRecvBytes = 0;
-   error = LPUART_RTOS_Receive(&handle, &recv_buffer, sizeof(recv_buffer), &numRecvBytes);
+   /* response is shorter so use angleRespLength instead */
+   error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, angleRespLength, &numRecvBytes);
       if(error != kStatus_Success){
       /* might want to include more comprehensive errors */
       *filtVolts = -4000.0;
@@ -239,7 +233,7 @@ void getAngles(float* angles){
       *(angles + 2) = -2000.0;
       return;
    }
-   error = LPUART_RTOS_Send(&handle, &anglesComm, sizeof(anglesComm));
+   error = LPUART_RTOS_Send(&uart3_handle, &recv_buffer, sizeof(anglesComm));
    if(error != kStatus_Success){
       /* might want to include more comprehensive errors */
       *angles = -3000.0;
@@ -248,7 +242,7 @@ void getAngles(float* angles){
    }
    vDelay(xDelay7ms);
    size_t numRecvBytes = 0;
-   error = LPUART_RTOS_Receive(&handle, &recv_buffer, 13, &numRecvBytes);
+   error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, 13, &numRecvBytes);
    if(error != kStatus_Success){
       /* might want to include more comprehensive errors */
       *angles = -4000.0;
