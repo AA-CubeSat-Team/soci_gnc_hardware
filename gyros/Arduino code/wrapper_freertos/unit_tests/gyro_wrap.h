@@ -46,9 +46,7 @@ typedef struct _Gyro
 {
   float gyroXYZ[3];           /* measured angular rates*/
   int8_t temperature;           /* measured temperature*/
-#if ARDUINO_CODE
-  TwoWire gyroWire;
-#else
+#if !ARDUINO_CODE
   lpi2c_rtos_handle_t * gyroHandle;   /* gyroscope i2c handle?*/
   lpi2c_master_transfer_t * gyroTransfer;   /* gyroscope i2c transfer structure pointer*/
 #endif

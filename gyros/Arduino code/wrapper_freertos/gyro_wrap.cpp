@@ -35,10 +35,10 @@ lpi2c_master_transfer_t * gyroTransfer1;
 void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
 {
 #if ARDUINO_CODE
-    (Gyro->gyroWire).beginTransmission(GYRO_ADDRESS);
-    (Gyro->gyroWire).write(reg);
-    (Gyro->gyroWire).endTransmission(false);
-    (Gyro->gyroWire).requestFrom(GYRO_ADDRESS, valueSize);
+    Wire.beginTransmission(GYRO_ADDRESS);
+    Wire.write(reg);
+    Wire.endTransmission(false);
+    Wire.requestFrom(GYRO_ADDRESS, valueSize);
     int i = 0;
     while (Wire.available()) {
       *(value+i) = Wire.read();
@@ -67,10 +67,10 @@ void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
 void writeReg(uint8_t reg, uint8_t value, gyro_t * Gyro)
 {
 #if ARDUINO_CODE
-  (Gyro->gyroWire).beginTransmission(GYRO_ADDRESS);
-  (Gyro->gyroWire).write(reg);
-  (Gyro->gyroWire).write(value);
-  (Gyro->gyroWire).endTransmission();
+  Wire.beginTransmission(GYRO_ADDRESS);
+  Wire.write(reg);
+  Wire.write(value);
+  Wire.endTransmission();
 #else
   Gyro->gyroTransfer->direction = kLPI2C_Write;
   Gyro->gyroTransfer->subaddress = reg;
@@ -152,7 +152,7 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle, lpi2c_master_trans
 #endif
 
 #if ARDUINO_CODE
-    (Gyro->gyroWire).begin();
+    Wire.begin();
 #endif
     Gyro->gyroInitialized = 1;
   }

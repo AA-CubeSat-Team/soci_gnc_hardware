@@ -1,6 +1,9 @@
 #include <Wire.h>
 #include "gyro_wrap.h"
 
+bool test_readtempdata = false;
+bool test_readgyrodata = false;
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -14,8 +17,22 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  double t0 = micros();
+  if (test_readtempdata) {
+    readTempData(&Gyro1);
+    Serial.println(Gyro1.temperature);
+  }
+  if (test_readgyrodata)
+  {
+    readGyroData(&Gyro1);
+    for (int i = 0; i < 3; i++) {
+      Serial.print(" ");
+      Serial.print(Gyro1.gyroXYZ[i], 7);
+    }
+    Serial.println();
+  }
+  while (micros() - t0 < 1.0 / GYRO_ODR_VALUE * 1e6) {
+  }
 }
 
 void test_initGyro()
@@ -140,4 +157,20 @@ void test_restGyro()
   }
   Serial.println("********************");
    
+}
+
+void test_readTempData() {
+  initGyro(&Gyro1);
+  startGyro(&Gyro1);
+  test_readtempdata = true;
+  Serial.println("Eyeballing the validity of the data");
+  Serial.println("********************");
+}
+
+void test_readGyroData() {
+  initGyro(&Gyro1);
+  startGyro(&Gyro1);
+  test_readgyrodata = true;
+  Serial.println("Eyeballing the validity of the data");
+  Serial.println("********************");
 }

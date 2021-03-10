@@ -10,11 +10,9 @@ void setup() {
   Serial.println("********************");
   test_initGyro();
   test_readRegs();
-  test_writeReg();
-  test_startGyro();
-  test_restGyro();
-  test_readTempData();
-  test_readGyroData();
+//  test_writeReg();
+//  test_startGyro();
+//  test_restGyro();
 }
 
 void loop() {
@@ -26,9 +24,9 @@ void loop() {
   if (test_readgyrodata)
   {
     readGyroData(&Gyro1);
-    for (int i = 0; i<3; i++){
-    Serial.print(" ");
-    Serial.print(Gyro1.gyroXYZ[i], 7);
+    for (int i = 0; i < 3; i++) {
+      Serial.print(" ");
+      Serial.print(Gyro1.gyroXYZ[i], 7);
     }
     Serial.println();
   }
@@ -40,6 +38,14 @@ void test_initGyro()
 {
   Serial.println("Testing initGyro...");
   initGyro(&Gyro1);
+  Wire.beginTransmission(GYRO_ADDRESS);
+  if (Wire.endTransmission())
+  {
+    Serial.println("Fail to connect i2c");
+  } else
+  {
+    Serial.println("Success to connect i2c");
+  }
   if (Gyro1.gyroInitialized)
   {
     Serial.println("Gyro initialized");
@@ -59,14 +65,14 @@ void test_readRegs()
   uint8_t readRawData[15];
   initGyro(&Gyro1);
   readRegs(0x07, &readRawData[0], 15, &Gyro1);
-  
+
   Serial.println("Reference raw data  Read raw data Result");
-  
+
   for (int i = 0; i < 15; i++) {
-    Serial.print(referenceRawData[i],BIN);
+    Serial.print(referenceRawData[i], BIN);
     Serial.print("  ");
-    Serial.print(readRawData[i],BIN);
-    Serial.print("  ");   
+    Serial.print(readRawData[i], BIN);
+    Serial.print("  ");
     if (referenceRawData[i] == readRawData[i]) {
       Serial.println("Pass");
     } else {
@@ -78,13 +84,13 @@ void test_readRegs()
 
 void test_writeReg()
 {
-  Serial.println("Testing raedRegs...");
+  Serial.println("Testing writeReg...");
   uint8_t referenceValue = 2;
   Serial.print("Reference value: ");
   Serial.println(referenceValue);
   initGyro(&Gyro1);
   writeReg(GYRO_CTRL_REG1, referenceValue, &Gyro1);
-  
+
   uint8_t readValue;
   readRegs(GYRO_CTRL_REG1, &readValue, 1, &Gyro1);
   Serial.print("Read value: ");
@@ -94,7 +100,7 @@ void test_writeReg()
   } else {
     Serial.println("Fail");
   }
-  Serial.println("********************");  
+  Serial.println("********************");
 }
 
 void test_startGyro()
@@ -103,11 +109,11 @@ void test_startGyro()
   Serial.print("Reference CTRL_REG0: ");
   Serial.println(GYRO_FSR_NUM, BIN);
   Serial.print("Reference CTRL_REG1: ");
-  Serial.println((GYRO_ODR_NUM <<2)|0b10, BIN);
+  Serial.println((GYRO_ODR_NUM << 2) | 0b10, BIN);
 
   initGyro(&Gyro1);
   startGyro(&Gyro1);
-  
+
   uint8_t readCtrlReg0;
   readRegs(GYRO_CTRL_REG0, &readCtrlReg0, 1, &Gyro1);
   Serial.print("Read CTRL_REG0: ");
@@ -121,12 +127,12 @@ void test_startGyro()
   readRegs(GYRO_CTRL_REG1, &readCtrlReg1, 1, &Gyro1);
   Serial.print("Read CTRL_REG1: ");
   Serial.println(readCtrlReg1, BIN);
-  if (readCtrlReg1 == (GYRO_ODR_NUM <<2)|0b10) {
+  if (readCtrlReg1 == (GYRO_ODR_NUM << 2) | 0b10) {
     Serial.println("Pass");
   } else {
     Serial.println("Fail");
   }
-  Serial.println("********************");  
+  Serial.println("********************");
 }
 
 void test_restGyro()
@@ -141,14 +147,14 @@ void test_restGyro()
   uint8_t referenceRawData[15] = {0, 0, 0, 0, 8, 0xD7, 0, 0, 0, 0, 1, 0, 0, 0, 0};
   uint8_t readRawData[15];
   readRegs(0x07, &readRawData[0], 15, &Gyro1);
-  
+
   Serial.println("Reference raw data  Read raw data Result");
-  
+
   for (int i = 0; i < 15; i++) {
-    Serial.print(referenceRawData[i],BIN);
+    Serial.print(referenceRawData[i], BIN);
     Serial.print("  ");
-    Serial.print(readRawData[i],BIN);
-    Serial.print("  ");   
+    Serial.print(readRawData[i], BIN);
+    Serial.print("  ");
     if (referenceRawData[i] == readRawData[i]) {
       Serial.println("Pass");
     } else {
@@ -157,18 +163,18 @@ void test_restGyro()
   }
 }
 
-void test_readTempData(){
+void test_readTempData() {
   initGyro(&Gyro1);
   startGyro(&Gyro1);
   test_readtempdata = true;
   Serial.println("Eyeballing the validity of the data");
-  Serial.println("********************");  
+  Serial.println("********************");
 }
 
-void test_readGyroData(){
+void test_readGyroData() {
   initGyro(&Gyro1);
   startGyro(&Gyro1);
   test_readgyrodata = true;
   Serial.println("Eyeballing the validity of the data");
-  Serial.println("********************");  
+  Serial.println("********************");
 }
