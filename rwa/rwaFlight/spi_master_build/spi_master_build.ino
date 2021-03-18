@@ -7,8 +7,7 @@
 */
 
 /* issues:
- * - CRC is producing arbitrary changing values on payload array
- * - need to split SPI mechanism from payload processing
+ * - need to wipe arrays? -> think I solved with local definitions
  */
 
 #include <SPI.h>
@@ -44,19 +43,6 @@ uint8_t rpl_len_Z;
 uint8_t rpl_len_Y;
 uint8_t rpl_len_X;
 uint8_t rpl_len_W;
-
-uint8_t req_payload_rw1[7] = {0};
-uint8_t req_payload_len_rw1 = 0;
-uint8_t req_packet_rw1[14] = {0};
-uint8_t req_packet_len_rw1 = 0;
-
-uint8_t rpl_payload_rw1[7] = {0};
-uint8_t rpl_payload_len_rw1 = 0;
-uint8_t rpl_packet_rw1[14] = {0};
-uint8_t rpl_packet_len_rw1 = 0;
-
-uint8_t result;
-
 
 unsigned int crc_value = 0xFFFF;
 unsigned int crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
@@ -96,19 +82,30 @@ unsigned int crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60
 SPISettings spiSet(200000, MSBFIRST, SPI_MODE0);
 
 #include "rwa_command_functions.h"
-#include "rwa_process_functions.h"
   
 void setup (void) {
   Serial.begin(115200);
 
-  // pulls SS1 HIGH (disengaged)
+  // pulls SS1,SS2,SS3,SS4 HIGH (disengaged)
   SPI.begin();
   pinMode(SS1, OUTPUT);
   digitalWrite(SS1, HIGH);
+  pinMode(SS2, OUTPUT);
+  digitalWrite(SS2, HIGH);
+  pinMode(SS3, OUTPUT);
+  digitalWrite(SS3, HIGH);
+  pinMode(SS4, OUTPUT);
+  digitalWrite(SS4, HIGH);
 
-  // powers on RW0-1
+  // powers on RW0-1,2,3,4
   pinMode(EN1, OUTPUT);
   digitalWrite(EN1, HIGH);
+  pinMode(EN2, OUTPUT);
+  digitalWrite(EN2, HIGH);
+  pinMode(EN3, OUTPUT);
+  digitalWrite(EN3, HIGH);
+  pinMode(EN4, OUTPUT);
+  digitalWrite(EN4, HIGH);
 
   Serial.println("master setup complete");
 }
@@ -118,39 +115,7 @@ void loop(void) {
   Serial.println(" ");
   Serial.println("loop start");
 
-  // example process
-  // RW0-1, sending cmd10 ping
+  runAll_cmd10();
   
-    // generates payload array
-  reqPayloadWrite_cmd10(&req_payload_rw1[0], &req_payload_len_rw1);
-    // process payload into packet
-  reqPacketProcess(&req_payload_rw1[0], &req_packet_rw1[0], &req_payload_len_rw1, &req_packet_len_rw1);
-    // sends Request to RW0-1, receives empty flag bytes back
-  reqSpiTransfer(&req_packet_rw1[0], &req_packet_len_rw1, SS1);
-
-    // SPI wait timeout (ms)
-  delay(100);
-
-    // queries Reply from RWO-1 with empty flag bytes, receives packet back
-  rplSpiTransfer(&rpl_packet_rw1[0], &rpl_packet_len_rw1, SS1);
-    // process packet into payload
-  rplPacketProcess(&rpl_payload_rw1[0], &rpl_packet_rw1[0], &rpl_payload_len_rw1, &rpl_packet_len_rw1);
-    // convert payload to data
-  rplPayloadRead_cmd10(&rpl_payload_rw1[0], &rpl_payload_len_rw1, &result);
-
-          Serial.print("req_packet_rw1:\t");
-          for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
-            Serial.print(req_packet_rw1[yy], HEX);
-            Serial.print("\t");
-          }
-          Serial.println(" ");
-
-          Serial.print("rpl_packet_rw1:\t");
-          for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
-            Serial.print(rpl_packet_rw1[yy], HEX);
-            Serial.print("\t");
-          }
-          Serial.println(" ");
-
   delay(10000);
 }

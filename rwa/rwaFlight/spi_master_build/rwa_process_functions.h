@@ -14,9 +14,9 @@ void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *
   }
   req_len_A = *req_payload_len_pt;
 
-
   // A to B – adding two CRC uint8_t s to end of array (WORKS)
   uint8_t req_crc[2] = { };
+  crc_value = 0xFFFF;
   
   for (ii = 0; ii < req_len_A; ii++) {
     crc_value = ((crc_value << 8) ^ crc_table[((crc_value >> 8) ^ req_array_A[ii]) & 0x00FF]);
@@ -30,7 +30,6 @@ void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *
   req_array_B[req_len_A] = req_crc[0];
   req_array_B[req_len_A + 1] = req_crc[1];
   req_len_B = req_len_A + 2;
-
 
   // B to C – checking for 0x7D uint8_t s (WORKS)
   uint8_t fnd;
@@ -48,7 +47,6 @@ void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *
   }
   req_len_C = req_len_B + fnd;
 
-
   // C to D – checking for 0x7E uint8_t s (WORKS)
   fnd = 0;
 
@@ -64,7 +62,6 @@ void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *
   }
   req_len_D = req_len_C + fnd;
 
-
   // D to E – adding 0x7E uint8_t s to front and back of array (WORKS)
   for (ii = 0; ii < req_len_D; ii++) {
     req_array_E[ii + 1] = req_array_D[ii];
@@ -72,7 +69,6 @@ void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *
   req_array_E[0] = 0x7E;
   req_array_E[req_len_D + 1] = 0x7E;
   req_len_E = req_len_D + 2;
-
 
   // assigning to packet array
   for (ii = 0; ii < req_len_E; ii++) {
@@ -116,8 +112,14 @@ void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t 
   digitalWrite(SS_id, HIGH);
   SPI.endTransaction();
 
+//  for (ii = 0; ii < *rpl_packet_len_pt; ii++) {
+//    *(rpl_packet_pt+ii) = spi_buffer[ii];
+//  }
+
+  uint8_t test_reply[] = {0x7E, 0x0A, 0x01, 0xE5, 0xE2, 0x7E};
+  *rpl_packet_len_pt = 6;
   for (ii = 0; ii < *rpl_packet_len_pt; ii++) {
-    *(rpl_packet_pt+ii) = spi_buffer[ii];
+    *(rpl_packet_pt+ii) = test_reply[ii];
   }
 }
 
@@ -132,16 +134,18 @@ void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *
   }
   rpl_len_Z = *rpl_packet_len_pt;
 
-      uint8_t rpl_array_T[] = {0x7E, 0x03, 0x01, 0x4F, 0x5D, 0x86, 0xBE, 0x7E};
-      uint8_t rpl_len_T = sizeof(rpl_array_T);
-
+//          Serial.print("rpl_array_Z:\t");
+//          for (uint8_t yy = 0; yy < rpl_len_Z; yy++) {
+//            Serial.print(rpl_array_Z[yy], HEX);
+//            Serial.print("\t");
+//          }
+//          Serial.println(" ");
 
   // Z to Y – copies request array to new array without frame flags (WORKS)
-  for (ii = 0; ii < (rpl_len_T - 1); ii++) {
-    rpl_array_Y[ii] = rpl_array_T[ii + 1];
+  for (ii = 0; ii < (rpl_len_Z - 1); ii++) {
+    rpl_array_Y[ii] = rpl_array_Z[ii + 1];
   }
-  rpl_len_Y = rpl_len_T - 2;
-
+  rpl_len_Y = rpl_len_Z - 2;
 
   // Y to X – runs XOR process to remove escape uint8_t s from reply array (WORKS)
   uint8_t fnd;
@@ -158,13 +162,11 @@ void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *
   }
   rpl_len_X = rpl_len_Y - fnd;
 
-
   // X to W – removes two CRC uint8_t s from end of array (WORKS)
   for (ii = 0; ii < (rpl_len_X - 2); ii++) {
     rpl_array_W[ii] = rpl_array_X[ii];
   }
   rpl_len_W = rpl_len_X - 2;
-
 
   // compares RWA reply CRC with calculated reply CRC (WORKS, need to add flag)
   uint8_t rpl_crc_rwa[] = {rpl_array_X[rpl_len_X - 2], rpl_array_X[rpl_len_X - 1]};
@@ -182,9 +184,17 @@ void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *
     Serial.println("reply CRC good");
   }
 
+
   // copies to rpl_payload_pt
-  for (ii = 0; ii < *rpl_payload_len_pt; ii++) {
+  for (ii = 0; ii < rpl_len_W; ii++) {
     *(rpl_payload_pt + ii) = rpl_array_W[ii];
   }
   *rpl_payload_len_pt = rpl_len_W;
+
+//          Serial.print("*rpl_payload_pt:\t");
+//          for (uint8_t yy = 0; yy < *rpl_payload_len_pt; yy++) {
+//            Serial.print(*(rpl_payload_pt+yy), HEX);
+//            Serial.print("\t");
+//          }
+//          Serial.println(" ");
 }
