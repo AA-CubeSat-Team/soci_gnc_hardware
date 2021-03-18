@@ -8,7 +8,7 @@
 #ifndef GYRO_WRAP_H_
 #define GYRO_WRAP_H_
 
-#define ARDUINO_CODE            1
+#define ARDUINO_CODE            0
 
 #if ARDUINO_CODE
 #include <Wire.h>
@@ -53,7 +53,7 @@ typedef struct _Gyro
   float gyroBias[3];            /* gyroscope zero-off set(bias)*/
   float gyroTempBiasCoe[3];       /* gyroscope temperature bias coefficients*/
   float gyroTempSensCoe[3];       /* gyroscope temperature sensitivity coefficients*/
-  char  gyroInitialized = 0; /* gyroscope status */
+  char  gyroInitialized; /* gyroscope status */
 } gyro_t;
 
 extern gyro_t Gyro1;                /* gyroscope 1*/
