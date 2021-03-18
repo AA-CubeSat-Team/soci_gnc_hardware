@@ -11,49 +11,51 @@
  * - need to split SPI mechanism from payload processing
  */
 
-#include<SPI.h>
+#include <SPI.h>
 
-// assigns GPIO pins to be slave-selects
+// assigns GPIO pins to be SS pins
 #define SS1 3
 #define SS2 4
 #define SS3 5
 #define SS4 6
 
-byte spi_req1_buf[8] = {0}; // creates request array buffer as global variable
-byte spi_req2_buf[8] = {0}; // need to allocate max possible size of bytes
-byte spi_req3_buf[8] = {0};
-byte spi_req4_buf[8] = {0};
-int spi_req1_buf_len;
-int spi_req2_buf_len;
-int spi_req3_buf_len;
-int spi_req4_buf_len;
-byte req_array_A[16] = {0}; // need to allocate max possible size of bytes
-byte req_array_B[16] = {0};
-byte req_array_C[16] = {0};
-byte req_array_D[16] = {0};
-byte req_array_E[16] = {0};
-int req_len_A;
-int req_len_B;
-int req_len_C;
-int req_len_D;
-int req_len_E;
+// assigns GPIO pins to be EN pins
+#define EN1 A1
+#define EN2 A2
+#define EN3 A3
+#define EN4 A4
 
-byte spi_rpl1_buf[8] = {0}; // need to allocate max possible size of bytes
-byte spi_rpl2_buf[8] = {0};
-byte spi_rpl3_buf[8] = {0};
-byte spi_rpl4_buf[8] = {0};
-int spi_rpl1_buf_len;
-int spi_rpl2_buf_len;
-int spi_rpl3_buf_len;
-int spi_rpl4_buf_len;
-byte rpl_array_Z[16] = {0}; // need to allocate max possible size of bytes
-byte rpl_array_Y[16] = {0};
-byte rpl_array_X[16] = {0};
-byte rpl_array_W[16] = {0};
-int rpl_len_Z;
-int rpl_len_Y;
-int rpl_len_X;
-int rpl_len_W;
+uint8_t req_array_A[16] = {0}; // need to allocate max possible size of uint8_t
+uint8_t req_array_B[16] = {0};
+uint8_t req_array_C[16] = {0};
+uint8_t req_array_D[16] = {0};
+uint8_t req_array_E[16] = {0};
+uint8_t req_len_A;
+uint8_t req_len_B;
+uint8_t req_len_C;
+uint8_t req_len_D;
+uint8_t req_len_E;
+
+uint8_t rpl_array_Z[16] = {0}; // need to allocate max possible size of uint8_t
+uint8_t rpl_array_Y[16] = {0};
+uint8_t rpl_array_X[16] = {0};
+uint8_t rpl_array_W[16] = {0};
+uint8_t rpl_len_Z;
+uint8_t rpl_len_Y;
+uint8_t rpl_len_X;
+uint8_t rpl_len_W;
+
+uint8_t req_payload_rw1[7] = {0};
+uint8_t req_payload_len_rw1 = 0;
+uint8_t req_packet_rw1[14] = {0};
+uint8_t req_packet_len_rw1 = 0;
+
+uint8_t rpl_payload_rw1[7] = {0};
+uint8_t rpl_payload_len_rw1 = 0;
+uint8_t rpl_packet_rw1[14] = {0};
+uint8_t rpl_packet_len_rw1 = 0;
+
+uint8_t result;
 
 
 unsigned int crc_value = 0xFFFF;
@@ -92,364 +94,63 @@ unsigned int crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60
                            };
 
 SPISettings spiSet(200000, MSBFIRST, SPI_MODE0);
+
+#include "rwa_command_functions.h"
+#include "rwa_process_functions.h"
   
 void setup (void) {
   Serial.begin(115200);
-  
+
+  // pulls SS1 HIGH (disengaged)
   SPI.begin();
   pinMode(SS1, OUTPUT);
   digitalWrite(SS1, HIGH);
 
+  // powers on RW0-1
+  pinMode(EN1, OUTPUT);
+  digitalWrite(EN1, HIGH);
+
   Serial.println("master setup complete");
 }
+
 
 void loop(void) {
   Serial.println(" ");
   Serial.println("loop start");
 
-  int32_t new_speed= 65000;
-  uint16_t new_ramp_time= 3200;
-
-  byte req_payload_rw1[7] = {0};
-  int req_payload_len_rw1 = 0;
-
-//              Serial.print("req_payload_rw1:\t");
-//              for (int yy = 0; yy < 7; yy++){
-//                Serial.print(req_payload_rw1[yy], HEX);
-//                Serial.print("\t");
-//              }
-//              Serial.println(" ");
-//              delay(500);
-
-
-//  payloadWrite_cmd6(&req_payload_rw1[0], &req_payload_len_rw1, new_speed, new_ramp_time);
-  payloadWrite_cmd4(&req_payload_rw1[0], &req_payload_len_rw1);
-
-//              Serial.print("req_payload_rw1:\t");
-//              for (int yy = 0; yy < req_payload_len_rw1; yy++){
-//                Serial.print(req_payload_rw1[yy], HEX);
-//                Serial.print("\t");
-//              }
-//              Serial.println(" ");
-//              delay(500);
-              
-
-  spiSendReq(&req_payload_rw1[0],req_payload_len_rw1,1);
-}
-
-void payloadWrite_cmd4(byte *req_payload_pt, int *req_payload_len_pt) {
-  // get reaction wheel status
-  byte com_id = 4;
-
-  *req_payload_pt = com_id;
-
-  *req_payload_len_pt = 1;
-}
-
-
-void payloadWrite_cmd6(byte *req_payload_pt, int *req_payload_len_pt, int32_t speed, uint16_t ramp_time) {
-  // set reference speed
-  byte com_id = 6;
-
-  byte speed0 = speed & 0xFF;
-  byte speed1 = (speed >> 8) & 0xFF;
-  byte speed2 = (speed >> 16) & 0xFF;
-  byte speed3 = (speed >> 24) & 0xFF;
-
-  byte ramp_time0 = ramp_time & 0xFF;
-  byte ramp_time1 = (ramp_time >> 8) & 0xFF; 
-
-  *req_payload_pt = com_id;
+  // example process
+  // RW0-1, sending cmd10 ping
   
-  *(req_payload_pt+1) = speed0;
-  *(req_payload_pt+2) = speed1;
-  *(req_payload_pt+3) = speed2;
-  *(req_payload_pt+4) = speed3;
-  
-  *(req_payload_pt+5) = ramp_time0;
-  *(req_payload_pt+6) = ramp_time1;
+    // generates payload array
+  reqPayloadWrite_cmd10(&req_payload_rw1[0], &req_payload_len_rw1);
+    // process payload into packet
+  reqPacketProcess(&req_payload_rw1[0], &req_packet_rw1[0], &req_payload_len_rw1, &req_packet_len_rw1);
+    // sends Request to RW0-1, receives empty flag bytes back
+  reqSpiTransfer(&req_packet_rw1[0], &req_packet_len_rw1, SS1);
 
-  *req_payload_len_pt = 1 + 6;
-}
+    // SPI wait timeout (ms)
+  delay(100);
 
+    // queries Reply from RWO-1 with empty flag bytes, receives packet back
+  rplSpiTransfer(&rpl_packet_rw1[0], &rpl_packet_len_rw1, SS1);
+    // process packet into payload
+  rplPacketProcess(&rpl_payload_rw1[0], &rpl_packet_rw1[0], &rpl_payload_len_rw1, &rpl_packet_len_rw1);
+    // convert payload to data
+  rplPayloadRead_cmd10(&rpl_payload_rw1[0], &rpl_payload_len_rw1, &result);
 
-void payloadWrite_cmd10(byte *req_payload_pt, int *req_payload_len_pt) {
-  // ping
-  byte com_id = 10;
-
-  *req_payload_pt = com_id;
-
-  *req_payload_len_pt = 1;
-}
-
-void spiQueryRpl(byte *spi_rpl_buf_pt, int spi_rpl_buf_len, int rw_id) { //(NEEDS WORK) --- --- --- --- --- --- --- --- ---
-
-  // creates empty flag array as local variable
-  byte flag_array[8] = {0}; // need to allocate max possible size of bytes
-  for (int ii = 0; ii < 8; ii++) {
-    flag_array[ii] = 0x7E;
-  }
-
-  // assigns slave select pin to corresponding reaction wheel (WORKS)
-  int SS_id;
-  switch (rw_id) {
-    case 1:
-      SS_id = SS1;
-      break;
-    case 2:
-      SS_id = SS2;
-      break;
-    case 3:
-      SS_id = SS3;
-      break;
-    case 4:
-      SS_id = SS4;
-      break;
-  }
-
-  // assigning back to original buffer variable
-  for (int ii = 0; ii < 8; ii++) {
-    *(spi_rpl_buf_pt + ii) = flag_array[ii];
-  }
-  spi_rpl_buf_len = 8;
-
-  //            Serial.print("spi_rpl_buf_pt (MOSI):\t");
-  //            for (int yy = 0; yy < spi_rpl_buf_len; yy++){
-  //                Serial.print(spi_rpl_buf_pt[yy], HEX);
-  //                Serial.print(" ");
-  //            }
-  //            Serial.println(" ");
-
-  digitalWrite(SS_id, LOW);
-  SPI.transfer(spi_rpl_buf_pt, spi_rpl_buf_len);
-  digitalWrite(SS_id, HIGH);
-
-
-  // buf to Z – copying buffer array (WORKS)
-  int ii;
-
-  for (ii = 0; ii < spi_rpl_buf_len; ii++) {
-    rpl_array_Z[ii] = *(spi_rpl_buf_pt + ii);
-  }
-  rpl_len_Z = spi_rpl_buf_len;
-
-  byte rpl_array_T[] = {0x7E, 0x03, 0x01, 0x4F, 0x5D, 0x86, 0xBE, 0x7E};
-  int rpl_len_T = sizeof(rpl_array_T);
-
-            Serial.print("rpl_array_T:\t");
-            for (int yy = 0; yy < rpl_len_T; yy++) {
-              Serial.print(rpl_array_T[yy], HEX);
-              Serial.print(" ");
-            }
-            Serial.println(" ");
-
-
-  // Z to Y – copies request array to new array without frame flags (WORKS)
-  for (ii = 0; ii < (rpl_len_T - 1); ii++) {
-    rpl_array_Y[ii] = rpl_array_T[ii + 1];
-  }
-  rpl_len_Y = rpl_len_T - 2;
-
-//            Serial.print("rpl_array_Y:\t");
-//            for (int yy = 0; yy < rpl_len_Y; yy++) {
-//              Serial.print(rpl_array_Y[yy], HEX);
-//              Serial.print(" ");
-//            }
-//            Serial.println(" ");
-
-
-  // Y to X – runs XOR process to remove escape bytes from reply array (WORKS)
-  int fnd;
-  fnd = 0;
-
-  for (int ii = 0; ii < rpl_len_Y; ii++) {
-    if (rpl_array_Y[ii + fnd] != 0x7D) {
-      rpl_array_X[ii] = rpl_array_Y[ii + fnd];
-    }
-    if (rpl_array_Y[ii + fnd] == 0x7D) {
-      rpl_array_X[ii] = rpl_array_Y[ii + fnd + 1] ^ 0x20;
-      fnd++;
-    }
-  }
-  rpl_len_X = rpl_len_Y - fnd;
-
-//            Serial.print("rpl_array_X:\t");
-//            for (int yy = 0; yy < rpl_len_X; yy++) {
-//              Serial.print(rpl_array_X[yy], HEX);
-//              Serial.print(" ");
-//            }
-//            Serial.println(" ");
-
-
-  // X to W – removes two CRC bytes from end of array (WORKS)
-  for (ii = 0; ii < (rpl_len_X - 2); ii++) {
-    rpl_array_W[ii] = rpl_array_X[ii];
-  }
-  rpl_len_W = rpl_len_X - 2;
-
-//            Serial.print("rpl_array_W:\t");
-//            for (int yy = 0; yy < rpl_len_W; yy++) {
-//              Serial.print(rpl_array_W[yy], HEX);
-//              Serial.print(" ");
-//            }
-//            Serial.println(" ");
-
-
-  // compares RWA reply CRC with calculated reply CRC (WORKS, need to add flag)
-  unsigned int rpl_crc_rwa[] = {rpl_array_X[rpl_len_X - 2], rpl_array_X[rpl_len_X - 1]};
-  
-  unsigned int rpl_crc_calc[2] = { };
-  crc_value = 0xFFFF;
-  
-  for (ii = 0; ii < rpl_len_W; ii++) {
-    crc_value = ((crc_value << 8) ^ crc_table[((crc_value >> 8) ^ rpl_array_W[ii]) & 0x00FF]);
-  }
-  rpl_crc_calc[0] = crc_value & 0xFF;
-  rpl_crc_calc[1] = crc_value >> 8;
-
-  if (rpl_crc_rwa[0] == rpl_crc_calc[0] && rpl_crc_rwa[1] == rpl_crc_calc[1]) {
-    Serial.println("reply CRC good");
-  }
-
-
-//            Serial.print("rpl_crc_rwa:\t");
-//            for (int yy = 0; yy < 2; yy++) {
-//              Serial.print(rpl_crc_rwa[yy], HEX);
-//              Serial.print(" ");
-//            }
-//            Serial.println(" ");
-//
-//            Serial.print("rpl_crc_calc:\t");
-//            for (int yy = 0; yy < 2; yy++) {
-//              Serial.print(rpl_crc_calc[yy], HEX);
-//              Serial.print(" ");
-//            }
-//            Serial.println(" ");
-
-
-}
-
-
-void spiSendReq(byte *req_payload_pt, int req_payload_len, int rw_id) { //(FIX POINTERS) --- --- --- --- --- --- --- --- ---
-
-
-  // buf to A – copying variable array (WORKS)
-  int ii;
-
-  for (ii = 0; ii < req_payload_len; ii++) {
-    req_array_A[ii] = *(req_payload_pt + ii);
-  }
-  req_len_A = req_payload_len;
-
-
-  // A to B – adding two CRC bytes to end of array (WORKS)
-  unsigned int req_crc[2] = { };
-  
-  for (ii = 0; ii < req_len_A; ii++) {
-    crc_value = ((crc_value << 8) ^ crc_table[((crc_value >> 8) ^ req_array_A[ii]) & 0x00FF]);
-  }
-  req_crc[0] = crc_value & 0xFF;
-  req_crc[1] = crc_value >> 8;
-
-  for (ii = 0; ii < req_len_A; ii++) {
-    req_array_B[ii] = req_array_A[ii];
-  }
-  req_array_B[req_len_A] = req_crc[0];
-  req_array_B[req_len_A + 1] = req_crc[1];
-  req_len_B = req_len_A + 2;
-
-
-  // B to C – checking for 0x7D bytes (WORKS)
-  int fnd;
-  fnd = 0;
-
-  for (ii = 0; ii < req_len_B; ii++) {
-    if (req_array_B[ii] != 0x7D) {
-      req_array_C[ii + fnd] = req_array_B[ii];
-    }
-    if (req_array_B[ii] == 0x7D) {
-      req_array_C[ii + fnd] = 0x7D;
-      req_array_C[ii + fnd + 1] = req_array_B[ii] ^ 0x20;
-      fnd++;
-    }
-  }
-  req_len_C = req_len_B + fnd;
-
-
-  // C to D – checking for 0x7E bytes (WORKS)
-  fnd = 0;
-
-  for (ii = 0; ii < req_len_C; ii++) {
-    if (req_array_C[ii] != 0x7E) {
-      req_array_D[ii + fnd] = req_array_C[ii];
-    }
-    if (req_array_C[ii] == 0x7E) {
-      req_array_D[ii + fnd] = 0x7D;
-      req_array_D[ii + fnd + 1] = req_array_C[ii] ^ 0x20;
-      fnd++;
-    }
-  }
-  req_len_D = req_len_C + fnd;
-
-
-  // D to E – adding 0x7E bytes to front and back of array (WORKS)
-  for (ii = 0; ii < req_len_D; ii++) {
-    req_array_E[ii + 1] = req_array_D[ii];
-  }
-  req_array_E[0] = 0x7E;
-  req_array_E[req_len_D + 1] = 0x7E;
-  req_len_E = req_len_D + 2;
-
-
-  // assigning to buffer variable (ISSUE)
-  byte spi_req_buf[16] = {0};
-  int spi_req_buf_len;
-  
-  for (ii = 0; ii < req_len_E; ii++) {
-    spi_req_buf[ii] = req_array_E[ii];
-  }
-  spi_req_buf_len = req_len_E;
-
-
-  // assigns slave select pin to corresponding reaction wheel (WORKS)
-  int SS_id;
-  switch (rw_id) {
-    case 1:
-      SS_id = SS1;
-      break;
-    case 2:
-      SS_id = SS2;
-      break;
-    case 3:
-      SS_id = SS3;
-      break;
-    case 4:
-      SS_id = SS4;
-      break;
-  }
-
-          Serial.print("spi_req_buf (MOSI):\t");
-          for (int yy = 0; yy < spi_req_buf_len; yy++) {
-            Serial.print(spi_req_buf[yy], HEX);
-            Serial.print("\t");
-          }
-          Serial.println(" ");
-          delay(500);
-
-  SPI.beginTransaction(spiSet);
-  digitalWrite(SS1, LOW);
-  SPI.transfer(spi_req_buf, spi_req_buf_len);
-  digitalWrite(SS1, HIGH);
-  SPI.endTransaction();
-
-          Serial.print("spi_req_buf (MISO):\t");
-          for (int yy = 0; yy < spi_req_buf_len; yy++) {
-            Serial.print(spi_req_buf[yy], HEX);
+          Serial.print("req_packet_rw1:\t");
+          for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
+            Serial.print(req_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
 
+          Serial.print("rpl_packet_rw1:\t");
+          for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
+            Serial.print(rpl_packet_rw1[yy], HEX);
+            Serial.print("\t");
+          }
+          Serial.println(" ");
 
-  // process reply to detect errors
-  // should recieve all 0x7E in this function
+  delay(10000);
 }
