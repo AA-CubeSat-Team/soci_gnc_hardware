@@ -118,25 +118,25 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle, lpi2c_master_trans
 #if DIFF_TEMP_BIAS_COE
     switch (base_Gyro){
       case LPI2C1:
-        static const gyroBiasValue = {-0.565375, 0.6173333, -0.0121667};
-        static const gyroTempBiasCoeValue = {0.02, 0.02, 0.01};
-        static const gyroTempSensCoeValue = {0.0008, 0.0008, 0.0001};
+        static const float gyroBiasValue = {-0.565375, 0.6173333, -0.0121667};
+        static const float gyroTempBiasCoeValue = {0.02, 0.02, 0.01};
+        static const float gyroTempSensCoeValue = {0.0008, 0.0008, 0.0001};
         Gyro->gyroBias = gyroBiasValue;
         Gyro->gyroTempBiasCoe = gyroTempBiasCoeValue;
         Gyro->gyroTempSensCoe = gyroTempSensCoeValue;
         break;
       case LPI2C2:
-        static const gyroBiasValue = {0, 0, 0};
-        static const gyroTempBiasCoeValue = {0, 0, 0};
-        static const gyroTempSensCoeValue = {0, 0, 0};
+        static const float gyroBiasValue = {0, 0, 0};
+        static const float gyroTempBiasCoeValue = {0, 0, 0};
+        static const float gyroTempSensCoeValue = {0, 0, 0};
         Gyro->gyroBias = gyroBiasValue;
         Gyro->gyroTempBiasCoe = gyroTempBiasCoeValue;
         Gyro->gyroTempSensCoe = gyroTempSensCoeValue;
         break;
       case LPI2C3:
-        static const gyroBiasValue = {0, 0, 0};
-        static const gyroTempBiasCoeValue = {0, 0, 0};
-        static const gyroTempSensCoeValue = {0, 0, 0};
+        static const float gyroBiasValue = {0, 0, 0};
+        static const float gyroTempBiasCoeValue = {0, 0, 0};
+        static const float gyroTempSensCoeValue = {0, 0, 0};
         Gyro->gyroBias = gyroBiasValue;
         Gyro->gyroTempBiasCoe = gyroTempBiasCoeValue;
         Gyro->gyroTempSensCoe = gyroTempSensCoeValue;
@@ -169,7 +169,7 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle, lpi2c_master_trans
 void startGyro(gyro_t * Gyro)
 {
   if (Gyro->gyroInitialized){
-        writeReg(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
+  writeReg(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
   writeReg(GYRO_CTRL_REG1, (GYRO_ODR_NUM<<2 | 0b10), Gyro);
   }
 }
