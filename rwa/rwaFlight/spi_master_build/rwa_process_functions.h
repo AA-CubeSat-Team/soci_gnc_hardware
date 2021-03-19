@@ -1,6 +1,17 @@
 // rwa_process_functions
 
 void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *req_payload_len_pt, uint8_t *req_packet_len_pt) { // --- --- --- --- --- --- --- --- ---
+  uint8_t req_array_A[16] = {0}; // need to allocate max possible size of uint8_t
+  uint8_t req_array_B[16] = {0};
+  uint8_t req_array_C[16] = {0};
+  uint8_t req_array_D[16] = {0};
+  uint8_t req_array_E[16] = {0};
+  uint8_t req_len_A;
+  uint8_t req_len_B;
+  uint8_t req_len_C;
+  uint8_t req_len_D;
+  uint8_t req_len_E;
+  
   uint8_t ii;
 
   for (ii = 0; ii < 14; ii++) {
@@ -105,7 +116,8 @@ void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t 
   for (ii = 0; ii < 14; ii++) {
     spi_buffer[ii] = 0x7E;
   }
-  
+
+  Serial.println(*rpl_packet_len_pt);
   SPI.beginTransaction(spiSet);
   digitalWrite(SS_id, LOW);
   SPI.transfer(spi_buffer, *rpl_packet_len_pt);
@@ -125,7 +137,15 @@ void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t 
 
 
 void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *rpl_payload_len_pt, uint8_t *rpl_packet_len_pt) { //(NEEDS WORK) --- --- --- --- --- --- --- --- ---
-
+  uint8_t rpl_array_Z[16] = {0}; // need to allocate max possible size of uint8_t
+  uint8_t rpl_array_Y[16] = {0};
+  uint8_t rpl_array_X[16] = {0};
+  uint8_t rpl_array_W[16] = {0};
+  uint8_t rpl_len_Z;
+  uint8_t rpl_len_Y;
+  uint8_t rpl_len_X;
+  uint8_t rpl_len_W;
+  
   // copying packet array (WORKS)
   uint8_t ii;
 
