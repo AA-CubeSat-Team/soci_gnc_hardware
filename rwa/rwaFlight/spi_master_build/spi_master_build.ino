@@ -103,5 +103,5 @@ void loop(void) {
 
   runAll_cmd10();
   
-  delay(1000);
+  delay(4000);
 }
