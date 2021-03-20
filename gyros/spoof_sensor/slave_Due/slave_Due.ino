@@ -9,7 +9,7 @@ extern TwoWire Wire1;
 #define SENSITIVITY                   7.8125e-3
 #define ADDRESS                       (uint8_t) 0x20
 #define TEMPERATURE                   23
-#define DOUBLE                        double
+#define DOUBLE                        float
 
 uint8_t tempReg; // variable holding the temporary requested register
 uint8_t tempValue = 0; // variable holding the temporary value
@@ -71,7 +71,7 @@ void receiveEventSimulink(int numByte) //recieve from Simulink
     gyroByteData[ii] = (uint8_t)(gyroIntData>>8);
     ii++;
     gyroByteData[ii] = (uint8_t)((gyroIntData<<8)>>8);
-    ii++;    
+    ii++;
   }
 }
 

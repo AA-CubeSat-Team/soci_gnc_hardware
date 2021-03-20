@@ -203,7 +203,6 @@ void readGyroData(gyro_t * Gyro)
   readTempData(Gyro);
   uint8_t rawData[6];  // x/y/z gyro register data stored here
   readRegs(GYRO_OUT_X_MSB,rawData, 6, Gyro);  // Read the six raw data registers into data array
-  readRegs(GYRO_OUT_X_MSB, &rawData[0], 6, Gyro);
 
 #if COUNT_TEMP_BIAS
   int8_t tempDelta = Gyro->temperature - GYRO_TEMP_0;

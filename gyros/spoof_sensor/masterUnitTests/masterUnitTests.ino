@@ -1,28 +1,37 @@
 #include <Wire.h>
 #include "gyro_wrap.h"
 
-bool test_readtempdata = false;
-bool test_readgyrodata = false;
-
+#define TEST_READGYRODATA true
+#define TEST_READTEMPDATA false
+#define TEST_PLOTTER         true
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
-  Serial.println("Tests begin");
-  Serial.println("********************");
-  test_initGyro();
-  test_readRegs();
-  test_writeReg();
-  test_startGyro();
-  test_restGyro();
+  
+  if (!TEST_PLOTTER)
+  {
+    Serial.println("Tests begin");
+    Serial.println("********************");
+    test_initGyro();
+    test_readRegs();
+    test_writeReg();
+    test_startGyro();
+    test_restGyro();
+  }
+  
+  if (TEST_READGYRODATA || TEST_READTEMPDATA) 
+  {
+    initGyro(&Gyro1);
+    startGyro(&Gyro1);
+  }
 }
 
 void loop() {
   double t0 = micros();
-  if (test_readtempdata) {
+  if (TEST_READTEMPDATA) {
     readTempData(&Gyro1);
     Serial.println(Gyro1.temperature);
   }
-  if (test_readgyrodata)
+  if (TEST_READGYRODATA)
   {
     readGyroData(&Gyro1);
     for (int i = 0; i < 3; i++) {
@@ -157,20 +166,4 @@ void test_restGyro()
   }
   Serial.println("********************");
    
-}
-
-void test_readTempData() {
-  initGyro(&Gyro1);
-  startGyro(&Gyro1);
-  test_readtempdata = true;
-  Serial.println("Eyeballing the validity of the data");
-  Serial.println("********************");
-}
-
-void test_readGyroData() {
-  initGyro(&Gyro1);
-  startGyro(&Gyro1);
-  test_readgyrodata = true;
-  Serial.println("Eyeballing the validity of the data");
-  Serial.println("********************");
 }

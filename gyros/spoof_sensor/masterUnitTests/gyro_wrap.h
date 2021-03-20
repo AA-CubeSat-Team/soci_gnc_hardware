@@ -8,7 +8,7 @@
 #ifndef GYRO_WRAP_H_
 #define GYRO_WRAP_H_
 
-#define ARDUINO_CODE            0
+#define ARDUINO_CODE            1
 
 #if ARDUINO_CODE
 #include <Wire.h>
@@ -31,9 +31,9 @@
 
 // gyro parameters
 
-#define GYRO_ODR_NUM        0b110
+#define GYRO_ODR_NUM        0b101
 #define GYRO_FSR_NUM        0b11
-#define GYRO_ODR_VALUE        12.5
+#define GYRO_ODR_VALUE        25
 #define GYRO_FSR_VALUE        250
 #define GYRO_SENSITIVITY      7.8125e-3
 #define GYRO_TEMP_0         23

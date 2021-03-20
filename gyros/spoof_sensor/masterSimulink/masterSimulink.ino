@@ -12,7 +12,7 @@
 #include <Wire.h>
 #define ADDRESS                       (uint8_t) 0x20
 #define GYRO_FSR_VALUE        250
-#define GYRO_ODR_VALUE        12.5
+#define GYRO_ODR_VALUE        25
 #define DOUBLE                        float
 DOUBLE gyroSimRead[3];
 char data[sizeof(gyroSimRead)];
@@ -39,7 +39,8 @@ void loop()
   gyroSimUpdate();
   memcpy(data, &gyroSimRead, 3*sizeof(DOUBLE));  
   Wire.beginTransmission(ADDRESS);
-  Serial.println(Wire.write(data, 3*sizeof(DOUBLE)));    
+  //Serial.println(Wire.write(data, 3*sizeof(DOUBLE)));
+  Wire.write(data, 3*sizeof(DOUBLE));    
   Wire.endTransmission(); 
   while (micros() - time1 < 1.0 / GYRO_ODR_VALUE * 1e6) {
   }
@@ -51,6 +52,8 @@ void gyroSimUpdate()
   {
     gyroSimRead[i] = GYRO_FSR_VALUE*sin((micros() - time0)*1e-6 + PI/3*i);
 //    gyroSimRead[i]= PI;
-    Serial.println(gyroSimRead[i],7);
+    Serial.print(gyroSimRead[i],7);
+    Serial.print("  ");
   }
+  Serial.println();
 }

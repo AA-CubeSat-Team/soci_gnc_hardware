@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "gyro_wrap.h"
 
-#define TEST_READGYRODATA false
+#define TEST_READGYRODATA true
 #define TEST_READTEMPDATA false
 
 void setup() {
@@ -9,11 +9,17 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Tests begin");
   Serial.println("********************");
-  test_initGyro();
-  test_readRegs();
-  test_writeReg();
-  test_startGyro();
-  test_restGyro();
+//  test_initGyro();
+//  test_readRegs();
+//  test_writeReg();
+//  test_startGyro();
+//  test_restGyro();
+  
+  if (TEST_READGYRODATA || TEST_READTEMPDATA) 
+  {
+    initGyro(&Gyro1);
+    startGyro(&Gyro1);
+  }
 }
 
 void loop() {
@@ -162,20 +168,4 @@ void test_restGyro()
       Serial.println("Fail");
     }
   }
-}
-
-void test_readTempData() {
-  initGyro(&Gyro1);
-  startGyro(&Gyro1);
-  test_readtempdata = true;
-  Serial.println("Eyeballing the validity of the data");
-  Serial.println("********************");
-}
-
-void test_readGyroData() {
-  initGyro(&Gyro1);
-  startGyro(&Gyro1);
-  test_readgyrodata = true;
-  Serial.println("Eyeballing the validity of the data");
-  Serial.println("********************");
 }
