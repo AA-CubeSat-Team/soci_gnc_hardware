@@ -9,11 +9,11 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Tests begin");
   Serial.println("********************");
-//  test_initGyro();
-//  test_readRegs();
-//  test_writeReg();
-//  test_startGyro();
-//  test_restGyro();
+  test_initGyro();
+  test_readRegs();
+  test_writeReg();
+  test_startGyro();
+  test_restGyro();
   
   if (TEST_READGYRODATA || TEST_READTEMPDATA) 
   {
@@ -134,7 +134,7 @@ void test_startGyro()
   readRegs(GYRO_CTRL_REG1, &readCtrlReg1, 1, &Gyro1);
   Serial.print("Read CTRL_REG1: ");
   Serial.println(readCtrlReg1, BIN);
-  if (readCtrlReg1 == (GYRO_ODR_NUM << 2) | 0b10) {
+  if (readCtrlReg1 == ((GYRO_ODR_NUM << 2) | 0b10)) {
     Serial.println("Pass");
   } else {
     Serial.println("Fail");
