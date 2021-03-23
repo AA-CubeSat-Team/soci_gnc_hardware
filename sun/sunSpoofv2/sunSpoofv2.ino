@@ -57,4 +57,5 @@ serialSendOBC();
 }
 
 void loop() {
+  serialRecieveOBC();
 }
