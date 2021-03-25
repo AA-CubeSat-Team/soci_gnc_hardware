@@ -5,7 +5,7 @@
 
 
 // Step 3: Configuration 
-#define  advance_config_reg 0x0B
+#define advance_config_reg 0x0B
 #define advance_config_value 0b00000000
 
 // Step 4: Enable Conversion Rate
