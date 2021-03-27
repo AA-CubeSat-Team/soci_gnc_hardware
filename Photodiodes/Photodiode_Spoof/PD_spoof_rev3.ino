@@ -5,7 +5,7 @@
 
 
 // Step 3: Configuration 
-#define advance_config_reg 0x0B
+#define  advance_config_reg 0x0B
 #define advance_config_value 0b00000000
 
 // Step 4: Enable Conversion Rate
@@ -140,7 +140,126 @@ void receiveEvent(int num_bytes){
   while(Wire.available() > 0){ // loop through all but the last
     received_array[ii] = Wire.read(); // receive byte as a character
     ii++;
+    var = received_array[ii];
+
+    switch (var){
+      case advance_config_reg
+        reg = var;
+        break;
+      case conv_rate_reg
+        reg = var;
+        break;
+      case disable_reg
+        reg = var;
+        break;
+      case interrupt_mask_reg
+        reg = var;
+        break;
+      case 0x2A
+        reg = var;
+        break;
+      case 0x2C
+        reg = var;
+        break;
+      case 0x2E
+        reg = var;
+        break;
+      case 0x30
+        reg = var;
+        break;
+      case 0x32
+        reg = var;
+        break;
+      case 0x2B
+        reg = var;
+        break;
+      case 0x2D
+        reg = var;
+        break;
+      case 0x2F
+        reg = var;
+        break;
+      case 0x31
+        reg = var;
+        break;
+      case 0x33 
+        reg = var;
+        break;
+      case config_reg
+        reg = var;
+        break;
+      case int_clear_reg
+        reg = var;
+        break;
+      case PD_vol_request
+        reg = var;
+        break;
+      default 
+        switch (reg)
+            case advance_config_reg
+              advance_config_value = var;
+              break;
+            case conv_rate_reg
+              conv_rate_value = var;
+            case disable_reg
+              disable_value = var;
+              break;
+            case interrupt_mask_reg
+              interrupt_mask_value = var;
+              break;
+            case 0x2A
+              in_high_val = var;
+              break;
+            case 0x2C
+              in_high_val = var;
+              break;
+            case 0x2E
+              in_high_val = var;
+              break;
+            case 0x30
+              in_high_val = var;
+              break;
+            case 0x32
+              in_high_val = var;
+              break;
+            case 0x2B
+              in_low_val = var;
+              break;
+            case 0x2D
+              in_low_val = var;
+              break;
+            case 0x2F
+              in_low_val = var;
+              break;
+            case 0x31
+              in_low_val = var;
+              break;
+            case 0x33 
+              in_low_val = var;
+              break;
+            case config_reg
+              config_default_val = var;
+            case int_clear_reg
+              int_clear_val = var;
+            default 
+              switch var
+                case ADC_reg
+                  break;
+                default
+                  // print " unknown value received"
+      
+}
+
+
+    
   }
+
+// insert received_array = var here, confused about data type
+
+// for loop to assess received_array
+
+
+
 
   
   
@@ -154,7 +273,7 @@ void requestEvent(){
 
 
 
-switch (var){ // where var will be the data  sent by the master 
+switch (var){
   case advance_config_reg
     Wire.write(advance_config_value);
     break;
