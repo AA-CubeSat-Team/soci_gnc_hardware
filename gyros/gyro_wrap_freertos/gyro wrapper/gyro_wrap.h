@@ -48,7 +48,6 @@ typedef struct _Gyro
   int8_t temperature;           /* measured temperature*/
 #if !ARDUINO_CODE
   lpi2c_rtos_handle_t * gyroHandle;   /* gyroscope i2c handle?*/
-  lpi2c_master_transfer_t * gyroTransfer;   /* gyroscope i2c transfer structure pointer*/
 #endif
   float gyroBias[3];            /* gyroscope zero-off set(bias)*/
   float gyroTempBiasCoe[3];       /* gyroscope temperature bias coefficients*/
@@ -118,7 +117,7 @@ void initGyro(gyro_t * Gyro);
  * @return void
  *
  */
-void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle, lpi2c_master_transfer_t *transfer);
+void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
 #endif
 
 /*!
