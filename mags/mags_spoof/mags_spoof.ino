@@ -15,15 +15,16 @@ extern TwoWire Wire1;
 #endif
 int gauss_LSB[3] = {1100, 1100, 980};
 // Address
-#define LSM303_ADDRESS_MAG                        0x3C
+#define LSM303_ADDRESS_MAG                        (0x3C>>1)
 #define DOUBLE                  double
 
 uint8_t tempReg; // variable holding the temporary requested register
 uint8_t tempValue = 0; // variable holding the temporary value
-uint8_t cra_reg_m = 0b00000000;
-uint8_t crb_reg_m = 0b00000000;
-uint8_t mr_reg_m = 0b00000000;
-uint8_t magByteData[6] = {0b00000001, 0b10000011, 0b00000001, 0b10000011, 0b00000001, 0b10000011};
+uint8_t cra_reg_m = 0b00010000;
+uint8_t crb_reg_m = 0b0010000;
+uint8_t mr_reg_m = 0b00000011;
+uint8_t sr_reg_mg = 0b00000000;
+uint8_t magByteData[6] = {0b00000001, 0b00000010, 0b00000011, 0b00000101, 0b00000110, 0b00000111};
 DOUBLE magDoubleData[3];
 int n=3;
 
@@ -56,9 +57,9 @@ void receiveEventOBC(int numByte) //recieve from OBC
         break;
       case LSM303_REGISTER_MAG_CRB_REG_M:
         crb_reg_m = tempValue;
-        if (crb_reg_m>>6) {
-          resetMag();
-        }
+        break;
+      case LSM303_REGISTER_MAG_SR_REG_Mg:
+        sr_reg_mg = tempValue;
         break;
     }
   } else {
@@ -78,16 +79,12 @@ void requestEventOBC() {  // request event sent from OBC
     case LSM303_REGISTER_MAG_OUT_X_H_M:
       Wire.write(magByteData, 6);
       break;
+    case LSM303_REGISTER_MAG_SR_REG_Mg:
+      Wire.write(sr_reg_mg);
+      break;
   } 
 }
 
-void resetMag() {
-  uint8_t magByteDataTemp[6] = {0b00000001, 0b00000010, 0b00000011, 0b00000100, 0b00000101, 0b00000110};
-  memcpy(magByteData, magByteDataTemp, 6);
-  cra_reg_m = 0b00000000;
-  crb_reg_m = 0b00000000;
-  mr_reg_m = 0b00000000;
-}
   
 void serialRecieve(double * doubleBuffer, int n)
 {
