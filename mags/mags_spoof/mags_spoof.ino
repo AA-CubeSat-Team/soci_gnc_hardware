@@ -42,7 +42,7 @@ void setup()
 void loop()
 {
   serialRecieve(magDoubleData, n);
-  double2MagFromat(magDoubleData, magByteData, n);
+  double2MagFormat(magDoubleData, magByteData, n);
 }
 
 void receiveEventOBC(int numByte) //recieve from OBC
