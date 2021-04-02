@@ -25,7 +25,7 @@ uint8_t crb_reg_m = 0b00000000;
 uint8_t mr_reg_m = 0b00000000;
 uint8_t magByteData[6] = {0b00000001, 0b10000011, 0b00000001, 0b10000011, 0b00000001, 0b10000011};
 DOUBLE magDoubleData[3];
-int n;
+int n=3;
 
 int16_t magRAWint;
 uint8_t doubleConvertor[sizeof(DOUBLE)];
