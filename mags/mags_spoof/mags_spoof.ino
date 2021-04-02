@@ -100,7 +100,7 @@ void serialRecieve(double * doubleBuffer, int n)
   }
 }
 
-void double2MagFromat(double * magDoubleData, uint8_t * magByteData, int n)
+void double2MagFormat(double * magDoubleData, uint8_t * magByteData, int n)
 {
   int16_t magIntData;
   for (int ii = 0; ii < n; ii++) {
