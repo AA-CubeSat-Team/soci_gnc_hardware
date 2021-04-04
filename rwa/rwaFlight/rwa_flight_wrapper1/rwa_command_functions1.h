@@ -51,12 +51,55 @@ unsigned int crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60
                             0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8,
                             0x6e17, 0x7E36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
                            };
+
+struct rw_data
+{
+    uint8_t result;
+    int32_t reqSpeed;
+    uint16_t rampTime;
+    uint8_t reqClcMode;
+    uint8_t lastResetStatus;
+    int32_t currSpeed;
+    int32_t refSpeed;
+    uint8_t state;
+    uint8_t currClcMode;
+    int32_t mcuTemp;
+    float presSensTemp;
+    float pressure;
+    uint32_t numOfInvalidCrcPackets;
+    uint32_t numOfInvalidLenPackets;
+    uint32_t numOfInvalidCmdPackets; 
+    uint32_t numOfCmdExecutedRequests;
+    uint32_t numOfCmdReplies; 
+    uint32_t uartNumOfBytesWritten; 
+    uint32_t uartNumOfBytesRead;
+    uint32_t uartNumOfParityErrors; 
+    uint32_t uartNumOfNoiseErrors; 
+    uint32_t uartNumOfFrameErrors; 
+    uint32_t uartNumOfRegisterOverrunErrors; 
+    uint32_t uartTotalNumOfErrors; 
+    uint32_t spiNumOfBytesWritten; 
+    uint32_t spiNumOfBytesRead; 
+    uint32_t spiNumOfRegisterOverrunErrors; 
+    uint32_t spiTotalNumOfErrors;
+    uint32_t versionMajor; 
+    uint32_t versionBuildNumber; 
+    uint32_t uid1; 
+    uint32_t uid2; 
+    uint32_t uid3;
+} rw1, rw2, rw3, rw4;
+
+// creates pointer to each rw struct
+struct rw_data *rw1_pt = &rw1; 
+struct rw_data *rw2_pt = &rw2; 
+struct rw_data *rw3_pt = &rw3; 
+struct rw_data *rw4_pt = &rw4;                     
                            
 #include "rwa_process_functions1.h"                       
 
 
 // command 4 - get reaction wheel status --- --- --- --- --- ---
-void reqPayloadWrite_cmd4(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt) {
+void reqPayloadWrite_cmd4(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, struct rw_data *rwX) {
   uint8_t com_id = 4;
 
   *req_payload_pt = com_id;
@@ -64,55 +107,47 @@ void reqPayloadWrite_cmd4(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt) 
   *req_payload_len_pt = 1;
 }
 
-void rplPayloadRead_cmd4(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, uint8_t *result, int32_t *curr_speed, int32_t *ref_speed, uint8_t *state, uint8_t *clc_mode) { 
+void rplPayloadRead_cmd4(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, struct rw_data *rwX) { 
   // com_id = 4
   // length = 12
-  *result = *(rpl_payload_pt+1);
+  rwX->result = *(rpl_payload_pt+1);
   
-  *curr_speed = (*(rpl_payload_pt+5) << 24) | (*(rpl_payload_pt+4) << 16) | (*(rpl_payload_pt+3) << 8) | *(rpl_payload_pt+2);
+  rwX->currSpeed = (*(rpl_payload_pt+5) << 24) | (*(rpl_payload_pt+4) << 16) | (*(rpl_payload_pt+3) << 8) | *(rpl_payload_pt+2);
   
-  *ref_speed = (*(rpl_payload_pt+9) << 24) | (*(rpl_payload_pt+8) << 16) | (*(rpl_payload_pt+7) << 8) | *(rpl_payload_pt+6);
+  rwX->refSpeed = (*(rpl_payload_pt+9) << 24) | (*(rpl_payload_pt+8) << 16) | (*(rpl_payload_pt+7) << 8) | *(rpl_payload_pt+6);
 
-  *state = *(rpl_payload_pt+10);
+  rwX->state = *(rpl_payload_pt+10);
 
-  *clc_mode = *(rpl_payload_pt+11);
+  rwX->currClcMode = *(rpl_payload_pt+11);
 }
 
 
 // command 6 - set reference speed --- --- --- --- --- ---
-void reqPayloadWrite_cmd6(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, int32_t req_speed, uint16_t ramp_time) { 
+void reqPayloadWrite_cmd6(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, struct rw_data *rwX) { 
   uint8_t com_id = 6;
-
-  uint8_t speed0 = req_speed & 0xFF;
-  uint8_t speed1 = (req_speed >> 8) & 0xFF;
-  uint8_t speed2 = (req_speed >> 16) & 0xFF;
-  uint8_t speed3 = (req_speed >> 24) & 0xFF;
-
-  uint8_t ramp_time0 = ramp_time & 0xFF;
-  uint8_t ramp_time1 = (ramp_time >> 8) & 0xFF; 
 
   *req_payload_pt = com_id;
   
-  *(req_payload_pt+1) = speed0;
-  *(req_payload_pt+2) = speed1;
-  *(req_payload_pt+3) = speed2;
-  *(req_payload_pt+4) = speed3;
+  *(req_payload_pt+1) = rwX->reqSpeed & 0xFF;
+  *(req_payload_pt+2) = (rwX->reqSpeed >> 8) & 0xFF;
+  *(req_payload_pt+3) = (rwX->reqSpeed >> 16) & 0xFF;
+  *(req_payload_pt+4) = (rwX->reqSpeed >> 24) & 0xFF;
   
-  *(req_payload_pt+5) = ramp_time0;
-  *(req_payload_pt+6) = ramp_time1;
+  *(req_payload_pt+5) = rwX->rampTime & 0xFF;
+  *(req_payload_pt+6) = (rwX->rampTime >> 8) & 0xFF; 
 
   *req_payload_len_pt = 1 + 6;
 }
 
-void rplPayloadRead_cmd6(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, uint8_t *result) {
+void rplPayloadRead_cmd6(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, struct rw_data *rwX) {
   // com_id = 6
   // length = 2
-  *result = *(rpl_payload_pt+1);
+  rwX->result = *(rpl_payload_pt+1);
 }
 
 
 // command 10 - ping --- --- --- --- --- ---
-void reqPayloadWrite_cmd10(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt) {
+void reqPayloadWrite_cmd10(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, struct rw_data *rwX) {
   uint8_t com_id = 10;
 
   *req_payload_pt = com_id;
@@ -120,73 +155,144 @@ void reqPayloadWrite_cmd10(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt)
   *req_payload_len_pt = 1;
 }
 
-void rplPayloadRead_cmd10(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, uint8_t *result) {
+void rplPayloadRead_cmd10(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, struct rw_data *rwX) {
   // com_id = 10
   // length = 2
-  *result = *(rpl_payload_pt+1);
+  rwX->result = *(rpl_payload_pt+1);
 }
 
 
-void commandAll_6speed(int32_t *req_speed_array_pt, uint16_t *ramp_time_array_pt){
+void commandAll_4status(){
   #include "array_def1.h"
 
-  int32_t req_speed_rw1 = *(req_speed_array_pt);
-  int32_t req_speed_rw2 = *(req_speed_array_pt+1);
-  int32_t req_speed_rw3 = *(req_speed_array_pt+2);
-  int32_t req_speed_rw4 = *(req_speed_array_pt+3);
-
-  uint16_t ramp_time_rw1 = *(ramp_time_array_pt);
-  uint16_t ramp_time_rw2 = *(ramp_time_array_pt+1);
-  uint16_t ramp_time_rw3 = *(ramp_time_array_pt+2);
-  uint16_t ramp_time_rw4 = *(ramp_time_array_pt+3);
-
-  int rpl_base_len = 5;
-  rpl_packet_len_rw1 = rpl_base_len;
-  rpl_packet_len_rw2 = rpl_base_len;
-  rpl_packet_len_rw3 = rpl_base_len;
-  rpl_packet_len_rw4 = rpl_base_len;
+  int rpl_data_len = 10;
+  rpl_packet_len_rw1 = 2*(rpl_data_len + 4) + 3;
+  rpl_packet_len_rw2 = 2*(rpl_data_len + 4) + 3;
+  rpl_packet_len_rw3 = 2*(rpl_data_len + 4) + 3;
+  rpl_packet_len_rw4 = 2*(rpl_data_len + 4) + 3;
 
   // rw1
-  reqPayloadWrite_cmd6(&req_payload_rw1[0], &req_payload_len_rw1, req_speed_rw1, ramp_time_rw1);
+  reqPayloadWrite_cmd4(&req_payload_rw1[0], &req_payload_len_rw1, &rw1);
   reqPacketProcess(&req_payload_rw1[0], &req_packet_rw1[0], &req_payload_len_rw1, &req_packet_len_rw1);
   reqSpiTransfer(&req_packet_rw1[0], &req_packet_len_rw1, SS1);
 
 //  // rw2
-//  reqPayloadWrite_cmd6(&req_payload_rw2[0], &req_payload_len_rw2, req_speed_rw2, ramp_time_rw2);
+//  reqPayloadWrite_cmd4(&req_payload_rw2[0], &req_payload_len_rw2, &rw2);
 //  reqPacketProcess(&req_payload_rw2[0], &req_packet_rw2[0], &req_payload_len_rw2, &req_packet_len_rw2);
 //  reqSpiTransfer(&req_packet_rw2[0], &req_packet_len_rw2, SS2);
 //
 //  // rw3
-//  reqPayloadWrite_cmd6(&req_payload_rw3[0], &req_payload_len_rw3, req_speed_rw3, ramp_time_rw3);
+//  reqPayloadWrite_cmd4(&req_payload_rw3[0], &req_payload_len_rw3, &rw3);
 //  reqPacketProcess(&req_payload_rw1[0], &req_packet_rw3[0], &req_payload_len_rw3, &req_packet_len_rw3);
 //  reqSpiTransfer(&req_packet_rw3[0], &req_packet_len_rw3, SS3);
 //
 //  // rw4
-//  reqPayloadWrite_cmd6(&req_payload_rw4[0], &req_payload_len_rw4, req_speed_rw4, ramp_time_rw4);
+//  reqPayloadWrite_cmd4(&req_payload_rw4[0], &req_payload_len_rw4, &rw4);
 //  reqPacketProcess(&req_payload_rw4[0], &req_packet_rw4[0], &req_payload_len_rw4, &req_packet_len_rw4);
 //  reqSpiTransfer(&req_packet_rw4[0], &req_packet_len_rw4, SS4);
 
-//  delay(SPI_TIMEOUT);
+  delay(SPI_TIMEOUT);
 
   // rw1
   rplSpiTransfer(&rpl_packet_rw1[0], &rpl_packet_len_rw1, SS1);
   rplPacketProcess(&rpl_payload_rw1[0], &rpl_packet_rw1[0], &rpl_payload_len_rw1, &rpl_packet_len_rw1);
-  rplPayloadRead_cmd6(&rpl_payload_rw1[0], &rpl_payload_len_rw1, &result1);
+  rplPayloadRead_cmd4(&rpl_payload_rw1[0], &rpl_payload_len_rw1, &rw1);
   
 //  // rw2
 //  rplSpiTransfer(&rpl_packet_rw2[0], &rpl_packet_len_rw2, SS2);
 //  rplPacketProcess(&rpl_payload_rw2[0], &rpl_packet_rw2[0], &rpl_payload_len_rw2, &rpl_packet_len_rw2);
-//  rplPayloadRead_cmd6(&rpl_payload_rw2[0], &rpl_payload_len_rw2, &result2);
+//  rplPayloadRead_cmd4(&rpl_payload_rw2[0], &rpl_payload_len_rw2, &rw2);
 //
 //  // rw3
 //  rplSpiTransfer(&rpl_packet_rw3[0], &rpl_packet_len_rw3, SS3);
 //  rplPacketProcess(&rpl_payload_rw3[0], &rpl_packet_rw3[0], &rpl_payload_len_rw3, &rpl_packet_len_rw3);
-//  rplPayloadRead_cmd6(&rpl_payload_rw3[0], &rpl_payload_len_rw3, &result3);
+//  rplPayloadRead_cmd4(&rpl_payload_rw3[0], &rpl_payload_len_rw3, &rw3);
 //
 //  // rw4
 //  rplSpiTransfer(&rpl_packet_rw4[0], &rpl_packet_len_rw4, SS4);
 //  rplPacketProcess(&rpl_payload_rw4[0], &rpl_packet_rw4[0], &rpl_payload_len_rw4, &rpl_packet_len_rw4);
-//  rplPayloadRead_cmd6(&rpl_payload_rw4[0], &rpl_payload_len_rw4, &result4);
+//  rplPayloadRead_cmd4(&rpl_payload_rw4[0], &rpl_payload_len_rw4, &rw4);
+
+          Serial.print("req_payload_rw1:\t");
+          for (uint8_t yy = 0; yy < req_payload_len_rw1; yy++) {
+            Serial.print(req_payload_rw1[yy], HEX);
+            Serial.print("\t");
+          }
+          Serial.println(" ");
+          
+          Serial.print("req_packet_rw1:\t");
+          for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
+            Serial.print(req_packet_rw1[yy], HEX);
+            Serial.print("\t");
+          }
+          Serial.println(" ");
+
+          Serial.print("rpl_packet_rw1:\t");
+          for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
+            Serial.print(rpl_packet_rw1[yy], HEX);
+            Serial.print("\t");
+          }
+          Serial.println(" ");
+
+          Serial.print("rpl_payload_rw1:\t");
+          for (uint8_t yy = 0; yy < rpl_payload_len_rw1; yy++) {
+            Serial.print(rpl_payload_rw1[yy], HEX);
+            Serial.print("\t");
+          }
+          Serial.println(" ");
+}
+
+
+void commandAll_6speed(){
+  #include "array_def1.h"
+
+  int rpl_data_len = 0;
+  rpl_packet_len_rw1 = 2*(rpl_data_len + 4) + 3;
+  rpl_packet_len_rw2 = 2*(rpl_data_len + 4) + 3;
+  rpl_packet_len_rw3 = 2*(rpl_data_len + 4) + 3;
+  rpl_packet_len_rw4 = 2*(rpl_data_len + 4) + 3;
+
+  // rw1
+  reqPayloadWrite_cmd6(&req_payload_rw1[0], &req_payload_len_rw1, &rw1);
+  reqPacketProcess(&req_payload_rw1[0], &req_packet_rw1[0], &req_payload_len_rw1, &req_packet_len_rw1);
+  reqSpiTransfer(&req_packet_rw1[0], &req_packet_len_rw1, SS1);
+
+//  // rw2
+//  reqPayloadWrite_cmd6(&req_payload_rw2[0], &req_payload_len_rw2, &rw2);
+//  reqPacketProcess(&req_payload_rw2[0], &req_packet_rw2[0], &req_payload_len_rw2, &req_packet_len_rw2);
+//  reqSpiTransfer(&req_packet_rw2[0], &req_packet_len_rw2, SS2);
+//
+//  // rw3
+//  reqPayloadWrite_cmd6(&req_payload_rw3[0], &req_payload_len_rw3, &rw3);
+//  reqPacketProcess(&req_payload_rw1[0], &req_packet_rw3[0], &req_payload_len_rw3, &req_packet_len_rw3);
+//  reqSpiTransfer(&req_packet_rw3[0], &req_packet_len_rw3, SS3);
+//
+//  // rw4
+//  reqPayloadWrite_cmd6(&req_payload_rw4[0], &req_payload_len_rw4, &rw4);
+//  reqPacketProcess(&req_payload_rw4[0], &req_packet_rw4[0], &req_payload_len_rw4, &req_packet_len_rw4);
+//  reqSpiTransfer(&req_packet_rw4[0], &req_packet_len_rw4, SS4);
+
+  delay(SPI_TIMEOUT);
+
+  // rw1
+  rplSpiTransfer(&rpl_packet_rw1[0], &rpl_packet_len_rw1, SS1);
+  rplPacketProcess(&rpl_payload_rw1[0], &rpl_packet_rw1[0], &rpl_payload_len_rw1, &rpl_packet_len_rw1);
+  rplPayloadRead_cmd6(&rpl_payload_rw1[0], &rpl_payload_len_rw1, &rw1);
+  
+//  // rw2
+//  rplSpiTransfer(&rpl_packet_rw2[0], &rpl_packet_len_rw2, SS2);
+//  rplPacketProcess(&rpl_payload_rw2[0], &rpl_packet_rw2[0], &rpl_payload_len_rw2, &rpl_packet_len_rw2);
+//  rplPayloadRead_cmd6(&rpl_payload_rw2[0], &rpl_payload_len_rw2, &rw2);
+//
+//  // rw3
+//  rplSpiTransfer(&rpl_packet_rw3[0], &rpl_packet_len_rw3, SS3);
+//  rplPacketProcess(&rpl_payload_rw3[0], &rpl_packet_rw3[0], &rpl_payload_len_rw3, &rpl_packet_len_rw3);
+//  rplPayloadRead_cmd6(&rpl_payload_rw3[0], &rpl_payload_len_rw3, &rw3);
+//
+//  // rw4
+//  rplSpiTransfer(&rpl_packet_rw4[0], &rpl_packet_len_rw4, SS4);
+//  rplPacketProcess(&rpl_payload_rw4[0], &rpl_packet_rw4[0], &rpl_payload_len_rw4, &rpl_packet_len_rw4);
+//  rplPayloadRead_cmd6(&rpl_payload_rw4[0], &rpl_payload_len_rw4, &rw4);
 
           Serial.print("req_payload_rw1:\t");
           for (uint8_t yy = 0; yy < req_payload_len_rw1; yy++) {
@@ -221,54 +327,53 @@ void commandAll_6speed(int32_t *req_speed_array_pt, uint16_t *ramp_time_array_pt
 void commandAll_10ping(){
   #include "array_def1.h"
 
-  int rpl_base_len = 5;
-
-  rpl_packet_len_rw1 = rpl_base_len;
-  rpl_packet_len_rw2 = rpl_base_len;
-  rpl_packet_len_rw3 = rpl_base_len;
-  rpl_packet_len_rw4 = rpl_base_len;
+  int rpl_data_len = 0;
+  rpl_packet_len_rw1 = 2*(rpl_data_len + 4) + 3;
+  rpl_packet_len_rw2 = 2*(rpl_data_len + 4) + 3;
+  rpl_packet_len_rw3 = 2*(rpl_data_len + 4) + 3;
+  rpl_packet_len_rw4 = 2*(rpl_data_len + 4) + 3;
 
   // rw1
-  reqPayloadWrite_cmd10(&req_payload_rw1[0], &req_payload_len_rw1);
+  reqPayloadWrite_cmd10(&req_payload_rw1[0], &req_payload_len_rw1, &rw1);
   reqPacketProcess(&req_payload_rw1[0], &req_packet_rw1[0], &req_payload_len_rw1, &req_packet_len_rw1);
   reqSpiTransfer(&req_packet_rw1[0], &req_packet_len_rw1, SS1);
 
 //  // rw2
-//  reqPayloadWrite_cmd10(&req_payload_rw2[0], &req_payload_len_rw2);
+//  reqPayloadWrite_cmd10(&req_payload_rw2[0], &req_payload_len_rw2, &rw2);
 //  reqPacketProcess(&req_payload_rw2[0], &req_packet_rw2[0], &req_payload_len_rw2, &req_packet_len_rw2);
 //  reqSpiTransfer(&req_packet_rw2[0], &req_packet_len_rw2, SS2);
 //
 //  // rw3
-//  reqPayloadWrite_cmd10(&req_payload_rw3[0], &req_payload_len_rw3);
+//  reqPayloadWrite_cmd10(&req_payload_rw3[0], &req_payload_len_rw3, &rw3);
 //  reqPacketProcess(&req_payload_rw1[0], &req_packet_rw3[0], &req_payload_len_rw3, &req_packet_len_rw3);
 //  reqSpiTransfer(&req_packet_rw3[0], &req_packet_len_rw3, SS3);
 //
 //  // rw4
-//  reqPayloadWrite_cmd10(&req_payload_rw4[0], &req_payload_len_rw4);
+//  reqPayloadWrite_cmd10(&req_payload_rw4[0], &req_payload_len_rw4, &rw4);
 //  reqPacketProcess(&req_payload_rw4[0], &req_packet_rw4[0], &req_payload_len_rw4, &req_packet_len_rw4);
 //  reqSpiTransfer(&req_packet_rw4[0], &req_packet_len_rw4, SS4);
 
-//  delay(SPI_TIMEOUT);
+  delay(SPI_TIMEOUT);
 
   // rw1
   rplSpiTransfer(&rpl_packet_rw1[0], &rpl_packet_len_rw1, SS1);
   rplPacketProcess(&rpl_payload_rw1[0], &rpl_packet_rw1[0], &rpl_payload_len_rw1, &rpl_packet_len_rw1);
-  rplPayloadRead_cmd10(&rpl_payload_rw1[0], &rpl_payload_len_rw1, &result1);
+  rplPayloadRead_cmd10(&rpl_payload_rw1[0], &rpl_payload_len_rw1, &rw1);
   
 //  // rw2
 //  rplSpiTransfer(&rpl_packet_rw2[0], &rpl_packet_len_rw2, SS2);
 //  rplPacketProcess(&rpl_payload_rw2[0], &rpl_packet_rw2[0], &rpl_payload_len_rw2, &rpl_packet_len_rw2);
-//  rplPayloadRead_cmd10(&rpl_payload_rw2[0], &rpl_payload_len_rw2, &result2);
+//  rplPayloadRead_cmd10(&rpl_payload_rw2[0], &rpl_payload_len_rw2, &rw2);
 //
 //  // rw3
 //  rplSpiTransfer(&rpl_packet_rw3[0], &rpl_packet_len_rw3, SS3);
 //  rplPacketProcess(&rpl_payload_rw3[0], &rpl_packet_rw3[0], &rpl_payload_len_rw3, &rpl_packet_len_rw3);
-//  rplPayloadRead_cmd10(&rpl_payload_rw3[0], &rpl_payload_len_rw3, &result3);
+//  rplPayloadRead_cmd10(&rpl_payload_rw3[0], &rpl_payload_len_rw3, &rw3);
 //
 //  // rw4
 //  rplSpiTransfer(&rpl_packet_rw4[0], &rpl_packet_len_rw4, SS4);
 //  rplPacketProcess(&rpl_payload_rw4[0], &rpl_packet_rw4[0], &rpl_payload_len_rw4, &rpl_packet_len_rw4);
-//  rplPayloadRead_cmd10(&rpl_payload_rw4[0], &rpl_payload_len_rw4, &result4);
+//  rplPayloadRead_cmd10(&rpl_payload_rw4[0], &rpl_payload_len_rw4, &rw4);
 
           Serial.print("req_payload_rw1:\t");
           for (uint8_t yy = 0; yy < req_payload_len_rw1; yy++) {

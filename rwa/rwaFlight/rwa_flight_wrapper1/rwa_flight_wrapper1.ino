@@ -7,7 +7,7 @@
 */
 
 /* issues:
- *
+ * need to make sure struct pointer system actually modifies the global struct within each function
  */
 
 #include <SPI.h>
