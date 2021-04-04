@@ -16,7 +16,7 @@ extern TwoWire Wire1;
 int gauss_LSB[3] = {1100, 1100, 980};
 // Address
 #define LSM303_ADDRESS_MAG                        (0x3C>>1)
-#define DOUBLE                  double
+
 
 uint8_t tempReg; // variable holding the temporary requested register
 uint8_t tempValue = 0; // variable holding the temporary value
@@ -25,11 +25,8 @@ uint8_t crb_reg_m = 0b0010000;
 uint8_t mr_reg_m = 0b00000011;
 uint8_t sr_reg_mg = 0b00000000;
 uint8_t magByteData[6] = {0b00000001, 0b00000010, 0b00000011, 0b00000101, 0b00000110, 0b00000111};
-DOUBLE magDoubleData[3];
+double magDoubleData[3];
 int n=3;
-
-int16_t magRAWint;
-uint8_t doubleConvertor[sizeof(DOUBLE)];
 
 void setup()
 {

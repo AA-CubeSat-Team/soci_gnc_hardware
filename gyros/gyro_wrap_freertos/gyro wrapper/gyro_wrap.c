@@ -14,12 +14,6 @@
 // gyroscope struct.
 gyro_t Gyro1;
 
-#if !ARDUINO_CODE
-// i2c stuff, should be defined in peripherals.c?
-lpi2c_rtos_handle_t * gyroHandle1;
-lpi2c_master_transfer_t * gyroTransfer1;
-#endif
-
 
 /*!
  * @brief read the value of registers of a gyroscope.
@@ -84,7 +78,6 @@ void writeReg(uint8_t reg, uint8_t value, gyro_t * Gyro)
  *
  */
 void initGyro(gyro_t * Gyro)
-{
 #else
 /*!
  * @brief Turn on a gyroscope. Initialize all parameters of a gyroscope.
@@ -97,8 +90,8 @@ void initGyro(gyro_t * Gyro)
  *
  */
 void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle)
-{
 #endif
+{
   if (!Gyro->gyroInitialized) 
   {
 #if !ARDUINO_CODE
@@ -159,8 +152,8 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle)
 void startGyro(gyro_t * Gyro)
 {
   if (Gyro->gyroInitialized){
-	writeReg(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
-	writeReg(GYRO_CTRL_REG1, (GYRO_ODR_NUM<<2 | 0b10), Gyro);
+  writeReg(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
+  writeReg(GYRO_CTRL_REG1, (GYRO_ODR_NUM<<2 | 0b10), Gyro);
   }
 }
 
@@ -193,7 +186,7 @@ void readGyroData(gyro_t * Gyro)
   readTempData(Gyro);
   uint8_t rawData[6];  // x/y/z gyro register data stored here
   readRegs(GYRO_OUT_X_MSB,rawData, 6, Gyro);  // Read the six raw data registers into data array
-  readRegs(GYRO_OUT_X_MSB, &rawData[0], 6, Gyro);
+
 
 #if COUNT_TEMP_BIAS
   int8_t tempDelta = Gyro->temperature - GYRO_TEMP_0;

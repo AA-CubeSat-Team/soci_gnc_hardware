@@ -56,16 +56,10 @@ typedef struct _Gyro
 } gyro_t;
 
 extern gyro_t Gyro1;                /* gyroscope 1*/
-/* lpi2c_rtos_handle_t * gyroHandle1 freertos handle of gyroscope 1?*/
-/* lpi2c_master_transfer_t gyroTransfer1 gyroscope i2c transfer structure pointer*/
 
 #if MULTI_GYROS
 extern gyro_t Gyro2;
 extern gyro_t Gyro3;
-/* lpi2c_rtos_handle_t * gyroHandle1 freertos handle of gyroscope 2?*/
-/* lpi2c_rtos_handle_t * gyroHandle1 freertos handle of gyroscope 3?*/
-/* lpi2c_master_transfer_t gyroTransfer2 gyroscope i2c transfer structure pointer*/
-/* lpi2c_master_transfer_t gyroTransfer3 gyroscope i2c transfer structure pointer*/
 #endif
 
 
