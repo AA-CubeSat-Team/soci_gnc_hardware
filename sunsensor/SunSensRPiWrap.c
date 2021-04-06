@@ -82,7 +82,7 @@ void readFloats(double* data, int floatsToRead){
    }
    /* lastly, if we're getting values for angles (floatsToRead is 3) then the 4th read value needs to be the error byte */
    if (floatsToRead == 3){
-      *(data + 3) = (double)recv_buffer[11];
+      *(data + 3) = (double)recv_buffer[angleRespLength - 2];
    }
    return;
 }
@@ -175,19 +175,29 @@ void getAngles(double* angles){
       return;
 	}
    /* issue command to sun sensor */
+   printf("issuing command\n");
    for(int i = 0; i < 4; i++){
       serialPutchar(fd, anglesComm[i]);
+      printf("%d", anglesComm[i]);
+      printf("\n");
    }
    /* wait until response can be sent */
    delay(7);
    /* read in response to receiver buffer - takes the entire length of the receive buffer */
+   printf("reading bytes\n");
    for(int i = 0; i < angleRespLength; i++){
       recv_buffer[i] = serialGetchar(fd);
+      printf("%d", recv_buffer[i]);
+      printf("\n");
    }
    serialClose(fd);
    if(anglesComm[1] == recv_buffer[1]){
+      printf("interpreting response\n");
       readFloats(angles, 3);
    }else{
+      printf("improper command code\n");
+      printf("%d", recv_buffer[1]);
+      printf("\n");
       *angles = -5000.0;
       *(angles + 1) = -5000.0;
       *(angles + 2) = -5000.0;
@@ -231,7 +241,7 @@ int main(){
       printf("%f",angles[i]);
       printf("\n");
    }
-   printf("testing volts\n");
+  /* printf("testing volts\n");
    checkSunSensorHealth(&filtVolts[0], &unFiltVolts[0]);
    printf("Filtered volts: \n");
    for(int i = 0; i < 4; i++){
@@ -242,5 +252,5 @@ int main(){
    for(int i = 0; i < 4; i++){
       printf("%f",unFiltVolts[i]);
       printf("\n");
-   }
+   } */
 }
