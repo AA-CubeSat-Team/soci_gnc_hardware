@@ -1,3 +1,5 @@
+//// Sun sensor spoof for communication between the OBC and Simulink ////
+
 #define Address 0x60               // Define sun sensor address
 byte Command[4];                   // Initialize command receiving array
 float DataA[3];
@@ -22,10 +24,6 @@ void serialRecieveSimulink(double * doubleBuffer, int n) {
 
 void serialSendOBC() {
   // Angular Position sent to OBC
-    DataA[0] = (float)doubleBuffer[0];
-    DataA[1] = (float)doubleBuffer[1];
-    DataA[2] = (float)doubleBuffer[2];
-    error = (byte)doubleBuffer[3];
     byte Data1[sizeof DataA[0]];
     memcpy(Data1,&DataA[0],sizeof DataA[0]);
     byte Data2[sizeof DataA[1]];
@@ -36,31 +34,42 @@ void serialSendOBC() {
     byte Checksum = byte(Command[1] + Length + Data1[0] + Data1[1] + Data1[2] + Data1[3] + Data2[0] + Data2[1] + Data2[2] + Data2[3] + Data3[0] + Data3[1] + Data3[2] + Data3[3] + error);
     Checksum = Checksum & 0xFF;
     byte Answer[] = {Address,Command[1],Length,Data1[0],Data1[1],Data1[2],Data1[3],Data2[0],Data2[1],Data2[2],Data2[3],Data3[0],Data3[1],Data3[2],Data3[3],error,Checksum};
+    for(int i = 0; i < 17; i++){
+      Serial.println(Answer[i]);
+    }
     Serial1.write(Answer,17);
 }
 
 void serialRecieveOBC() {
-// Read incoming command packet from OBC and populate Command array when serial data is available
-if(Serial1.available()) {
-// Wait for entire command package to enter buffer
-  delay(10);
+// Read incoming command packet from OBC and populate Command array
 // Incoming address
   Command[0] = Serial1.read();
-// Check for correct address before proceeding 
+  delay(1);
   if (Command[0] == 0x60){ 
-// Incoming command
-  Command[1] = Serial1.read();
-// Incoming length
-  Command[2] = Serial1.read();
-// Incoming checksum
-  Command[3] = Serial1.read();
-
-serialRecieveSimulink(sunDoubleData, 2);
-serialSendOBC();
-  }
+    // Incoming command
+    Command[1] = Serial1.read();
+    delay(1);
+    if (Command[1] == 0x04){ 
+      // Incoming length
+      Command[2] = Serial1.read();
+      delay(1);
+      // Incoming checksum
+      Command[3] = Serial1.read();
+      delay(1);
+    }
   }
 }
 
 void loop() {
-  serialRecieveOBC();
+  if(Serial.available()){
+    serialRecieveSimulink(doubleBuffer, 4);
+    DataA[0] = (float)doubleBuffer[0];
+    DataA[1] = (float)doubleBuffer[1];
+    DataA[2] = (float)doubleBuffer[2];
+    error = (byte)doubleBuffer[3];
+  }
+  if(Serial1.available()){
+    serialRecieveOBC();
+    serialSendOBC();
+  }
 }
