@@ -85,11 +85,8 @@ void serialRecieve(double * doubleBuffer, int n)
 {
   while (Serial.available() < n*sizeof(double)){
   }
-  uint8_t doubleConvertor[sizeof(double)];
-  for (int ii = 0; ii < n; ii++) {
-    Serial.readBytes(doubleConvertor,sizeof(doubleConvertor));
-    memcpy(doubleBuffer + ii, doubleConvertor, sizeof(double));
-  }
+  Serial.readBytes((char*)doubleBuffer,n*sizeof(double));
+  Serial.write((char*)doubleBuffer, n*sizeof(double));
 }
 
 void double2GyroFromat(double * gyroDoubleData, uint8_t * gyroByteData, int n)
