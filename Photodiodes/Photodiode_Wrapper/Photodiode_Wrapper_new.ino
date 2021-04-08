@@ -8,7 +8,7 @@ uint8_t ADC_ser_address = 0x1D; // ADC address
 #define PD3_reg 0x22
 #define PD4_reg 0x23
 #define PD5_reg 0x24
-uint8_t PD_reg[] = {PD1_reg,PD2_reg,PD3_reg,PD4_reg,PD5_reg}; // Photodiode 1-5 register address'
+uint8_t PD_reg[] = {PD1_reg,PD2_reg,PD3_reg,PD4_reg,PD5_reg}; // Photodiode 1-5 register address'   //WILL: rename array to "PD_reg_list" or "PD_reg_array" for clarity
 uint16_t PDVol[10];
 uint16_t PDVoltage1;
 uint16_t PDVoltage2;
@@ -22,7 +22,7 @@ int j;
 
 //________________Quick Start (Page 33 in ADC Datasheet)_________________________
 // Step 3: Configuration 
-uint8_t advance_config_reg = 0x0B;
+uint8_t advance_config_reg = 0x0B;              // WILL: can reg addresses be #defined instead of using variables?
 uint8_t advance_config_value = 0b00000000;
 
 // Step 4: Enable Conversion Rate
@@ -60,7 +60,7 @@ uint8_t int_clear_val = 0b00000001;
 
 void setup(){
   // Enable Pullup resistors
-  pinMode(4,INPUT_PULLUP);  
+  pinMode(4,INPUT_PULLUP);            //WILL: are pullup resistors standard for UART? Does the OBC have this built in capability, like the Arduino?
   pinMode(5,INPUT_PULLUP);
   Serial.begin (9600); //Declare baude rate
   while (!Serial) 
@@ -69,9 +69,11 @@ void setup(){
   Wire.begin();
 
   //_____________________ Quick Start Cont. _______________________________________________________
+  
+// WILL: all of this quick start code (where you're actually reading/writing, line 71-165) should be placed in an initADC() function
   // STEP 1&2: wait for at least 33 ms
   uint8_t c = 1;
-  while (c) {
+  while (c) {                                 //WILL: is the 33 ms included anywhere here?
     readRegs(busy_status_reg, 1, &c);
     }
     
@@ -105,7 +107,7 @@ void setup(){
   Serial.println(interrupt_mask_value);
   
   //STEP7: Sending Limits for only enable input
-  writeReg(in_high_reg[0],in_high_val);
+  writeReg(in_high_reg[0],in_high_val);               //WILL: break up this block of text for readability
   writeReg(in_low_reg[0],in_low_val);
   readRegs(in_high_reg[0],1,&in_high_val);
   readRegs(in_low_reg[0],1,&in_low_val);
@@ -166,7 +168,7 @@ void setup(){
 
 
 
-void loop(){
+void loop(){    //WILL: add one higher layer of structure as a "runPHD()" function that contains getVoltage() and health(), this is what will run on the OBC
   getVoltage();
   
   health();
@@ -180,7 +182,7 @@ void health()
   if((PDVoltage1 > maxV || PDVoltage2 > maxV || PDVoltage3 > maxV || PDVoltage4 > maxV || PDVoltage5 > maxV) || PDVoltage1 + PDVoltage2 + PDVoltage3 + PDVoltage4 + PDVoltage5 > 3*maxV){
     writeReg(config_reg, 0b01001000);
     
-  // STEP 1&2: wait for at least 33 ms
+  // STEP 1&2: wait for at least 33 ms    //WILL: condense this by just calling "initADC()" function. 
       uint8_t c = 1;
   while (c) {
     readRegs(busy_status_reg, 1, &c);
@@ -281,7 +283,7 @@ void getVoltage()
 {
   j = 0;
   for(i=0; i<sizeof(PD_reg); i++){ 
-    Wire.beginTransmission(ADC_ser_address);
+    Wire.beginTransmission(ADC_ser_address);            //WILL: can you just use your "readRegs()" function for this?
     Wire.write(PD_reg[i]);     // Write register address
     Wire.endTransmission(false);
     Wire.requestFrom(ADC_ser_address,uint8_t(2));
@@ -296,8 +298,8 @@ void getVoltage()
   Serial.println(PDVol[1]);
   delay(1000);
   
-  PDVoltage1 = PDVol[0]<<8 | PDVol[1];
-  PDVoltage2 = PDVol[2]<<8 | PDVol[3];
+  PDVoltage1 = PDVol[0]<<8 | PDVol[1];     //WILL: does this value need to be converted from D_out back into a voltage? See what flight software wants. Output of
+  PDVoltage2 = PDVol[2]<<8 | PDVol[3];     //      photodiode is a fraction, not an actual voltage
   PDVoltage3 = PDVol[4]<<8 | PDVol[5];
   PDVoltage4 = PDVol[6]<<8 | PDVol[7];
   PDVoltage5 = PDVol[8]<<8 | PDVol[9];
