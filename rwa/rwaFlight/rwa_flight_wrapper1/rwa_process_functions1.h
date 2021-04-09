@@ -116,8 +116,7 @@ void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t 
   for (ii = 0; ii < 14; ii++) {
     spi_buffer[ii] = 0x7E;
   }
-
-  Serial.println(*rpl_packet_len_pt);
+  
   SPI.beginTransaction(spiSet);
   digitalWrite(SS_id, LOW);
   SPI.transfer(spi_buffer, *rpl_packet_len_pt);
@@ -128,8 +127,8 @@ void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t 
 //    *(rpl_packet_pt+ii) = spi_buffer[ii];
 //  }
 
-  uint8_t test_reply[] = {0x7E, 0x0A, 0x01, 0xE5, 0xE2, 0x7E};
-  *rpl_packet_len_pt = 6;
+  uint8_t test_reply[] = {0x7E, 0x7E, 0x0A, 0x01, 0xE5, 0xE2, 0x7E, 0x7E, 0x7E};
+  *rpl_packet_len_pt = 9;
   for (ii = 0; ii < *rpl_packet_len_pt; ii++) {
     *(rpl_packet_pt+ii) = test_reply[ii];
   }
@@ -154,24 +153,24 @@ void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *
   }
   rpl_len_Z = *rpl_packet_len_pt;
 
-//          Serial.print("rpl_array_Z:\t");
-//          for (uint8_t yy = 0; yy < rpl_len_Z; yy++) {
-//            Serial.print(rpl_array_Z[yy], HEX);
-//            Serial.print("\t");
-//          }
-//          Serial.println(" ");
-
-  // Z to Y – copies request array to new array without frame flags (WORKS)
-  for (ii = 0; ii < (rpl_len_Z - 1); ii++) {
-    rpl_array_Y[ii] = rpl_array_Z[ii + 1];
-  }
-  rpl_len_Y = rpl_len_Z - 2;
-
-  // Y to X – runs XOR process to remove escape uint8_t s from reply array (WORKS)
+  // Z to Y – copies request array to new array without frame flags (0x7E) (DOESN'T WORK)
   uint8_t fnd;
   fnd = 0;
+  
+  for (ii = 0; ii < rpl_len_Z; ii++) {
+    if (rpl_array_Z[ii] != 0x7E) {
+      rpl_array_Y[ii - fnd] = rpl_array_Z[ii];
+    }
+    if (rpl_array_Z[ii] == 0x7E) {
+      fnd++;
+    }
+  }
+  rpl_len_Y = rpl_len_Z - fnd;
 
-  for (uint8_t ii = 0; ii < rpl_len_Y; ii++) {
+  // Y to X – runs reverse XOR process to remove escape bytes (0x7D) from reply array (WORKS)
+  fnd = 0;
+
+  for (ii = 0; ii < rpl_len_Y; ii++) {
     if (rpl_array_Y[ii + fnd] != 0x7D) {
       rpl_array_X[ii] = rpl_array_Y[ii + fnd];
     }
@@ -201,7 +200,7 @@ void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *
   rpl_crc_calc[1] = crc_value >> 8;
 
   if (rpl_crc_rwa[0] == rpl_crc_calc[0] && rpl_crc_rwa[1] == rpl_crc_calc[1]) {
-    Serial.println("reply CRC good");
+//    Serial.println("reply CRC good");
   }
 
 

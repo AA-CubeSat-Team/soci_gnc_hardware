@@ -220,14 +220,14 @@ void commandAll_4status(){
           }
           Serial.println(" ");
           
-          Serial.print("req_packet_rw1:\t");
+          Serial.print("req_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
             Serial.print(req_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
 
-          Serial.print("rpl_packet_rw1:\t");
+          Serial.print("rpl_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
             Serial.print(rpl_packet_rw1[yy], HEX);
             Serial.print("\t");
@@ -301,14 +301,14 @@ void commandAll_6speed(){
           }
           Serial.println(" ");
           
-          Serial.print("req_packet_rw1:\t");
+          Serial.print("req_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
             Serial.print(req_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
 
-          Serial.print("rpl_packet_rw1:\t");
+          Serial.print("rpl_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
             Serial.print(rpl_packet_rw1[yy], HEX);
             Serial.print("\t");
@@ -382,14 +382,14 @@ void commandAll_10ping(){
           }
           Serial.println(" ");
           
-          Serial.print("req_packet_rw1:\t");
+          Serial.print("req_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
             Serial.print(req_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
 
-          Serial.print("rpl_packet_rw1:\t");
+          Serial.print("rpl_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
             Serial.print(rpl_packet_rw1[yy], HEX);
             Serial.print("\t");

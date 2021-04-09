@@ -46,7 +46,10 @@ void loop(void) {
   Serial.println(" ");
   Serial.println("loop start");
 
-  commandAll_10ping();
+  rw1.reqSpeed = 65000;
+  rw1.rampTime = 10;
+  
+  commandAll_6speed();
   
   delay(4000);
 }
