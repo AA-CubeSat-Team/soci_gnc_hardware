@@ -8,6 +8,13 @@
 
 /* issues:
  * need to make sure struct pointer system actually modifies the global struct within each function
+ * SPI issue:
+ *  0071: all 0xF9s, bit shifted with/without MISO, but more successful without MISO
+ *        in some cases, RW understood request, but correct reply by bit shifted
+ *  0072: more 0x7Es to start, but falls out of sync after a few bytes
+ *        started working, not sure why - spun up motor
+ *  0110: worked right away, spun up motor
+ *  0109: all 0xF9s, works when MISO is unplugged from Arduino, spun up motor
  */
 
 #include <SPI.h>
@@ -38,7 +45,8 @@ void setup (void) {
   pinMode(EN4, OUTPUT);
   digitalWrite(EN4, HIGH);
 
-  Serial.println("master setup complete");
+  Serial.println("--- --- master setup complete --- ---");
+  delay(50);
 }
 
 
@@ -46,10 +54,13 @@ void loop(void) {
   Serial.println(" ");
   Serial.println("loop start");
 
-  rw1.reqSpeed = 65000;
+  rw1.reqSpeed = 10000;
   rw1.rampTime = 10;
   
+//  commandAll_10ping();
   commandAll_6speed();
+
+
   
-  delay(4000);
+  delay(5000);
 }

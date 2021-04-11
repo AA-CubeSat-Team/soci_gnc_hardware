@@ -92,17 +92,16 @@ void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *
 void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, uint8_t SS_id) { // --- --- --- --- --- --- --- --- ---
   int ii;
   
-  uint8_t spi_buffer[14] = {0};
-  uint8_t spi_buffer_len = 14;
+  uint8_t spi_buffer[MAX_REQ_PACKET] = {0};
   
   for (ii = 0; ii < *req_packet_len_pt; ii++) {
     spi_buffer[ii] = *(req_packet_pt+ii);
+//    spi_buffer[ii] = 0x7E;
   }
-  spi_buffer_len = *req_packet_len_pt;
   
   SPI.beginTransaction(spiSet);
   digitalWrite(SS_id, LOW);
-  SPI.transfer(spi_buffer, spi_buffer_len);
+  SPI.transfer(spi_buffer, *req_packet_len_pt);
   digitalWrite(SS_id, HIGH);
   SPI.endTransaction();
 }
@@ -111,9 +110,10 @@ void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, uint8_t 
 void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t SS_id) { // --- --- --- --- --- --- --- --- ---
   int ii;
   
-  uint8_t spi_buffer[14] = {0};
-  
-  for (ii = 0; ii < 14; ii++) {
+  uint8_t spi_buffer[MAX_RPL_PACKET] = {0};
+
+  ii = 0;
+  for (ii = 0; ii < MAX_RPL_PACKET; ii++) {
     spi_buffer[ii] = 0x7E;
   }
   
@@ -123,23 +123,25 @@ void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t 
   digitalWrite(SS_id, HIGH);
   SPI.endTransaction();
 
-//  for (ii = 0; ii < *rpl_packet_len_pt; ii++) {
-//    *(rpl_packet_pt+ii) = spi_buffer[ii];
-//  }
-
-  uint8_t test_reply[] = {0x7E, 0x7E, 0x0A, 0x01, 0xE5, 0xE2, 0x7E, 0x7E, 0x7E};
-  *rpl_packet_len_pt = 9;
   for (ii = 0; ii < *rpl_packet_len_pt; ii++) {
-    *(rpl_packet_pt+ii) = test_reply[ii];
+    *(rpl_packet_pt+ii) = spi_buffer[ii];
   }
+
+//  uint8_t test_reply[] = {0x7E, 0x7E, 0x0A, 0x01, 0xE5, 0xE2, 0x7E, 0x7E, 0x7E};
+//  uint8_t test_reply[14] = {0};
+//  
+//  *rpl_packet_len_pt = 14;
+//  for (ii = 0; ii < *rpl_packet_len_pt; ii++) {
+//    *(rpl_packet_pt+ii) = test_reply[ii];
+//  }
 }
 
 
 void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *rpl_payload_len_pt, uint8_t *rpl_packet_len_pt) { //(NEEDS WORK) --- --- --- --- --- --- --- --- ---
-  uint8_t rpl_array_Z[16] = {0}; // need to allocate max possible size of uint8_t
-  uint8_t rpl_array_Y[16] = {0};
-  uint8_t rpl_array_X[16] = {0};
-  uint8_t rpl_array_W[16] = {0};
+  uint8_t rpl_array_Z[MAX_RPL_PACKET] = {0}; 
+  uint8_t rpl_array_Y[MAX_RPL_PACKET] = {0};
+  uint8_t rpl_array_X[MAX_RPL_PACKET] = {0};
+  uint8_t rpl_array_W[MAX_RPL_PACKET] = {0};
   uint8_t rpl_len_Z;
   uint8_t rpl_len_Y;
   uint8_t rpl_len_X;
@@ -153,7 +155,7 @@ void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *
   }
   rpl_len_Z = *rpl_packet_len_pt;
 
-  // Z to Y – copies request array to new array without frame flags (0x7E) (DOESN'T WORK)
+  // Z to Y – copies request array to new array without frame flags (0x7E) (WORKS)
   uint8_t fnd;
   fnd = 0;
   

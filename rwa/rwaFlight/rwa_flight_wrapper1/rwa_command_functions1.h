@@ -3,7 +3,7 @@
 SPISettings spiSet(125000, MSBFIRST, SPI_MODE0);
 
 // set timeout between request and reply (milliseconds)
-#define SPI_TIMEOUT 100
+#define SPI_TIMEOUT 200
 
 // assigns GPIO pins to be SS pins
 #define SS1 3
@@ -16,6 +16,11 @@ SPISettings spiSet(125000, MSBFIRST, SPI_MODE0);
 #define EN2 A2
 #define EN3 A3
 #define EN4 A4
+
+#define MAX_REQ_PAYLOAD 6 + 1     // N_max = 6 plus comID
+#define MAX_REQ_PACKET 2*(MAX_REQ_PAYLOAD + 2) + 2   // adds CRC, doubles for max XOR, adds flags
+#define MAX_RPL_PAYLOAD 10 + 2    // N_max = 10 plus comID and result
+#define MAX_RPL_PACKET 2*(MAX_RPL_PAYLOAD + 2) + 2    // adds CRC, doubles for max XOR, adds flags
 
 unsigned int crc_value = 0xFFFF;
 unsigned int crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
@@ -357,6 +362,7 @@ void commandAll_10ping(){
 
   // rw1
   rplSpiTransfer(&rpl_packet_rw1[0], &rpl_packet_len_rw1, SS1);
+  // ISSUE: packet length goes negative if pointer doen't hold value (not sure why)
   rplPacketProcess(&rpl_payload_rw1[0], &rpl_packet_rw1[0], &rpl_payload_len_rw1, &rpl_packet_len_rw1);
   rplPayloadRead_cmd10(&rpl_payload_rw1[0], &rpl_payload_len_rw1, &rw1);
   
@@ -389,6 +395,8 @@ void commandAll_10ping(){
           }
           Serial.println(" ");
 
+//          Serial.print("rpl_packet_len_rw1:\t");
+//          Serial.println(rpl_packet_len_rw1);
           Serial.print("rpl_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
             Serial.print(rpl_packet_rw1[yy], HEX);
@@ -396,6 +404,8 @@ void commandAll_10ping(){
           }
           Serial.println(" ");
 
+//          Serial.print("rpl_payload_len_rw1:\t");
+//          Serial.println(rpl_payload_len_rw1);
           Serial.print("rpl_payload_rw1:\t");
           for (uint8_t yy = 0; yy < rpl_payload_len_rw1; yy++) {
             Serial.print(rpl_payload_rw1[yy], HEX);
