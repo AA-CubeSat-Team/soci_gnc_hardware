@@ -3,59 +3,55 @@
 #include <Wire.h>
 
 uint8_t ADC_ser_address = 0x1D; // ADC address
+
+// Define all registers:
 #define PD1_reg 0x20
 #define PD2_reg 0x21
 #define PD3_reg 0x22
 #define PD4_reg 0x23
 #define PD5_reg 0x24
-uint8_t PD_reg_array[] = {PD1_reg,PD2_reg,PD3_reg,PD4_reg,PD5_reg}; // Photodiode 1-5 register address'
-uint16_t PDVol[10];
-uint16_t PDVoltage1;
-uint16_t PDVoltage2;
-uint16_t PDVoltage3;
-uint16_t PDVoltage4;
-uint16_t PDVoltage5;
-uint16_t maxV = 2880;
-int i;
-int j;
+#define advance_config_reg 0x0B
+#define config_reg 0x00
+#define conv_rate_reg 0x07
+#define disable_reg 0x08
+#define interrupt_mask_reg 0x03
+#define busy_status_reg 0x0C
+#define in_high_reg1 0x2A
+#define in_high_reg2 0x2C
+#define in_high_reg3 0x2E
+#define in_high_reg4 0x30
+#define in_high_reg5 0x32
+#define in_low_reg1 0x2B
+#define in_low_reg2 0x2D
+#define in_low_reg3 0x2F
+#define in_low_reg4 0x31
+#define in_low_reg5 0x33
 
-
-//________________Quick Start (Page 33 in ADC Datasheet)_________________________
-// Step 3: Configuration 
-uint8_t advance_config_reg = 0x0B;              // WILL: can reg addresses be #defined instead of using variables?
+// Initialize register values to be used in ADC initialization:
 uint8_t advance_config_value = 0b00000000;
-
-// Step 4: Enable Conversion Rate
-uint8_t config_reg = 0x00;
 uint8_t test;
-uint8_t conv_rate_reg = 0x07;
 uint8_t conv_rate_value = 0b00000001;
-
-// Step 5: Disable analog inputs (disables IN5,IN6,temp)
-uint8_t disable_reg = 0x08;
-uint8_t disable_value = 0b11100000; 
-
-// Step 6: Enable interrupt mask 
-uint8_t interrupt_mask_reg = 0x03;
+uint8_t disable_value = 0b11100000;
 uint8_t interrupt_mask_value = 0b00011111;
-
-//Step 7: Program limit registers
-//IN0 High limit
-uint8_t in_high_reg[] = {0x2A,0x2C,0x2E,0x30,0x32};
-uint8_t in_high_val = 0b101 ; // change this (just a test for now)
-
-// IN0 Low limit
-uint8_t in_low_reg[] = {0x2B,0x2D,0x2F,0x31,0x33};
+uint8_t in_high_val = 0b101; // change this (just a test for now)
 uint8_t in_low_val = 0;
-
-// Step 8: Starting the ADC
 uint8_t config_default_value = 0b00001000;
 uint8_t start_value = 0b00001001;
-uint8_t busy_status_reg = 0x0C;
-
-// Step 9: Setting INT_clear to zero
 uint8_t int_clear_val = 0b00000001;
-//______________________________________________________________________________________________
+
+// Initialize PD register array and D_out variables:
+uint8_t PD_reg_array[] = {PD1_reg,PD2_reg,PD3_reg,PD4_reg,PD5_reg}; // Photodiode 1-5 register address'
+uint16_t PDVol[10];
+uint16_t D_out[5];
+uint16_t current[5];
+uint16_t maxV = 2880;
+
+// Define values for current calculations:
+#define R 10000
+#define V_ref 3.3
+
+int i;
+int j;
 
 
 void setup(){
@@ -67,6 +63,7 @@ void setup(){
     {
     }
   Wire.begin();
+  initADC();
 }
 
 
@@ -85,9 +82,9 @@ void runPHD(){
 
 // Initialize ADC
 void initADC(){  
-  // STEP 1&2: wait for at least 33 ms
+  // STEP 1&2: wait until busy status register is read not busy
   uint8_t c = 1;
-  while (c) {                                 //WILL: is the 33 ms included anywhere here?
+  while (c) {
     readRegs(busy_status_reg, 1, &c);
     }
     
@@ -212,13 +209,25 @@ void getVoltage()
   Serial.println("Unprocessed PD Voltage data:");
   Serial.println(PDVol[0]);
   Serial.println(PDVol[1]);
-  delay(1000);
+  delay(500);
   
-  PDVoltage1 = PDVol[0]<<8 | PDVol[1];     //WILL: does this value need to be converted from D_out back into a voltage? See what flight software wants. Output of
-  PDVoltage2 = PDVol[2]<<8 | PDVol[3];     //      photodiode is a fraction, not an actual voltage
-  PDVoltage3 = PDVol[4]<<8 | PDVol[5];
-  PDVoltage4 = PDVol[6]<<8 | PDVol[7];
-  PDVoltage5 = PDVol[8]<<8 | PDVol[9];
+  j = 0;
+  for(i=0; i<sizeof(current); i++){
+    D_out[i] = PDVol[j]<<8 | PDVol[j+1];
+    current[i] = ((D_out[i]/pow(2,12))*V_ref)/R;
+    j = j+2;
+  }
+  Serial.println("PD current:");
+  Serial.println(current[1]);
+  delay(500);
+    
+//  D_out[0] = PDVol[0]<<8 | PDVol[1];
+//  D_out[1] = PDVol[2]<<8 | PDVol[3];
+//  D_out[2] = PDVol[4]<<8 | PDVol[5];
+//  D_out[3] = PDVol[6]<<8 | PDVol[7];
+//  D_out[4] = PDVol[8]<<8 | PDVol[9];
+//
+//  current[i] = ((D_out/pow(2,12))*V_ref)/R;
 }
 
 
