@@ -118,50 +118,50 @@ void initADC(){
   Serial.println(interrupt_mask_value);
   
   //STEP7: Sending Limits for only enable input
-  writeReg(in_high_reg[0],in_high_val);
-  writeReg(in_low_reg[0],in_low_val);
-  readRegs(in_high_reg[0],1,&in_high_val);
-  readRegs(in_low_reg[0],1,&in_low_val);
+  writeReg(in_high_reg1,in_high_val);
+  writeReg(in_low_reg1,in_low_val);
+  readRegs(in_high_reg1,1,&in_high_val);
+  readRegs(in_low_reg1,1,&in_low_val);
   Serial.println("Step7: Limits for IN0");
   Serial.println(in_high_val);
   Serial.println(in_low_val);
   
   in_high_val = 0b101;
   in_low_val = 0;
-  writeReg(in_high_reg[1],in_high_val);
-  writeReg(in_low_reg[1],in_low_val);
-  readRegs(in_high_reg[1],1,&in_high_val);
-  readRegs(in_low_reg[1],1,&in_low_val);
+  writeReg(in_high_reg2,in_high_val);
+  writeReg(in_low_reg2,in_low_val);
+  readRegs(in_high_reg2,1,&in_high_val);
+  readRegs(in_low_reg2,1,&in_low_val);
   Serial.println("Step7: Limits for IN1");
   Serial.println(in_high_val);
   Serial.println(in_low_val);
   
   in_high_val = 0b101;
   in_low_val = 0;
-  writeReg(in_high_reg[2],in_high_val);
-  writeReg(in_low_reg[2],in_low_val);
-  readRegs(in_high_reg[2],1,&in_high_val);
-  readRegs(in_low_reg[2],1,&in_low_val);
+  writeReg(in_high_reg3,in_high_val);
+  writeReg(in_low_reg3,in_low_val);
+  readRegs(in_high_reg3,1,&in_high_val);
+  readRegs(in_low_reg3,1,&in_low_val);
   Serial.println("Step7: Limits for IN2");
   Serial.println(in_high_val);
   Serial.println(in_low_val);
   
   in_high_val = 0b101;
   in_low_val = 0;
-  writeReg(in_high_reg[3],in_high_val);
-  writeReg(in_low_reg[3],in_low_val);
-  readRegs(in_high_reg[3],1,&in_high_val);
-  readRegs(in_low_reg[3],1,&in_low_val);
+  writeReg(in_high_reg4,in_high_val);
+  writeReg(in_low_reg4,in_low_val);
+  readRegs(in_high_reg4,1,&in_high_val);
+  readRegs(in_low_reg4,1,&in_low_val);
   Serial.println("Step7: Limits for IN3");
   Serial.println(in_high_val);
   Serial.println(in_low_val);
   
   in_high_val = 0b101;
   in_low_val = 0;
-  writeReg(in_high_reg[4],in_high_val);
-  writeReg(in_low_reg[4],in_low_val);
-  readRegs(in_high_reg[4],1,&in_high_val);
-  readRegs(in_low_reg[4],1,&in_low_val);
+  writeReg(in_high_reg5,in_high_val);
+  writeReg(in_low_reg5,in_low_val);
+  readRegs(in_high_reg5,1,&in_high_val);
+  readRegs(in_low_reg5,1,&in_low_val);
   Serial.println("Step7: Limits for IN4");
   Serial.println(in_high_val);
   Serial.println(in_low_val);    
@@ -183,7 +183,7 @@ void initADC(){
 
 // Health check: If any channel exceeds the maxV or all 5 channels exceed 3*maxV when summed: 1) resets registers to default values and puts ADC into shutdown mode. 2) Reinitializes ADC to proper configuration (same as quickstart procedure).
 void health() {
-  if((PDVoltage1 > maxV || PDVoltage2 > maxV || PDVoltage3 > maxV || PDVoltage4 > maxV || PDVoltage5 > maxV) || PDVoltage1 + PDVoltage2 + PDVoltage3 + PDVoltage4 + PDVoltage5 > 3*maxV){
+  if((D_out[0] > maxV || D_out[1] > maxV || D_out[2] > maxV || D_out[3] > maxV || D_out[4] > maxV) || D_out[0] + D_out[1] + D_out[2] + D_out[3] + D_out[4] > 3*maxV){
     writeReg(config_reg, 0b01001000);
     
   initADC();
