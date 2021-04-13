@@ -28,7 +28,7 @@ uint8_t ADC_ser_address = 0x1D; // ADC address
 #define in_low_reg5 0x33
 
 // Initialize register values to be used in ADC initialization:
-uint8_t advance_config_value = 0b00000000;
+uint8_t advance_config_value = 0b00000001;
 uint8_t test;
 uint8_t conv_rate_value = 0b00000001;
 uint8_t disable_value = 0b11100000;
@@ -47,8 +47,8 @@ uint16_t current[5];
 uint16_t maxV = 2880;
 
 // Define values for current calculations:
-#define R 10000
-#define V_ref 3.3
+#define R 1
+#define V_ref 5
 
 int i;
 int j;
@@ -214,11 +214,11 @@ void getVoltage()
   j = 0;
   for(i=0; i<sizeof(current); i++){
     D_out[i] = PDVol[j]<<8 | PDVol[j+1];
-    current[i] = ((D_out[i]/pow(2,12))*V_ref)/R;
+    current[i] = uint16_t(((D_out[i]/4096)*V_ref)/R);
     j = j+2;
   }
   Serial.println("PD current:");
-  Serial.println(current[1]);
+  Serial.println(current[0]);
   delay(500);
     
 //  D_out[0] = PDVol[0]<<8 | PDVol[1];
@@ -228,6 +228,12 @@ void getVoltage()
 //  D_out[4] = PDVol[8]<<8 | PDVol[9];
 //
 //  current[i] = ((D_out/pow(2,12))*V_ref)/R;
+  float analogValue = analogRead(A0);
+  // Rescale to potentiometer's voltage (from 0V to 3.3V):
+  float voltage = analogValue/200;
+
+  Serial.print("Voltage: ");
+  Serial.println(voltage);
 }
 
 
