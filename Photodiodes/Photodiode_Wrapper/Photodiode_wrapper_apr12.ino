@@ -45,11 +45,11 @@
   uint16_t PDVol[10];
   uint16_t D_out[5];
   uint16_t current[5];   ////// Current reported to flight software in uA (micro Amps) ///////
-  uint16_t maxV = 2880;
   
   // Define values for current calculations:
   #define R 10           // Resistance in kilo Ohms
   #define V_ref 5        // Voltage in V
+  #define max_current 170
   
   int i;
   int j;
@@ -185,7 +185,7 @@
   
   // Health check: If any channel exceeds the maxV or all 5 channels exceed 3*maxV when summed: 1) resets registers to default values and puts ADC into shutdown mode. 2) Reinitializes ADC to proper configuration (same as quickstart procedure).
   void health() {
-    if((D_out[0] > maxV || D_out[1] > maxV || D_out[2] > maxV || D_out[3] > maxV || D_out[4] > maxV) || D_out[0] + D_out[1] + D_out[2] + D_out[3] + D_out[4] > 3*maxV){
+    if((current[0] > max_current || current[1] > max_current || current[2] > max_current || current[3] > max_current || current[4] > max_current) || current[0] + current[1] + current[2] + current[3] + current[4] > 3*max_current){
       writeReg(config_reg, 0b01001000);
       
     initADC();
