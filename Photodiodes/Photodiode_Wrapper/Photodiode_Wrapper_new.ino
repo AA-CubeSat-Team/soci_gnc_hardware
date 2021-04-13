@@ -228,12 +228,6 @@ void getVoltage()
 //  D_out[4] = PDVol[8]<<8 | PDVol[9];
 //
 //  current[i] = ((D_out/pow(2,12))*V_ref)/R;
-  float analogValue = analogRead(A0);
-  // Rescale to potentiometer's voltage (from 0V to 3.3V):
-  float voltage = analogValue/200;
-
-  Serial.print("Voltage: ");
-  Serial.println(voltage);
 }
 
 
