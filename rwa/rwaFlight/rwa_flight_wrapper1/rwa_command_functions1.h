@@ -3,7 +3,7 @@
 SPISettings spiSet(125000, MSBFIRST, SPI_MODE0);
 
 // set timeout between request and reply (milliseconds)
-#define SPI_TIMEOUT 200
+#define SPI_TIMEOUT 300
 
 // assigns GPIO pins to be SS pins
 #define SS1 3

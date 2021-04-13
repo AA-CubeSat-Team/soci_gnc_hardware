@@ -15,6 +15,12 @@
  *        started working, not sure why - spun up motor
  *  0110: worked right away, spun up motor
  *  0109: all 0xF9s, works when MISO is unplugged from Arduino, spun up motor
+ *  
+ *  pull-up resistors make no impact
+ *  works when low-side V_in is >3.4V
+ *  LV pin is 4.0V, but A1-A4 idles at 3.2V
+ *  
+ *  weird issue where it only requested a single flag
  */
 
 #include <SPI.h>
@@ -57,10 +63,10 @@ void loop(void) {
   rw1.reqSpeed = 10000;
   rw1.rampTime = 10;
   
-//  commandAll_10ping();
-  commandAll_6speed();
+  commandAll_10ping();
+//  commandAll_6speed();
 
 
   
-  delay(5000);
+  delay(3000);
 }
