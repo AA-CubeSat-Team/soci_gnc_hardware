@@ -44,12 +44,12 @@
   uint8_t PD_reg_array[] = {PD1_reg,PD2_reg,PD3_reg,PD4_reg,PD5_reg}; // Photodiode 1-5 register address'
   uint16_t PDVol[10];
   uint16_t D_out[5];
-  uint16_t current[5];
+  uint16_t current[5];   ////// Current reported to flight software in uA (micro Amps) ///////
   uint16_t maxV = 2880;
   
   // Define values for current calculations:
-  #define R 1
-  #define V_ref 5
+  #define R 10           // Resistance in kilo Ohms
+  #define V_ref 5        // Voltage in V
   
   int i;
   int j;
@@ -68,12 +68,13 @@
   }
   
   
+
   void loop(){
     runPHD();
   }
   
   
-  
+  ////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////
   void runPHD(){
     getVoltage();
     
@@ -195,6 +196,7 @@
   // Reads voltages from ADC
   void getVoltage()
   {
+    // Recieve data from ADC
     j = 0;
     for(i=0; i<sizeof(PD_reg_array); i++){ 
       Wire.beginTransmission(ADC_ser_address);            
@@ -207,34 +209,18 @@
       }
       j = j+2;
     }
-    Serial.println("Unprocessed PD Voltage data:");
-    Serial.println(PDVol[0]);
-    Serial.println(PDVol[1]);
-    delay(500);
     
+    // Process Data and hold current 5 values in 'current' buffer
     j = 0;
     for(i=0; i<sizeof(current); i++){
       D_out[i] = PDVol[j]<<8 | PDVol[j+1];
-      current[i] = uint16_t(((D_out[i]/4096)*V_ref)/R);
+      current[i] = uint16_t((((D_out[i]/4096)*V_ref)/R)*1000);  // current calculated in uA (micro Amps)
       j = j+2;
     }
     Serial.println("PD current:");
-    Serial.println(current[0]);
-    delay(500);
-      
-  //  D_out[0] = PDVol[0]<<8 | PDVol[1];
-  //  D_out[1] = PDVol[2]<<8 | PDVol[3];
-  //  D_out[2] = PDVol[4]<<8 | PDVol[5];
-  //  D_out[3] = PDVol[6]<<8 | PDVol[7];
-  //  D_out[4] = PDVol[8]<<8 | PDVol[9];
-  //
-  //  current[i] = ((D_out/pow(2,12))*V_ref)/R;
-    float analogValue = analogRead(A0);
-    // Rescale to potentiometer's voltage (from 0V to 3.3V):
-    float voltage = analogValue/200;
-  
-    Serial.print("Voltage: ");
-    Serial.println(voltage);
+    for(i=0; i<sizeof(current); i++){
+      Serial.println(current[i]);
+    }
   }
   
   
