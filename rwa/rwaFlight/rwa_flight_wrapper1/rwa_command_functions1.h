@@ -92,13 +92,7 @@ struct rw_data
     uint32_t uid1; 
     uint32_t uid2; 
     uint32_t uid3;
-} rw1, rw2, rw3, rw4;
-
-// creates pointer to each rw struct
-struct rw_data *rw1_pt = &rw1; 
-struct rw_data *rw2_pt = &rw2; 
-struct rw_data *rw3_pt = &rw3; 
-struct rw_data *rw4_pt = &rw4;                     
+} rw1, rw2, rw3, rw4;                   
                            
 #include "rwa_process_functions1.h"                       
 
