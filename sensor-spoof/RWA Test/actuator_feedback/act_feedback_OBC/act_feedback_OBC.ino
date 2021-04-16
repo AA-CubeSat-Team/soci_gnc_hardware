@@ -12,10 +12,10 @@
  * 4. give current values back to FSW (send to Simulink)
  */
 
-#include <Wire.h>
+#include <Wire.h> 
 
 #define ACT_DUE_ADDRESS 0x18
-#define DOUBLE_SIZE 4
+#define DOUBLE_SIZE 8
 
 struct rw_data
 {
@@ -34,7 +34,7 @@ void setup() {
   Wire.begin();
 
   Serial.println("--- --- master setup complete --- ---");
-  delay(50);
+  delay(100);
 }
 
 void loop() {
@@ -78,7 +78,7 @@ void loop() {
 //          Serial.println(rw1_currSpeed_double,3);
 
   // split doubles into bytes for serial transmission
-  // reaction wheels speeds
+  // reaction wheels
   uint8_t rw1_currSpeed_bytes[DOUBLE_SIZE] = {0};
   uint8_t rw2_currSpeed_bytes[DOUBLE_SIZE] = {0};
   uint8_t rw3_currSpeed_bytes[DOUBLE_SIZE] = {0};
@@ -88,8 +88,15 @@ void loop() {
   memcpy(&rw2_currSpeed_bytes[0], &rw2_currSpeed_double, DOUBLE_SIZE);
   memcpy(&rw3_currSpeed_bytes[0], &rw3_currSpeed_double, DOUBLE_SIZE);
   memcpy(&rw4_currSpeed_bytes[0], &rw4_currSpeed_double, DOUBLE_SIZE);
+  
+  uint8_t rwa_currSpeed_bytes[4*DOUBLE_SIZE] = {0};
 
-  // magnetorquer dipoles
+  memcpy(&rwa_currSpeed_bytes[0], &rw1_currSpeed_bytes[0], DOUBLE_SIZE);
+  memcpy(&rwa_currSpeed_bytes[0]+DOUBLE_SIZE, &rw2_currSpeed_bytes[0], DOUBLE_SIZE);
+  memcpy(&rwa_currSpeed_bytes[0]+2*DOUBLE_SIZE, &rw3_currSpeed_bytes[0], DOUBLE_SIZE);
+  memcpy(&rwa_currSpeed_bytes[0]+3*DOUBLE_SIZE, &rw4_currSpeed_bytes[0], DOUBLE_SIZE);
+
+  // magnetorquers
   uint8_t x_dipole_bytes[DOUBLE_SIZE] = {0};
   uint8_t y_dipole_bytes[DOUBLE_SIZE] = {0};
   uint8_t z_dipole_bytes[DOUBLE_SIZE] = {0};
@@ -98,22 +105,30 @@ void loop() {
   memcpy(&y_dipole_bytes[0], &y_dipole, DOUBLE_SIZE);
   memcpy(&z_dipole_bytes[0], &z_dipole, DOUBLE_SIZE);
 
-          Serial.print("rw1_currSpeed_bytes:\t");
-          for (uint8_t yy = 0; yy < DOUBLE_SIZE; yy++) {
-            Serial.print(rw1_currSpeed_bytes[yy], HEX);
-            Serial.print("\t");
-          }
-          Serial.println(" ");
+  uint8_t xyz_dipole_bytes[3*DOUBLE_SIZE] = {0};
+
+  memcpy(&xyz_dipole_bytes[0], &x_dipole_bytes[0], DOUBLE_SIZE);
+  memcpy(&xyz_dipole_bytes[0]+DOUBLE_SIZE, &y_dipole_bytes[0], DOUBLE_SIZE);
+  memcpy(&xyz_dipole_bytes[0]+2*DOUBLE_SIZE, &z_dipole_bytes[0], DOUBLE_SIZE);
+
+  // both actuators
+  const int act_feedback_len = sizeof(rwa_currSpeed_bytes) + sizeof(xyz_dipole_bytes);
+  uint8_t act_feedback_bytes[act_feedback_len] = {0};
+
+  memcpy(&act_feedback_bytes[0], &rwa_currSpeed_bytes[0], sizeof(rwa_currSpeed_bytes));
+  memcpy(&act_feedback_bytes[0]+sizeof(rwa_currSpeed_bytes), &xyz_dipole_bytes[0], sizeof(xyz_dipole_bytes));
+  
   
   Wire.beginTransmission(ACT_DUE_ADDRESS);
-  Wire.write(&rw1_currSpeed_bytes[0], DOUBLE_SIZE); 
-  Wire.write(&rw2_currSpeed_bytes[0], DOUBLE_SIZE); 
-  Wire.write(&rw3_currSpeed_bytes[0], DOUBLE_SIZE); 
-  Wire.write(&rw4_currSpeed_bytes[0], DOUBLE_SIZE); 
-  Wire.write(&x_dipole_bytes[0], DOUBLE_SIZE);
-  Wire.write(&y_dipole_bytes[0], DOUBLE_SIZE);
-  Wire.write(&z_dipole_bytes[0], DOUBLE_SIZE); 
+  Wire.write(&act_feedback_bytes[0], act_feedback_len); 
   Wire.endTransmission(true);
+
+  Serial.print("rwa_currSpeed_bytes:\t");
+  for(int ii=0;ii<sizeof(rwa_currSpeed_bytes);ii++){
+    Serial.print(rwa_currSpeed_bytes[ii],HEX);
+    Serial.print(" ");
+  }
+  Serial.println(" ");
 
   delay(5000);
 }
