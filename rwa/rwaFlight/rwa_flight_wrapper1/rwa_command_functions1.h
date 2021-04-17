@@ -212,33 +212,35 @@ void commandAll_4status(){
 //  rplPacketProcess(&rpl_payload_rw4[0], &rpl_packet_rw4[0], &rpl_payload_len_rw4, &rpl_packet_len_rw4);
 //  rplPayloadRead_cmd4(&rpl_payload_rw4[0], &rpl_payload_len_rw4, &rw4);
 
-          Serial.print("req_payload_rw1:\t");
-          for (uint8_t yy = 0; yy < req_payload_len_rw1; yy++) {
-            Serial.print(req_payload_rw1[yy], HEX);
-            Serial.print("\t");
-          }
-          Serial.println(" ");
-          
+// print command id, results for each reaction wheel
+
+          #if DEBUG_MODE==1
           Serial.print("req_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
             Serial.print(req_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
-
           Serial.print("rpl_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
             Serial.print(rpl_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
-
-          Serial.print("rpl_payload_rw1:\t");
-          for (uint8_t yy = 0; yy < rpl_payload_len_rw1; yy++) {
-            Serial.print(rpl_payload_rw1[yy], HEX);
+          
+          Serial.print("req_packet_rw2:\t\t");
+          for (uint8_t yy = 0; yy < req_packet_len_rw2; yy++) {
+            Serial.print(req_packet_rw2[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
+          Serial.print("rpl_packet_rw2:\t\t");
+          for (uint8_t yy = 0; yy < rpl_packet_len_rw2; yy++) {
+            Serial.print(rpl_packet_rw2[yy], HEX);
+            Serial.print("\t");
+          }
+          Serial.println(" ");
+          #endif
 }
 
 
@@ -293,33 +295,33 @@ void commandAll_6speed(){
 //  rplPacketProcess(&rpl_payload_rw4[0], &rpl_packet_rw4[0], &rpl_payload_len_rw4, &rpl_packet_len_rw4);
 //  rplPayloadRead_cmd6(&rpl_payload_rw4[0], &rpl_payload_len_rw4, &rw4);
 
-          Serial.print("req_payload_rw1:\t");
-          for (uint8_t yy = 0; yy < req_payload_len_rw1; yy++) {
-            Serial.print(req_payload_rw1[yy], HEX);
-            Serial.print("\t");
-          }
-          Serial.println(" ");
-          
+          #if DEBUG_MODE==1
           Serial.print("req_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
             Serial.print(req_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
-
           Serial.print("rpl_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
             Serial.print(rpl_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
-
-          Serial.print("rpl_payload_rw1:\t");
-          for (uint8_t yy = 0; yy < rpl_payload_len_rw1; yy++) {
-            Serial.print(rpl_payload_rw1[yy], HEX);
+          
+          Serial.print("req_packet_rw2:\t\t");
+          for (uint8_t yy = 0; yy < req_packet_len_rw2; yy++) {
+            Serial.print(req_packet_rw2[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
+          Serial.print("rpl_packet_rw2:\t\t");
+          for (uint8_t yy = 0; yy < rpl_packet_len_rw2; yy++) {
+            Serial.print(rpl_packet_rw2[yy], HEX);
+            Serial.print("\t");
+          }
+          Serial.println(" ");
+          #endif
 }
 
 
@@ -375,35 +377,33 @@ void commandAll_10ping(){
 //  rplPacketProcess(&rpl_payload_rw4[0], &rpl_packet_rw4[0], &rpl_payload_len_rw4, &rpl_packet_len_rw4);
 //  rplPayloadRead_cmd10(&rpl_payload_rw4[0], &rpl_payload_len_rw4, &rw4);
 
-          Serial.print("req_payload_rw1:\t");
-          for (uint8_t yy = 0; yy < req_payload_len_rw1; yy++) {
-            Serial.print(req_payload_rw1[yy], HEX);
-            Serial.print("\t");
-          }
-          Serial.println(" ");
-          
+          #if DEBUG_MODE==1
           Serial.print("req_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
             Serial.print(req_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
-
-//          Serial.print("rpl_packet_len_rw1:\t");
-//          Serial.println(rpl_packet_len_rw1);
           Serial.print("rpl_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < rpl_packet_len_rw1; yy++) {
             Serial.print(rpl_packet_rw1[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
-
-//          Serial.print("rpl_payload_len_rw1:\t");
-//          Serial.println(rpl_payload_len_rw1);
-          Serial.print("rpl_payload_rw1:\t");
-          for (uint8_t yy = 0; yy < rpl_payload_len_rw1; yy++) {
-            Serial.print(rpl_payload_rw1[yy], HEX);
+          
+          Serial.print("req_packet_rw2:\t\t");
+          for (uint8_t yy = 0; yy < req_packet_len_rw2; yy++) {
+            Serial.print(req_packet_rw2[yy], HEX);
             Serial.print("\t");
           }
           Serial.println(" ");
+          Serial.print("rpl_packet_rw2:\t\t");
+          for (uint8_t yy = 0; yy < rpl_packet_len_rw2; yy++) {
+            Serial.print(rpl_packet_rw2[yy], HEX);
+            Serial.print("\t");
+          }
+          Serial.println(" ");
+          #endif
+
+
 }
