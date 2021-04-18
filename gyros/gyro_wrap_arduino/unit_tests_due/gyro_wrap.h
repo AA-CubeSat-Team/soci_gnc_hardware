@@ -9,12 +9,20 @@
 #define GYRO_WRAP_H_
 
 #define ARDUINO_CODE            1
+#define DUE                     0
 
 #if ARDUINO_CODE
 #include <Wire.h>
 #else
 #include "fsl_lpi2c.h"
 #include "fsl_lpi2c_freertos.h"
+#endif
+
+#if DUE
+extern TwoWire Wire1;
+#define WIRE                    Wire1
+#else
+#define WIRE                    Wire
 #endif
 
 #define COUNT_TEMP_BIAS       0     // if the code count temperature influence on output

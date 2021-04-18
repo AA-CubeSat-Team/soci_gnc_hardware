@@ -43,8 +43,11 @@ void test_initGyro() {
   Serial.println("Testing initGyro...");
   initGyro(&Gyro1);
   Wire.beginTransmission(GYRO_ADDRESS);
-  if (Wire.endTransmission()) {
-    Serial.println("Fail to connect i2c");
+  int i2cStatus = Wire.endTransmission();
+  if (i2cStatus) {
+    Serial.print("Status:");
+    Serial.print(i2cStatus);
+    Serial.println("  Fail to connect i2c");
   } else {
     Serial.println("Success to connect i2c");
   }
