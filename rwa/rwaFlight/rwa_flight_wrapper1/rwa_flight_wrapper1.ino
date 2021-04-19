@@ -7,26 +7,15 @@
 */
 
 /* issues:
- * need to make sure struct pointer system actually modifies the global struct within each function
- * SPI issue:
- *  0071: all 0xF9s, bit shifted with/without MISO, but more successful without MISO
- *        in some cases, RW understood request, but correct reply by bit shifted
- *  0072: more 0x7Es to start, but falls out of sync after a few bytes
- *        started working, not sure why - spun up motor
- *  0110: worked right away, spun up motor
- *  0109: all 0xF9s, works when MISO is unplugged from Arduino, spun up motor
- *  
- *  pull-up resistors make no impact
- *  works when low-side V_in is >3.4V
- *  LV pin is 4.0V, but A1-A4 idles at 3.2V
- *  
- *  weird issue where it only requested a single flag
+ * make reply payload extraction more robust
  */
+ 
+#define DEBUG_MODE 0
+#define PRINT_RESULTS 0
 
 #include <SPI.h>
 #include "rwa_command_functions1.h"
 
-  
 void setup (void) {
   Serial.begin(115200);
 
