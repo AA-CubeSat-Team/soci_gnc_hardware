@@ -1,73 +1,45 @@
 // photodiode spoof
 #include <Wire.h>
+#include <SoftwareSerial.h>
+#define ADC_REG 0x1D
+#define ADVANCE_config_reg 0x0B
+#define config_reg 0x00
+#define CONV_RATE_REG 0x07
+#define DISABLE_REG 0x08
+#define INTERRUPT_MASK_REG 0x03
+#define IN_HIGH_REG1 0x2A
+#define IN_HIGH_REG2 0x2C
+#define IN_HIGH_REG3 0x2E
+#define IN_HIGH_REG4 0x30
+#define IN_HIGH_REG5 0x32
+#define IN_LOW_REG1 0x2B
+#define IN_LOW_REG2 0x2D
+#define IN_LOW_REG3 0x2F
+#define IN_LOW_REG4 0x31
+#define IN_LOW_REG5 0x33
+#define config_reg 0x00
+#define BUSY_STATUS_REG 0x0C
+#define INT_CLEAR_REG 0x00
+#define PD1_REG 0x20
+#define PD2_REG 0x21
+#define PD3_REG 0x22
+#define PD4_REG 0x23
+#define PD5_REG 0x24
+#define ADC_SER_ADDRESS 0x1D 
+#define R 10000
 
-// Defining global variables var and reg to pass between receive and request event functions
-#define ADC_reg 0x1D
 uint8_t var;
 uint8_t reg;
+uint8_t config_storage_val = 0b00001000;
+uint8_t advance_config_value = 0b00000000;
+uint8_t conv_rate_value  = 0b0000001;
+uint8_t disable_value = 0xE0;
+uint8_t interrupt_mask_value = 0b00011111;
+uint8_t in_high_val = 0b101;
+uint8_t in_low_val = 0;
+uint8_t int_clear_val = 0b00001000;
 
-// Defining constants for ADC quick start (page 33)
-  // Step 3: Configuration 
-  #define  advance_config_reg 0x0B
-  #define advance_config_value 0b00000000
-  
-  // Step 4: Enable Conversion Rate
-  #define start_reg 0x00
-  uint8_t test;
-  #define conv_rate_reg 0x07
-  uint8_t conv_rate_value  = 0b0000001;
-  
-  // Step 5: Disable analog inputs (disables IN5,IN6,temp)
-  #define disable_reg 0x08
-  #define disable_value 0xE0
-  
-  // Step 6: Enable interrupt mask 
-  #define interrupt_mask_reg 0x03
-  uint8_t interrupt_mask_value = 0b00011111;
-  
-  //Step 7: Program limit registers
-  //IN0 High limit
-  #define in_high_reg1 0x2A
-  #define in_high_reg2 0x2C
-  #define in_high_reg3 0x2E
-  #define in_high_reg4 0x30
-  #define in_high_reg5 0x32
-  uint8_t in_high_val = 0b101 ;
-  
-  //uint8_t in_high_reg[] = {in_high_reg1,in_high_reg2,in_high_reg3,in_high_reg4,in_high_reg5}; 
-  // the switch case didn't like using array elements as case arguments
-  
-  // In Low limit
-  #define in_low_reg1 0x2B
-  #define in_low_reg2 0x2D
-  #define in_low_reg3 0x2F
-  #define in_low_reg4 0x31
-  #define in_low_reg5 0x33
-  uint8_t in_low_val = 0;
-  
-  // Step 8: Starting the ADC
-  #define config_reg 0x00
-  uint8_t config_default_value = 0b00001000;
-  uint8_t start_value = 0b00001001;
-  #define busy_status_reg 0x0C
-  
-  // Step 9: Setting INT_clear to zero
-  #define int_clear_reg 0x00
-  uint8_t int_clear_val = 0b00001000;
-
-
-
-// Givens
-#define R 10000
-#define V_ref 3.3
-#define ADC_ser_address 0x1D // ADC address
-
-#define PD1_reg 0x20
-#define PD2_reg 0x21
-#define PD3_reg 0x22
-#define PD4_reg 0x23
-#define PD5_reg 0x24
-
+uint16_t V_ref = 3.3;
 // Function Variables 
 double PD_comp;           //array of inputs
 uint16_t D_out_12bit[5];  // Array of spoof outputs
@@ -87,55 +59,30 @@ uint8_t D_out_byte_array[10] = {0};
 
 void setup(){
   Serial.begin(9600);
-  Serial.println("function start");
-
   // this data processing code will be relocated to the Simulink serial input function, once written
-  int ii = 0;
-  double dVIN = 0;
-  double D_out_64bit = 0;
-  uint16_t D_out_16bit = 0;
-  
-  for(ii=0; ii<5; ii++){
-    // split the calculation step into multiple lines for clarity
-    // D_out_16bit = desired 12bit value, but more clear that it still takes up 16 bits of storage
-    dVIN = test_val_array[ii]*R;
-    D_out_64bit = dVIN/V_ref * pow(2,12);
-    D_out_16bit = int(D_out_64bit);
-
-    // weird error where the script restarts at this point, can probably ignore it for now
-
-    // Wire.write() requires the data to be split into individual bytes, 
-    // so these two lines split each 16 bit D_out into two bytes
-    // bytes are arranged in little endian: [PD1_LSB, PD1_MSB, PD2_LSB, PD2_MSB, ...]
-    D_out_byte_array[2*ii] = D_out_16bit & 0xFF;
-    D_out_byte_array[2*ii+1] = (D_out_16bit >> 8) & 0xFF;
-  }
-  delay(1000);
-
-  // printing out D_out bytes for demonstration
-  Serial.print("PD1 D_out:\t");
-  Serial.print(D_out_byte_array[1],HEX);
-  Serial.println(D_out_byte_array[0],HEX);
-
-  Serial.print("PD2 D_out:\t");
-  Serial.print(D_out_byte_array[3],HEX);
-  Serial.println(D_out_byte_array[2],HEX);
-
-  Serial.print("PD3 D_out:\t");
-  Serial.print(D_out_byte_array[5],HEX);
-  Serial.println(D_out_byte_array[4],HEX);
-
-  Serial.print("PD4 D_out:\t");
-  Serial.print(D_out_byte_array[7],HEX);
-  Serial.println(D_out_byte_array[6],HEX);
-
-  Serial.print("PD5 D_out:\t");
-  Serial.print(D_out_byte_array[9],HEX);
-  Serial.println(D_out_byte_array[8],HEX);
-
-  Wire.begin(ADC_ser_address);      // join i2c bus with address 0x1D
+//  int ii = 0;
+//  double dVIN = 0;
+//  double D_out_64bit = 0;
+//  uint16_t D_out_16bit = 0;
+//  
+//  for(ii=0; ii<5; ii++){
+//    // split the calculation step into multiple lines for clarity
+//    // D_out_16bit = desired 12bit value, but more clear that it still takes up 16 bits of storage
+//    dVIN = test_val_array[ii]*R;
+//    D_out_64bit = dVIN/V_ref * pow(2,12);
+//    D_out_16bit = int(D_out_64bit);
+//
+//    // weird error where the script restarts at this point, can probably ignore it for now
+//
+//    // Wire.write() requires the data to be split into individual bytes, 
+//    // so these two lines split each 16 bit D_out into two bytes
+//    // bytes are arranged in little endian: [PD1_LSB, PD1_MSB, PD2_LSB, PD2_MSB, ...]
+//    D_out_byte_array[2*ii] = D_out_16bit & 0xFF;
+//    D_out_byte_array[2*ii+1] = (D_out_16bit >> 8) & 0xFF;
+//  }
+  Wire.begin(ADC_SER_ADDRESS);      // join i2c bus with address 0x1D
   Wire.onReceive(receiveEvent); // sets register event, calls function automatically when master sends data
-//  Wire.onRequest(requestEvent); // sets request event, calls function automatically when master requests data
+  Wire.onRequest(requestEvent); // sets request event, calls function automatically when master requests data
 }
 
           
@@ -147,22 +94,15 @@ void loop(){
 
 void receiveEvent(int num_bytes){
 // this function is used when the master uses Wire.beginTransmission()->Wire.write()->Wire.endTransmission()
-  
-  // need to write code to process/sort values sent by master, this is a very rough draft
   uint8_t received_array[3] = {0};    // creates array of three 0 that is reset every loop
   int ii = 0;
   while(Wire.available() > 0){ // loop through all but the last
     received_array[ii] = Wire.read(); // receive byte as a character
-    ii++;
-   
-
-    
+    ii++;    
   }
 
 // for loop to assess received_array
-
 for(ii=0; ii<3; ii++){
-
  var = received_array[ii]; 
 
 // Two cases: Wrapper is writing an address or a value. The switch case evaluates possibilities in the form:
@@ -173,113 +113,115 @@ for(ii=0; ii<3; ii++){
       // Once the correct register is determined, the data byte associated with the register is updated to the value written from the wrapper
 
     switch (var){
-      case ADC_reg:
+      case ADC_REG:
         break;
-      case advance_config_reg:
+      case ADVANCE_config_reg:
         reg = var;
         break;
-      case conv_rate_reg:
+      case CONV_RATE_REG:
         reg = var;
         break;
-      case disable_reg:
+        // Start Reg
+      case DISABLE_REG:
         reg = var;
         break;
-      case interrupt_mask_reg:
+      case config_reg:
         reg = var;
         break;
-      case in_high_reg1: 
+      case INTERRUPT_MASK_REG:
         reg = var;
         break;
-      case in_high_reg2:
+      case IN_HIGH_REG1: 
         reg = var;
         break;
-      case in_high_reg3:
+      case IN_HIGH_REG2:
         reg = var;
         break;
-      case in_high_reg4:
+      case IN_HIGH_REG3:
         reg = var;
         break;
-      case in_high_reg5:
+      case IN_HIGH_REG4:
         reg = var;
         break;
-      case in_low_reg1:
+      case IN_HIGH_REG5:
         reg = var;
         break;
-      case in_low_reg2:
+      case IN_LOW_REG1:
         reg = var;
         break;
-      case in_low_reg3:
+      case IN_LOW_REG2:
         reg = var;
         break;
-      case in_low_reg4:
+      case IN_LOW_REG3:
         reg = var;
         break;
-      case in_low_reg5:
+      case IN_LOW_REG4:
         reg = var;
         break;
-      case int_clear_reg:
+      case IN_LOW_REG5:
         reg = var;
         break;
-      case PD1_reg:
+      case PD1_REG:
         reg = var;
         break;
-      case PD2_reg:
+      case PD2_REG:
         reg = var;
         break;
-      case PD3_reg:
+      case PD3_REG:
         reg = var;
         break;
-      case PD4_reg:
+      case PD4_REG:
         reg = var;
         break;
-      case PD5_reg:
+      case PD5_REG:
         reg = var;
         break;
       default:
         switch (reg){
-            case advance_config_reg:
+            case ADVANCE_config_reg:
               advance_config_value = var;
               break;
-            case conv_rate_reg:
+            case CONV_RATE_REG:
               conv_rate_value = var;
-            case disable_reg:
+            case DISABLE_REG:
               disable_value = var;
               break;
-            case interrupt_mask_reg:
+            case config_reg:
+              config_storage_val = var;
+              break;
+            case INTERRUPT_MASK_REG:
               interrupt_mask_value = var;
               break;
-            case in_high_reg1:
+            case IN_HIGH_REG1:
               in_high_val = var;
               break;
-            case in_high_reg2:
+            case IN_HIGH_REG2:
               in_high_val = var;
               break;
-            case in_high_reg3:
+            case IN_HIGH_REG3:
               in_high_val = var;
               break;
-            case in_high_reg4:
+            case IN_HIGH_REG4:
               in_high_val = var;
               break;
-            case in_high_reg5:
+            case IN_HIGH_REG5:
               in_high_val = var;
               break;
-            case in_low_reg1:
+            case IN_LOW_REG1:
               in_low_val = var;
               break;
-            case in_low_reg2:
+            case IN_LOW_REG2:
               in_low_val = var;
               break;
-            case in_low_reg3:
+            case IN_LOW_REG3:
               in_low_val = var;
               break;
-            case in_low_reg4:
+            case IN_LOW_REG4:
               in_low_val = var;
               break;
-            case in_low_reg5:
+            case IN_LOW_REG5:
               in_low_val = var;
               break;
-            case int_clear_reg:
-              int_clear_val = var;
             default:
               Serial.println("Unknown Value received"); // print " unknown value received"
               break;
@@ -298,70 +240,65 @@ void requestEvent(){
     // write the value that corresponds to the register
       // else print "unknown register received" 
 
-// NOTE: incorporated the PD voltage request into the main case, as the switch case form does not like using array elements as case arguments
-
 switch (reg){
-  case advance_config_reg:
+  case ADVANCE_config_reg:
     Wire.write(advance_config_value);
     break;
-  case conv_rate_reg:
+  case CONV_RATE_REG:
     Wire.write(conv_rate_value);
     break;
-  case disable_reg:
+  case DISABLE_REG:
     Wire.write(disable_value);
     break;
-  case interrupt_mask_reg:
+  case config_reg:
+    Wire.write(config_storage_val);      
+    break;
+  case INTERRUPT_MASK_REG:
     Wire.write(interrupt_mask_value);
     break;
-  case in_high_reg1:
+  case IN_HIGH_REG1:
     Wire.write(in_high_val);
     break;
-  case in_high_reg2:
+  case IN_HIGH_REG2:
     Wire.write(in_high_val);
     break;
-  case in_high_reg3:
+  case IN_HIGH_REG3:
     Wire.write(in_high_val);
     break;
-  case in_high_reg4:
+  case IN_HIGH_REG4:
     Wire.write(in_high_val);
     break;
-  case in_high_reg5:
+  case IN_HIGH_REG5:
     Wire.write(in_high_val);
     break;
-  case in_low_reg1:
+  case IN_LOW_REG1:
     Wire.write(in_low_val);
     break;
-  case in_low_reg2:
+  case IN_LOW_REG2:
     Wire.write(in_low_val);
     break;
-  case in_low_reg3:
+  case IN_LOW_REG3:
     Wire.write(in_low_val);
     break;
-  case in_low_reg4:
+  case IN_LOW_REG4:
     Wire.write(in_low_val);
     break;
-  case in_low_reg5:
+  case IN_LOW_REG5:
     Wire.write(in_low_val);
     break;
-  case config_reg:
-    Wire.write(config_default_value);
-    break;
-  case int_clear_reg:
-    Wire.write(int_clear_val);
-    break;
-  case PD1_reg:
+  case PD1_REG:
     Wire.write(&D_out_byte_array[0],2);
     break;
-  case PD2_reg:
+  case PD2_REG:
     Wire.write(&D_out_byte_array[2],2);
     break;
-  case PD3_reg:
+  case PD3_REG:
     Wire.write(&D_out_byte_array[4],2);
     break;
-  case PD4_reg:
+  case PD4_REG:
     Wire.write(&D_out_byte_array[6],2);
     break;
-  case PD5_reg:
+  case PD5_REG:
     Wire.write(&D_out_byte_array[8],2);
     break;
   default:
