@@ -69,6 +69,7 @@ void initMag(mag_t * Mag);
 void initMag(mag_t * Mag, lpi2c_rtos_handle_t *magHandle);
 #endif
 
+void startMag(mag_t * Mag);
 void readMagData(mag_t * Mag);
 void readMagTemp(mag_t * Mag);
 
