@@ -31,9 +31,9 @@
 
 // gyro parameters
 
-#define GYRO_ODR_NUM        0b110
+#define GYRO_ODR_NUM        0b101
 #define GYRO_FSR_NUM        0b11
-#define GYRO_ODR_VALUE        12.5
+#define GYRO_ODR_VALUE        25
 #define GYRO_FSR_VALUE        250
 #define GYRO_SENSITIVITY      7.8125e-3
 #define GYRO_TEMP_0         23
@@ -48,7 +48,6 @@ typedef struct _Gyro
   int8_t temperature;           /* measured temperature*/
 #if !ARDUINO_CODE
   lpi2c_rtos_handle_t * gyroHandle;   /* gyroscope i2c handle?*/
-  lpi2c_master_transfer_t * gyroTransfer;   /* gyroscope i2c transfer structure pointer*/
 #endif
   float gyroBias[3];            /* gyroscope zero-off set(bias)*/
   float gyroTempBiasCoe[3];       /* gyroscope temperature bias coefficients*/
@@ -57,16 +56,10 @@ typedef struct _Gyro
 } gyro_t;
 
 extern gyro_t Gyro1;                /* gyroscope 1*/
-/* lpi2c_rtos_handle_t * gyroHandle1 freertos handle of gyroscope 1?*/
-/* lpi2c_master_transfer_t gyroTransfer1 gyroscope i2c transfer structure pointer*/
 
 #if MULTI_GYROS
 extern gyro_t Gyro2;
 extern gyro_t Gyro3;
-/* lpi2c_rtos_handle_t * gyroHandle1 freertos handle of gyroscope 2?*/
-/* lpi2c_rtos_handle_t * gyroHandle1 freertos handle of gyroscope 3?*/
-/* lpi2c_master_transfer_t gyroTransfer2 gyroscope i2c transfer structure pointer*/
-/* lpi2c_master_transfer_t gyroTransfer3 gyroscope i2c transfer structure pointer*/
 #endif
 
 
@@ -118,7 +111,7 @@ void initGyro(gyro_t * Gyro);
  * @return void
  *
  */
-void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle, lpi2c_master_transfer_t *transfer);
+void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
 #endif
 
 /*!
