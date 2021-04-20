@@ -3,7 +3,7 @@
 
 #define TEST_READGYRODATA true
 #define TEST_READTEMPDATA false
-#define TEST_PLOTTER         false
+#define TEST_PLOTTER         true
 void setup() {
   Serial.begin(115200);
   
