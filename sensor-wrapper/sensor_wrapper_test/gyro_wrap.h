@@ -55,7 +55,7 @@ typedef struct _Gyro
   char  gyroInitialized; /* gyroscope status */
 } gyro_t;
 
-extern gyro_t Gyro1;                /* gyroscope 1*/
+extern gyro_t Gyro1, Gyro2, Gyro3;                /* gyroscope 1, 2, 3*/
 
 #if MULTI_GYROS
 extern gyro_t Gyro2;
@@ -71,7 +71,6 @@ extern gyro_t Gyro3;
  * @param value The variable to hold the value of the register.
  * @param valueSize The size of the value of the register.
  * @param Gyro The gyroscope want to be read.
- * @return void
  *
  */
 void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro);

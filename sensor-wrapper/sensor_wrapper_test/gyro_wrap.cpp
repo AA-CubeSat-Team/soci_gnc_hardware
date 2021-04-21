@@ -12,7 +12,7 @@
 #endif
 
 // gyroscope struct.
-gyro_t Gyro1;
+gyro_t Gyro1, Gyro2, Gyro3;
 
 
 /*!

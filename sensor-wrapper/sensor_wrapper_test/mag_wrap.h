@@ -53,12 +53,7 @@ typedef struct _Mag
   int errorFlag;
 } mag_t;
 
-extern mag_t Mag1;
-
-#if MULTI_MAGS
-extern mag_t Mag2;
-extern mag_t Mag3;
-#endif
+extern mag_t Mag1, Mag2, Mag3;
 
 void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, mag_t * Mag);
 void write8(uint8_t reg, uint8_t value, mag_t * Mag);

@@ -11,7 +11,7 @@
 #endif
 
 // initialize struct.
-mag_t Mag1;
+mag_t Mag1, Mag2, Mag3;
 
 void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, mag_t * Mag)
 {
@@ -91,7 +91,7 @@ void startMag(mag_t * Mag)
 void readMagData(mag_t * Mag)
 {
     uint8_t reg_mg;
-    readRegs(LSM303_REGISTER_MAG_SR_RE+G_Mg, &reg_mg, 1, Mag);
+    readRegs(LSM303_REGISTER_MAG_SR_REG_Mg, &reg_mg, 1, Mag);
     if (!(reg_mg & 0x1)) {
       Mag->errorFlag = 2;
     }
