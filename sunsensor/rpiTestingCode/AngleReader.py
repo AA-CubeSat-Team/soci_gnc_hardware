@@ -1,4 +1,4 @@
-#Last updated 1-18-21
+#Last updated 4-22-21
 #Angle Reader code written by William Lacrampe
 #This code is meant to be used when testing the sun sensor's angle measurement
 #It will prompt the user to name a file that it will save data to, and then repeatedly ask the user to
@@ -25,7 +25,7 @@ def readData(commandCode):
     #it's either 2 for angles (1 float per angle) or 4 for voltage (1 per cell)
     floatNum = 0
     if commandCode == 4:
-        floatNum = 2
+        floatNum = 3
     else:
         floatNum = 4
     #sun sensor also hands along length, which is the next byte:
@@ -70,21 +70,24 @@ def readData(commandCode):
                 frac = frac + 2**(-(i-8))
         #lastly, put it all through the formula:
         readVals[x-1] = sign*2**(exp-127)*frac
-    #the third value for an angle reading is actually an error code, need to check
+    #the fourth value for an angle reading is actually an error code, need to check
     #if it's supposed to read it, and if so, read it
-    if floatNum == 2:
-        readVals[2] = int.from_bytes(ser.read(), byteorder='big')
+    if floatNum == 3:
+        readVals[3] = int.from_bytes(ser.read(), byteorder='big')
         #also need to add it to checkSum
-        checkSum = checkSum + readVals[2]
+        checkSum = checkSum + readVals[3]
     #Need to cut checkSum down to just the least significant byte
     #A byte can be no greater than 255, and 256 is a factor of 2^(8+i) nonnegative i
     #so check if checkSum is greater than 255 and remove 256
     while checkSum > 255:
         checkSum = checkSum - 256
     #then I read the checkSum byte from the sensor and check if it's different
-    #if it is, then let the user know (for now)
-    if checkSum != int.from_bytes(ser.read(), byteorder='big'):
+    #if it is, then return a bunch of -100's
+    sensorCheckSum = int.from_bytes(ser.read(), byteorder='big')
+    if checkSum != sensorCheckSum:
         print('checkSum is bad')
+        #-1000 volts would be both the wrong sign and ridiculously large for voltage
+        #and would make no sense for angles and the angle error code
         return [-1000, -1000, -1000, -1000]
     return readVals
 
@@ -141,7 +144,7 @@ with open(filename, 'w') as file:
         readVals = getAngles()
         #check to make sure there's no error returns
         if readVals != [-2000, -2000, -2000] and readVals != [-1000, -1000, -1000]:
-            writer.writerow([eAlpha, eBeta, readVals[0], readVals[1], readVals[2]])
+            writer.writerow([eAlpha, eBeta, readVals[0], readVals[1], readVals[2], readVals[3]])
         #otherwise, inform the user something went wrong
         else:
             print('Error found, not writing data, please try measuring the angles again.')

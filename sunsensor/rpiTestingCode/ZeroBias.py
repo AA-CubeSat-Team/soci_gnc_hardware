@@ -1,4 +1,4 @@
-#last updated 1-18-21
+#last updated 4-22-21
 #Zero Bias code written by William Lacrampe
 #The zero bias code is meant to test if the sun sensor has any inherit offset in any of the data
 #it can return. This should be done in a completely dark enviornment. The code will ask the user to
@@ -27,7 +27,7 @@ def readData(commandCode):
     #it's either 2 for angles (1 float per angle) or 4 for voltage (1 per cell)
     floatNum = 0
     if commandCode == 4:
-        floatNum = 2
+        floatNum = 3
     else:
         floatNum = 4
     #sun sensor also hands along length, which is the next byte:
@@ -72,12 +72,12 @@ def readData(commandCode):
                 frac = frac + 2**(-(i-8))
         #lastly, put it all through the formula:
         readVals[x-1] = sign*2**(exp-127)*frac
-    #the third value for an angle reading is actually an error code, need to check
+    #the fourth value for an angle reading is actually an error code, need to check
     #if it's supposed to read it, and if so, read it
-    if floatNum == 2:
-        readVals[2] = int.from_bytes(ser.read(), byteorder='big')
+    if floatNum == 3:
+        readVals[3] = int.from_bytes(ser.read(), byteorder='big')
         #also need to add it to checkSum
-        checkSum = checkSum + readVals[2]
+        checkSum = checkSum + readVals[3]
     #Need to cut checkSum down to just the least significant byte
     #A byte can be no greater than 255, and 256 is a factor of 2^(8+i) nonnegative i
     #so check if checkSum is greater than 255 and remove 256
@@ -85,7 +85,9 @@ def readData(commandCode):
         checkSum = checkSum - 256
     #then I read the checkSum byte from the sensor and check if it's different
     #if it is, then return a bunch of -100's
-    if checkSum != int.from_bytes(ser.read(), byteorder='big'):
+    sensorCheckSum = int.from_bytes(ser.read(), byteorder='big')
+    if checkSum != sensorCheckSum:
+        print('checkSum is bad')
         #-1000 volts would be both the wrong sign and ridiculously large for voltage
         #and would make no sense for angles and the angle error code
         return [-1000, -1000, -1000, -1000]
