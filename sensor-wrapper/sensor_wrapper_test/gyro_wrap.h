@@ -11,6 +11,7 @@
 #define ARDUINO_CODE            1
 
 #if ARDUINO_CODE
+#include <Arduino.h>
 #include <Wire.h>
 #else
 #include "fsl_lpi2c.h"

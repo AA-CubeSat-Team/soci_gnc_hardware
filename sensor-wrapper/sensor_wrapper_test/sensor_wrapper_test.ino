@@ -21,5 +21,5 @@ void loop(){
   readMagData(&Mag2);
   readMagData(&Mag3);
 
-  getSunAngles(double* angles);
+//  getSunAngles(double* angles);
 }

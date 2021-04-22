@@ -5,6 +5,7 @@
 //  Created by Josh Perry on 3/21/21.
 //
 
+
 #ifndef mag_wrap_h
 #define mag_wrap_h
 #include <stdio.h>
@@ -13,6 +14,7 @@
 #define MULTI_MAGS              0
 
 #if ARDUINO_CODE
+#include <Arduino.h>
 #include <Wire.h>
 #else
 #include "fsl_lpi2c.h"
