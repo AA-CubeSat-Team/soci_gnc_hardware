@@ -14,11 +14,7 @@ void setup() {
   test_writeReg();
   test_startGyro();
   test_restGyro();
-
-  if (TEST_READGYRODATA || TEST_READTEMPDATA) {
-    initGyro(&Gyro1);
-    startGyro(&Gyro1);
-  }
+  test_quickStartGyro();
 }
 
 void loop() {
@@ -39,27 +35,7 @@ void loop() {
   }
 }
 
-void test_initGyro() {
-  Serial.println("Testing initGyro...");
-  initGyro(&Gyro1);
-  Wire.beginTransmission(GYRO_ADDRESS);
-  int i2cStatus = Wire.endTransmission();
-  if (i2cStatus) {
-    Serial.print("Status:");
-    Serial.print(i2cStatus);
-    Serial.println("  Fail to connect i2c");
-  } else {
-    Serial.println("Success to connect i2c");
-  }
-  if (Gyro1.gyroInitialized) {
-    Serial.println("Gyro initialized");
-    Serial.println("Pass");
-  } else {
-    Serial.println("Gryo failed to be initialized");
-    Serial.println("Fail");
-  }
-  Serial.println("********************");
-}
+
 
 void test_readRegs() {
   Serial.println("Testing raedRegs...");
@@ -105,6 +81,28 @@ void test_writeReg() {
   Serial.println("********************");
 }
 
+void test_initGyro() {
+  Serial.println("Testing initGyro...");
+  initGyro(&Gyro1);
+  Wire.beginTransmission(GYRO_ADDRESS);
+  int i2cStatus = Wire.endTransmission();
+  if (i2cStatus) {
+    Serial.print("Status:");
+    Serial.print(i2cStatus);
+    Serial.println("  Fail to connect i2c");
+  } else {
+    Serial.println("Success to connect i2c");
+  }
+  if (Gyro1.gyroInitialized) {
+    Serial.println("Gyro initialized");
+    Serial.println("Pass");
+  } else {
+    Serial.println("Gryo failed to be initialized");
+    Serial.println("Fail");
+  }
+  Serial.println("********************");
+}
+
 void test_startGyro() {
   Serial.println("Test startGyro...");
   Serial.print("Reference CTRL_REG0: ");
@@ -136,10 +134,17 @@ void test_startGyro() {
   Serial.println("********************");
 }
 
+void test_quickStartGyro() {
+  Serial.println("Test quick start gyro...");
+  test_initGyro();
+  test_startGyro();
+  Serial.println("********************");
+}
+
 void test_restGyro() {
   Serial.println("Test restGyro...");
   initGyro(&Gyro1);
-  startGyro(&Gyro1);
+//  startGyro(&Gyro1);
   Serial.println("Start the Gyro");
   resetGyro(&Gyro1);
   Serial.println("Rest the gyro");
@@ -162,4 +167,5 @@ void test_restGyro() {
       Serial.println("Fail");
     }
   }
+  Serial.println("********************");
 }
