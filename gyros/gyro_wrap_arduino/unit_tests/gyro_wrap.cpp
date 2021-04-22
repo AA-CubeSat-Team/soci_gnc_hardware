@@ -157,6 +157,28 @@ void startGyro(gyro_t * Gyro)
   }
 }
 
+/*!
+ * @brief initialize the gyroscope and start the gyroscope's reading. This
+ * is the function going to be used on the FSW for starting the gyroscope.
+ *
+ *
+ * @param Gyro The gyroscope wants to be set.
+ * @return void
+ *
+ */
+#if ARDUINO_CODE
+void quickStartGyro(gyro_t * Gyro)
+#else
+void quickStartGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle)
+#endif
+{
+#if ARDUINO_CODE
+  initGyro(Gyro);
+#else
+  initGyro(Gyro, lpi2c_rtos_handle_t *gyroHandle);
+#endif
+  startGyro(Gyro);
+}
 
 /*!
  * @brief Read the temperature of a gyroscope.

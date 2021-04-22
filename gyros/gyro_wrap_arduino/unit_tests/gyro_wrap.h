@@ -125,6 +125,17 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
 void startGyro(gyro_t * Gyro);
 
 /*!
+ * @brief initialize the gyroscope and start the gyroscope's reading
+ *
+ *
+ * @param Gyro The gyroscope wants to be set.
+ * @return void
+ *
+ */
+void onestepTurnOnGyro(gyro_t * Gyro);
+
+
+/*!
  * @brief Read the temperature of a gyroscope.
  *
  *
