@@ -108,18 +108,17 @@ def getAngles():
     sleep(0.25)
     #eat the address byte, it's not useful
     ser.read()
-    print(ser.in_waiting)
     commByte = ser.read()
     #check that I receive the right command code
     if commByte == b'\x04':
         #pass along the command code
         returnedData = readData(4)
-        return returnedData[0:3]
+        return returnedData
     else:
         #reset the input buffer because the rest of the sun sensor's data
         #should be ignored and removed
         ser.reset_input_buffer()
-        return[-2000, -2000, -2000]
+        return[-2000, -2000, -2000, -2000]
         
 
 def getVoltage():
@@ -159,8 +158,10 @@ def repeatedRead(comm, numReads):
         writer = csv.writer(file)
         #check what command it is, read in vals and write them to the file if they are non-error vals
         if comm == "A":
-            writer.writerow(["Alpha", "Beta", "Error Code"])
+            writer.writerow(["Alpha", "Beta", "Sun Detection", "Error Code"])
             for x in range(numReads):
+                print("Reading")
+                print(x)
                 readVals = getAngles()
                 #make sure they're not errors:
                 if readVals != [-2000, -2000, -2000] and readVals != [-1000, -1000, -1000]:
