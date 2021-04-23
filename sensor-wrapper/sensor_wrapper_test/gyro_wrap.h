@@ -58,11 +58,6 @@ typedef struct _Gyro
 
 extern gyro_t Gyro1, Gyro2, Gyro3;                /* gyroscope 1, 2, 3*/
 
-#if MULTI_GYROS
-extern gyro_t Gyro2;
-extern gyro_t Gyro3;
-#endif
-
 
 /*!
  * @brief read the value of registers of a gyroscope.

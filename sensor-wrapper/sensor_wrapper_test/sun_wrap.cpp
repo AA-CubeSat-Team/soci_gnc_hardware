@@ -78,13 +78,13 @@ void readFloats(double* data, int floatsToRead){
 void getUnfiltVolts(double* unFiltVolts){
    /* issue command to sun sensor */
    for(int i = 0; i < 4; i++){
-     Serial.write(unFiltVoltsComm[i]);
+     Serial1.write(unFiltVoltsComm[i]);
    }
    /* wait until response can be sent */
    delay(3);
    /* read in response to receiver buffer - takes the entire length of the receive buffer */
    for(int i = 0; i < voltRespLength; i++){
-      recv_buffer[i] = Serial.read();
+      recv_buffer[i] = Serial1.read();
    }
    /* check that the command byte (the 2nd byte) sent corresponds to the command byte received */
    if(unFiltVoltsComm[1] == recv_buffer[1]){
@@ -105,13 +105,13 @@ void getUnfiltVolts(double* unFiltVolts){
 void getFiltVolts(double* filtVolts){
    /* issue command to sun sensor */
    for(int i = 0; i < 4; i++){
-     Serial.write(filtVoltsComm[i]);
+     Serial1.write(filtVoltsComm[i]);
    }
    /* wait until response can be sent */
    delay(3);
    /* read in response to receiver buffer - takes the entire length of the receive buffer */
    for(int i = 0; i < voltRespLength; i++){
-      recv_buffer[i] = Serial.read();
+      recv_buffer[i] = Serial1.read();
    }
    if(filtVoltsComm[1] == recv_buffer[1]){
       readFloats(filtVolts, 4);
@@ -128,13 +128,13 @@ void getFiltVolts(double* filtVolts){
 /* similar to getUnfiltVolts() */
 void getSunAngles(double* angles){
    for(int i = 0; i < 4; i++){
-     Serial.write(anglesComm[i]);
+     Serial1.write(anglesComm[i]);
    }
    /* wait until response can be sent */
-   delay(7);
+   delay(50);
    /* read in response to receiver buffer - takes the entire length of the receive buffer */
    for(int i = 0; i < angleRespLength; i++){
-      recv_buffer[i] = Serial.read();
+      recv_buffer[i] = Serial1.read();
    }
    if(anglesComm[1] == recv_buffer[1]){
       readFloats(angles, 3);
