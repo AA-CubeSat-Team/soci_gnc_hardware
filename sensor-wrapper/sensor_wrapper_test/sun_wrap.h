@@ -16,3 +16,21 @@ const int angleRespLength = 17;
 /* it gets even saltier if I try to replace voltRespLength as a #define */
 /* so I'm just putting it as 20 */
 extern int recv_buffer[20];
+
+/*!
+ * @brief Structure contains information about one gyroscope
+ *
+ */
+typedef struct _Sun
+{
+  double angles[4];           /* measured alpha and beta angles*/
+  double unFiltVolts[4];      /* measured unfiltered voltages*/
+  double filtVolts[4];        /* measured filtered voltages*/
+} sun_t;
+
+extern sun_t Sun1;                /* sun sensor 1*/
+
+void readFloats(double* data, int floatsToRead);
+void getSunAngles(sun_t * Sun);
+void getFiltVolts(sun_t * Sun);
+void getUnfiltVolts(sun_t * Sun);

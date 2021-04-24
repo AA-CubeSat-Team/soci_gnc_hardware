@@ -1,6 +1,9 @@
 
 #include "sun_wrap.h"
 
+// sun sensor struct
+sun_t Sun1;
+
 int recv_buffer[20];
 
 /* converts the response bytes into floats, but saves them as doubles */
@@ -75,7 +78,7 @@ void readFloats(double* data, int floatsToRead){
 /* getUnfiltVolts() will issue the unfiltered cell voltage commmand to the sun sensor, read in the response, perform some checks */
 /* and then call readFloats to interpret data */
 /* it needs the pointer to the unfiltered cell voltages */
-void getUnfiltVolts(double* unFiltVolts){
+void getUnfiltVolts(sun_t * Sun){
    /* issue command to sun sensor */
    for(int i = 0; i < 4; i++){
      Serial1.write(unFiltVoltsComm[i]);
@@ -89,20 +92,20 @@ void getUnfiltVolts(double* unFiltVolts){
    /* check that the command byte (the 2nd byte) sent corresponds to the command byte received */
    if(unFiltVoltsComm[1] == recv_buffer[1]){
       /* if it's correct, call readFloats and read in 4 floats */
-      readFloats(unFiltVolts, 4);
+      readFloats(Sun->unFiltVolts, 4);
    }else{
       /* if it's incorrect, assign an error value */
-      *unFiltVolts = -1000.0;
-      *(unFiltVolts + 1) = -1000.0;
-      *(unFiltVolts + 2) = -1000.0;
-      *(unFiltVolts + 3) = -1000.0;
+      *(Sun->unFiltVolts) = -1000.0;
+      *(Sun->unFiltVolts + 1) = -1000.0;
+      *(Sun->unFiltVolts + 2) = -1000.0;
+      *(Sun->unFiltVolts + 3) = -1000.0;
       return;
    }
    return;
 }
 
 /* similar to getUnfiltVolts() */
-void getFiltVolts(double* filtVolts){
+void getFiltVolts(sun_t * Sun){
    /* issue command to sun sensor */
    for(int i = 0; i < 4; i++){
      Serial1.write(filtVoltsComm[i]);
@@ -114,19 +117,19 @@ void getFiltVolts(double* filtVolts){
       recv_buffer[i] = Serial1.read();
    }
    if(filtVoltsComm[1] == recv_buffer[1]){
-      readFloats(filtVolts, 4);
+      readFloats(Sun->filtVolts, 4);
    }else{
-      *filtVolts = -1000.0;
-      *(filtVolts + 1) = -1000.0;
-      *(filtVolts + 2) = -1000.0;
-      *(filtVolts + 3) = -1000.0;
+      *(Sun->filtVolts) = -1000.0;
+      *(Sun->filtVolts + 1) = -1000.0;
+      *(Sun->filtVolts + 2) = -1000.0;
+      *(Sun->filtVolts + 3) = -1000.0;
       return;
    }
    return;
 }
 
 /* similar to getUnfiltVolts() */
-void getSunAngles(double* angles){
+void getSunAngles(sun_t * Sun){
    for(int i = 0; i < 4; i++){
      Serial1.write(anglesComm[i]);
    }
@@ -137,12 +140,12 @@ void getSunAngles(double* angles){
       recv_buffer[i] = Serial1.read();
    }
    if(anglesComm[1] == recv_buffer[1]){
-      readFloats(angles, 3);
+      readFloats(Sun->angles, 3);
    }else{
-      *angles = -1000.0;
-      *(angles + 1) = -1000.0;
-      *(angles + 2) = -1000.0;
-      *(angles + 3) = -1000.0;
+      *(Sun->angles) = -1000.0;
+      *(Sun->angles + 1) = -1000.0;
+      *(Sun->angles + 2) = -1000.0;
+      *(Sun->angles + 3) = -1000.0;
       return;
    }
    return;
