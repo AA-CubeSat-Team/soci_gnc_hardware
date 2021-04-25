@@ -11,34 +11,44 @@ int recv_buffer[20];
 /* takes a pointer to the data that will be written over (e.g. angles) */
 /* and the number of floats to read */
 void readFloats(double* data, int floatsToRead){
-   /* read in floatsToRead num of "floats" */
+
+  
+//   /* read in floatsToRead num of "floats" */
+//   for (int x = 0; x < floatsToRead; x++){
+//      /* initialize some variables that will be used to calculate the value of a "float" later */
+//      double sign = 1.0;
+//      double exp = -127.0;
+//      double frac = 1.0;
+//      /* next, I need to take 4 data bytes from recv_buffer that correspond to the data */
+//      int bytes[4] = {recv_buffer[4*x+6], recv_buffer[4*x+5], recv_buffer[4*x+4], recv_buffer[4*x+3]};
+//      /* The sun sensor sends from LSB to MSB so I need to reverse the order of the bytes */
+//      /* the most significant bit corresponds to the sign */
+//      /* the sign defaults to 1 if the most siginificant bit is 0, but if it is 1, then the sign is -1 */
+//      if (bytes[0] > 127){
+//        sign = -1.0;
+//        /* need to subtract off the most significant bit so I can start working on the exponent */
+//        bytes[0] -= 128;
+//      }
+//      /* the next 8 bits comprise the exponent bit. these are the remaining bits of byte3 and the first of byte2 */
+//      exp += 2*(double)bytes[0];
+//      /* if the first bit of the next byte is 1, then 2^0 needs to be added to exp */
+//      if (bytes[1] > 127){
+//        exp += 1.0;
+//        bytes[1] -= 128;
+//      }
+//      /* the remaining bits make up the fraction. */
+//      frac += (double)bytes[1]*pow(2.0, -7.0)+(double)bytes[2]*pow(2.0, -15.0)+(double)bytes[3]*pow(2.0, -23.0);
+//      /* putting sign, exp, and frac together and assigning it to the data array */
+//      *(data + x) = sign*pow(2.0, exp)*frac;
+//      }
+
+   // new section
    for (int x = 0; x < floatsToRead; x++){
-      /* initialize some variables that will be used to calculate the value of a "float" later */
-      double sign = 1.0;
-      double exp = -127.0;
-      double frac = 1.0;
-      /* next, I need to take 4 data bytes from recv_buffer that correspond to the data */
-      int bytes[4] = {recv_buffer[4*x+6], recv_buffer[4*x+5], recv_buffer[4*x+4], recv_buffer[4*x+3]};
-      /* The sun sensor sends from LSB to MSB so I need to reverse the order of the bytes */
-      /* the most significant bit corresponds to the sign */
-      /* the sign defaults to 1 if the most siginificant bit is 0, but if it is 1, then the sign is -1 */
-      if (bytes[0] > 127){
-   sign = -1.0;
-   /* need to subtract off the most significant bit so I can start working on the exponent */
-   bytes[0] -= 128;
-      }
-      /* the next 8 bits comprise the exponent bit. these are the remaining bits of byte3 and the first of byte2 */
-      exp += 2*(double)bytes[0];
-      /* if the first bit of the next byte is 1, then 2^0 needs to be added to exp */
-      if (bytes[1] > 127){
-   exp += 1.0;
-   bytes[1] -= 128;
-      }
-      /* the remaining bits make up the fraction. */
-      frac += (double)bytes[1]*pow(2.0, -7.0)+(double)bytes[2]*pow(2.0, -15.0)+(double)bytes[3]*pow(2.0, -23.0);
-      /* putting sign, exp, and frac together and assigning it to the data array */
-      *(data + x) = sign*pow(2.0, exp)*frac;
-      }
+      int bytes[4] = {recv_buffer[4*x+3], recv_buffer[4*x+4], recv_buffer[4*x+5], recv_buffer[4*x+6]};
+      memcpy(&data[0]+x, &bytes[0], sizeof(double));
+   }
+
+      
    /* next, take the total sum of all the bytes except the address byte */
    int totSum = 0;
    /* need to sum from command (2nd) byte to last data byte (2nd to last of array) */

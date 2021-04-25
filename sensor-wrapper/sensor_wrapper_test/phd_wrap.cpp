@@ -117,11 +117,16 @@
     
     // process data and hold current 5 values in 'current' buffer
     j = 0;
-    for(i=0; i<sizeof(current); i++){
+    for(i=0;i<5;i++){
       D_out[i] = PDVol[j]<<8 | PDVol[j+1];
-      current[i] = uint16_t((((D_out[i]/4096)*V_REF)/R)*1000);  // current calculated in uA (micro Amps)
       j = j+2;
     }
+
+    Diodes->current_pos_x = uint16_t((((D_out[0]/4096)*V_REF)/R)*1000); // current calculated in uA (micro Amps)
+    Diodes->current_neg_x = uint16_t((((D_out[3]/4096)*V_REF)/R)*1000);
+    Diodes->current_pos_y = uint16_t((((D_out[1]/4096)*V_REF)/R)*1000);
+    Diodes->current_neg_y = uint16_t((((D_out[2]/4096)*V_REF)/R)*1000);
+    Diodes->current_pos_z = uint16_t((((D_out[4]/4096)*V_REF)/R)*1000);
   }
   
   
