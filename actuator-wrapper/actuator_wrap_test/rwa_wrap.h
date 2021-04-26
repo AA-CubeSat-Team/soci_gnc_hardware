@@ -3,7 +3,7 @@
 #include <SPI.h>
 
 // set timeout between request and reply (milliseconds)
-#define SPI_TIMEOUT 20
+#define SPI_TIMEOUT 25
 
 // assigns GPIO pins to be SS pins (Arduino only)
 #define SS1 3
@@ -22,7 +22,7 @@
 #define MAX_RPL_PAYLOAD 10 + 2    // N_max = 10 plus comID and result
 #define MAX_RPL_PACKET 2*(MAX_RPL_PAYLOAD + 2) + 2    // adds CRC, doubles for max XOR, adds flags
 
-const uint16_t crc_value = 0xFFFF;
+#define CRC_VAL (uint16_t)0xFFFF
 const uint16_t crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
                             0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
                             0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
@@ -59,6 +59,7 @@ const uint16_t crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x
 
 struct rw_data
 {
+    int16_t time_N;
     uint8_t result;
     uint16_t rampTime;
     int32_t reqSpeed;
@@ -97,6 +98,10 @@ struct rw_data
 }; 
 
 extern struct rw_data rw1, rw2, rw3, rw4;
+
+// test only
+extern bool debug_mode;
+extern int16_t time_0;
 
 void rwaArduinoBoot();
 

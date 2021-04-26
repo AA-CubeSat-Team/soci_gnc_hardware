@@ -5,11 +5,11 @@
  * freezing on Due (possibly can't handle all 0x7E reply)
  * add double conversion
  * flight wrapper should request reqSpeed and return currSpeed
+ * make reply data read more robust
  */
 
  /* notes:
-  * works on Due running at 328 kHz (Due has voltage issue)
-  * works with SPI timeout down to 20 ms (only tested ping)
+  * tested SPI_TIMEOUT down to 1 ms on Arduino Uno with com_id 6
   */
 
 #include <Arduino.h>                     
@@ -67,22 +67,22 @@ void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *
   }
   req_len_A = *req_payload_len_pt;
 
-  // A to B – adding two CRC uint8_t s to end of array (WORKS)
-  uint8_t req_crc[2] = { };
-  uint16_t req_crc_calc_16b = 0xFFFF; 
-  
-  for (ii = 0; ii < req_len_A; ii++) {
-    req_crc_calc_16b = ((crc_value << 8) ^ crc_table[((crc_value >> 8) ^ req_array_A[ii]) & 0x00FF]);
-  }
-  req_crc[0] = req_crc_calc_16b & 0xFF;
-  req_crc[1] = req_crc_calc_16b >> 8;
-
-  for (ii = 0; ii < req_len_A; ii++) {
-    req_array_B[ii] = req_array_A[ii];
-  }
-  req_array_B[req_len_A] = req_crc[0];
-  req_array_B[req_len_A + 1] = req_crc[1];
-  req_len_B = req_len_A + 2;
+        // A to B – adding two CRC uint8_t s to end of array (ISSUE)
+        uint8_t req_crc[2] = {0};
+        uint16_t crc_value = CRC_VAL; 
+        
+        for (ii = 0; ii < req_len_A; ii++) {
+          crc_value = ((crc_value << 8) ^ crc_table[((crc_value >> 8) ^ req_array_A[ii]) & 0x00FF]);
+        }
+        req_crc[0] = crc_value & 0xFF;
+        req_crc[1] = crc_value >> 8;
+      
+        for (ii = 0; ii < req_len_A; ii++) {
+          req_array_B[ii] = req_array_A[ii];
+        }
+        req_array_B[req_len_A] = req_crc[0];
+        req_array_B[req_len_A + 1] = req_crc[1];
+        req_len_B = req_len_A + 2;
 
   // B to C – checking for 0x7D uint8_t s (WORKS)
   uint8_t fnd;
@@ -235,13 +235,13 @@ void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *
   uint8_t rpl_crc_rwa[] = {rpl_array_X[rpl_len_X - 2], rpl_array_X[rpl_len_X - 1]};
   
   uint8_t rpl_crc_calc[2] = { };
-  uint16_t rpl_crc_calc_16b = 0xFFFF; 
+  uint16_t crc_value = CRC_VAL; 
   
   for (ii = 0; ii < rpl_len_W; ii++) {
-    rpl_crc_calc_16b = ((crc_value << 8) ^ crc_table[((crc_value >> 8) ^ rpl_array_W[ii]) & 0x00FF]);
+    crc_value = ((crc_value << 8) ^ crc_table[((crc_value >> 8) ^ rpl_array_W[ii]) & 0x00FF]);
   }
-  rpl_crc_calc[0] = rpl_crc_calc_16b & 0xFF;
-  rpl_crc_calc[1] = rpl_crc_calc_16b >> 8;
+  rpl_crc_calc[0] = crc_value & 0xFF;
+  rpl_crc_calc[1] = crc_value >> 8;
 
   if (rpl_crc_rwa[0] == rpl_crc_calc[0] && rpl_crc_rwa[1] == rpl_crc_calc[1]) {
 //    do something
@@ -276,6 +276,9 @@ void rplPayloadRead_cmd4(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, s
   rwX_pt->state = *(rpl_payload_pt+10);
 
   rwX_pt->currClcMode = *(rpl_payload_pt+11);
+
+  // system ID only
+  rwX_pt->time_N = millis() - time_0;
 }
 
 
@@ -298,6 +301,24 @@ void reqPayloadWrite_cmd6(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, 
 
 void rplPayloadRead_cmd6(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, struct rw_data *rwX_pt) {
   // com_id = 6
+  // length = 2
+  rwX_pt->result = *(rpl_payload_pt+1);
+}
+
+
+// command 7 - set current limit control mode --- --- --- --- --- ---
+void reqPayloadWrite_cmd7(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, struct rw_data *rwX_pt) { 
+  uint8_t com_id = 7;
+
+  *req_payload_pt = com_id;
+  
+  *(req_payload_pt+1) = rwX_pt->reqClcMode;
+
+  *req_payload_len_pt = 1 + 1;
+}
+
+void rplPayloadRead_cmd7(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, struct rw_data *rwX_pt) {
+  // com_id = 7
   // length = 2
   rwX_pt->result = *(rpl_payload_pt+1);
 }
@@ -327,6 +348,9 @@ void reqPayloadWriteSwitcher(uint8_t com_id, uint8_t *req_payload_pt, uint8_t *r
     case 6:
       reqPayloadWrite_cmd6(req_payload_pt, req_payload_len_pt, rwX_pt);
       break;
+    case 7:
+      reqPayloadWrite_cmd7(req_payload_pt, req_payload_len_pt, rwX_pt);
+      break;
     case 10:
       reqPayloadWrite_cmd10(req_payload_pt, req_payload_len_pt, rwX_pt);
       break;
@@ -340,6 +364,9 @@ void rplPayloadReadSwitcher(uint8_t com_id, uint8_t *rpl_payload_pt, uint8_t *rp
       break;
     case 6:
       rplPayloadRead_cmd6(rpl_payload_pt, rpl_payload_len_pt, rwX_pt);
+      break;
+    case 7:
+      rplPayloadRead_cmd7(rpl_payload_pt, rpl_payload_len_pt, rwX_pt);
       break;
     case 10:
       rplPayloadRead_cmd10(rpl_payload_pt, rpl_payload_len_pt, rwX_pt);
@@ -450,7 +477,7 @@ void commandAll(uint8_t com_id){
 //  rplPacketProcess(&rpl_payload_rw4[0], &rpl_packet_rw4[0], &rpl_payload_len_rw4, &rpl_packet_len_rw4);
 //  rplPayloadReadSwitcher(com_id, &rpl_payload_rw4[0], &rpl_payload_len_rw4, &rw4);
 
-          
+        if (debug_mode == 1){
           Serial.print("req_packet_rw1:\t\t");
           for (uint8_t yy = 0; yy < req_packet_len_rw1; yy++) {
             Serial.print(req_packet_rw1[yy], HEX);
@@ -463,4 +490,6 @@ void commandAll(uint8_t com_id){
             Serial.print("\t");
           }
           Serial.println(" ");
+          Serial.println(" ");
+        }
 }
