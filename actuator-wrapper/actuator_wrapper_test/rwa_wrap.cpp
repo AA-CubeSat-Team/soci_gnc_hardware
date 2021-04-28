@@ -19,29 +19,6 @@ SPISettings spiSet(125000, MSBFIRST, SPI_MODE0);
 
 struct rw_data rw1, rw2, rw3, rw4;
 
-void rwaArduinoBoot(){
-  // pulls SS1,SS2,SS3,SS4 HIGH
-  SPI.begin();
-  pinMode(SS1, OUTPUT);
-  digitalWrite(SS1, HIGH);
-  pinMode(SS2, OUTPUT);
-  digitalWrite(SS2, HIGH);
-  pinMode(SS3, OUTPUT);
-  digitalWrite(SS3, HIGH);
-  pinMode(SS4, OUTPUT);
-  digitalWrite(SS4, HIGH);
-
-  // powers on RW0-1,2,3,4
-  pinMode(EN1, OUTPUT);
-  digitalWrite(EN1, HIGH);
-  pinMode(EN2, OUTPUT);
-  digitalWrite(EN2, HIGH);
-  pinMode(EN3, OUTPUT);
-  digitalWrite(EN3, HIGH);
-  pinMode(EN4, OUTPUT);
-  digitalWrite(EN4, HIGH);
-}
-
 void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *req_payload_len_pt, uint8_t *req_packet_len_pt) { // --- --- --- --- --- --- --- --- ---
   uint8_t req_array_A[MAX_REQ_PACKET] = {0}; // need to allocate max possible size of uint8_t
   uint8_t req_array_B[MAX_REQ_PACKET] = {0};

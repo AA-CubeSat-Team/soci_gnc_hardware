@@ -103,8 +103,6 @@ extern struct rw_data rw1, rw2, rw3, rw4;
 extern bool debug_mode;
 extern int16_t time_0;
 
-void rwaArduinoBoot();
-
 void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *req_payload_len_pt, uint8_t *req_packet_len_pt);
 void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, uint8_t SS_id);
 void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t SS_id);
