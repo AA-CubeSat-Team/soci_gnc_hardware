@@ -31,7 +31,7 @@ void loop() {
     }
     Serial.println();
   }
-  while (micros() - t0 < 1.0 / GYRO_ODR_VALUE * 1e6) {
+  while (micros() - t0 < 0.5 * 1e6) {
   }
 }
 
