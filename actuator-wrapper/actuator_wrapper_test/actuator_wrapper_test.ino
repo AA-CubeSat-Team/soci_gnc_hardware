@@ -9,9 +9,14 @@ File dataFile;
 #include "RTClib.h"
 RTC_PCF8523 rtc;
 
+#include <Wire.h>
+#include <Adafruit_INA219.h>
+Adafruit_INA219 ina219;
+
 bool debug_mode = 0;
 
 int16_t time_0;
+
 
 void setup (void) {
   delay(100);
@@ -38,6 +43,13 @@ void setup (void) {
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
   rtc.start();
+
+  /* INA219 init */
+  if (! ina219.begin()) {
+    Serial.println("failed to find INA219 chip");
+    while (1) { delay(10); }
+  }
+  ina219.setCalibration_32V_1A();
   
   /* RWA init */
   rwaArduinoBoot();   
@@ -65,6 +77,18 @@ void rwaSysID(struct rw_data *rwX_pt){
   String minuteString = (now.minute() < 10) ? "0" + String(now.minute()) : String(now.minute());
   String fileString = monthString + dayString + hourString + minuteString + ".CSV";
 
+  /* writing header */
+  String headerString = "entry, time_ms, currSpeed_01rpm, refSpeed_01rpm, busVoltage_V, current_mA, power_mW";
+  dataFile = SD.open(fileString, FILE_WRITE);
+  if (!dataFile){
+    Serial.println("error opening dataFile"); 
+    while(1);
+  }
+  if (dataFile) {
+    dataFile.println(headerString);
+    dataFile.close();
+  }
+
   /* prepping test */
   Serial.println("zeroing reaction wheel");
   rw1.reqSpeed = 0;     // sets RPM to 0
@@ -73,6 +97,10 @@ void rwaSysID(struct rw_data *rwX_pt){
 
   rw1.reqClcMode = 0;   // sets CLC to low current limit
 //  commandAll(7);
+
+  float busVoltage_V = 0;
+  float current_mA = 0;
+  float power_mW = 0;
 
   delay(10000);
   Serial.println("starting system identification");
@@ -89,6 +117,10 @@ void rwaSysID(struct rw_data *rwX_pt){
   for (int ii=0;ii<100;ii++){
 //    commandAll(4);
 
+    busVoltage_V = ina219.getBusVoltage_V();
+    current_mA = ina219.getCurrent_mA();
+    power_mW = ina219.getPower_mW();
+
         rwX_pt->currSpeed = 3470;
         rwX_pt->refSpeed = 3500;
         rwX_pt->time_N = 120;
@@ -99,7 +131,8 @@ void rwaSysID(struct rw_data *rwX_pt){
         Serial.print(String(rwX_pt->refSpeed));
 
     /* data recording */
-    String dataString = String(ii) + "," + String(rwX_pt->time_N) + "," + String(rwX_pt->currSpeed) + "," + String(rwX_pt->refSpeed);
+    String dataString = String(ii) + "," + String(rwX_pt->time_N) + "," + String(rwX_pt->currSpeed) + "," + String(rwX_pt->refSpeed)
+                        + "," + String(busVoltage_V) + "," + String(current_mA) + "," + String(power_mW);
     dataFile = SD.open(fileString, FILE_WRITE);
     if (!dataFile){
       Serial.println("error opening dataFile"); 
