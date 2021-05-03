@@ -8,7 +8,7 @@
 #ifndef GYRO_WRAP_H_
 #define GYRO_WRAP_H_
 
-#define ARDUINO_CODE            0
+#define ARDUINO_CODE            1
 
 #if ARDUINO_CODE
 #include <Wire.h>
@@ -18,6 +18,7 @@
 #include "peripherals.h"
 #endif
 
+#define COUNT_ZERO_OFFSET     0
 #define COUNT_TEMP_BIAS       0     // if the code count temperature influence on output
 #define MULTI_GYROS         0   // if there are multiple gyroscopes(three)
 #define DIFF_TEMP_BIAS_COE      0   // if the gyroscopes have different temperature bias and sensitivity coefficients.
@@ -143,7 +144,7 @@ void startGyro(gyro_t * Gyro);
  *
  */
 #if ARDUINO_CODE
-void quickStartGyro(gyro_t * Gyro)
+void quickStartGyro(gyro_t * Gyro);
 #else
 void quickStartGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
 #endif
