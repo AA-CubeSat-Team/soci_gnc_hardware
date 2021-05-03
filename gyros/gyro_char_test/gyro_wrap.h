@@ -18,6 +18,7 @@
 #include "peripherals.h"
 #endif
 
+#define COUNT_ZERO_OFFSET     0
 #define COUNT_TEMP_BIAS       0     // if the code count temperature influence on output
 #define MULTI_GYROS         0   // if there are multiple gyroscopes(three)
 #define DIFF_TEMP_BIAS_COE      0   // if the gyroscopes have different temperature bias and sensitivity coefficients.

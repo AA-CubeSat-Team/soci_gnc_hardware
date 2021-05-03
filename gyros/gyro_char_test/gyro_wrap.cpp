@@ -122,9 +122,16 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle)
         break;
     }
 #else
+
+#if COUNT_ZERO_OFFSET
     static const float gyroBiasValue[3] = {-0.565375, 0.6173333, -0.0121667};
     static const float gyroTempBiasCoeValue[3] = {0.02, 0.02, 0.01};
     static const float gyroTempSensCoeValue[3] = {0.0008, 0.0008, 0.0001};
+#else
+    static const float gyroBiasValue[3] = {.0, .0, .0};
+    static const float gyroTempBiasCoeValue[3] = {.0, .0, .0};
+    static const float gyroTempSensCoeValue[3] = {.0, .0, .0};
+#endif
     memcpy(Gyro->gyroBias,gyroBiasValue, 12);
     memcpy(Gyro->gyroTempBiasCoe,gyroTempBiasCoeValue, 12);
     memcpy(Gyro->gyroTempSensCoe,gyroTempSensCoeValue, 12);
