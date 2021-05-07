@@ -37,6 +37,8 @@ def readData(commandCode):
         frac = 1.0
         #need to get the 4 bytes that will give one of the floats
         inputBytes = [ser.read(), ser.read(), ser.read(), ser.read()]
+        print("response data bytes are: ")
+        print(inputBytes)
         #I've got to put these into bits and then put them in the right order
         #currently they're reversed
         for i in range(0,4):
@@ -53,6 +55,8 @@ def readData(commandCode):
             #then pad the bits with 0s since they are important
             for k in range(1, 9-len(inputBytes[i])):
                 inputBytes[i] = '0' + inputBytes[i]
+        print("formatted in binary")
+        print(inputBytes)
         #combine all of the strings into one long string
         longForm = inputBytes[3] + inputBytes[2] + inputBytes[1] + inputBytes[0]
         #the first "bit" of longForm is the sign bit, which defaults to -1, so I only need to check
