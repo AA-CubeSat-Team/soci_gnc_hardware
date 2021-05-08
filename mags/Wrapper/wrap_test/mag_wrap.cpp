@@ -115,7 +115,7 @@ void readMagData(mag_t * Mag)
     
     if ((raw_x >= 2040) | (raw_x <= -2040) |
         (raw_y >= 2040) | (raw_y <= -2040) |
-        (raw_z >= 2040) | (raw_z <= -2040) )  {Mag->errorFlag = 4; }
+        (raw_z >= 2040) | (raw_z <= -2040) )  {Mag->errorFlag = 3; }
 
     Mag->magXYZ[0] = Mag->magCalCoe[0]*(((float)raw_x/_lsm303Mag_Gauss_LSB_XY*GAUSS_TO_MICROTESLA) - Mag->magCalVec[0]);
     Mag->magXYZ[1] = Mag->magCalCoe[1]*(((float)raw_y/_lsm303Mag_Gauss_LSB_XY*GAUSS_TO_MICROTESLA) - Mag->magCalVec[1]);
