@@ -34,7 +34,7 @@ void setup (void) {
 
   /* RTC init */
   if (! rtc.begin()) {
-    Serial.println("Couldn't find RTC");
+    Serial.println("couldn't find RTC");
     Serial.flush();
     abort();
   }
@@ -76,10 +76,12 @@ void rwaSysID(struct rw_data *rwX_pt){
   String hourString = (now.hour() < 10) ? "0" + String(now.hour()) : String(now.hour());
   String minuteString = (now.minute() < 10) ? "0" + String(now.minute()) : String(now.minute());
   String fileString = monthString + dayString + hourString + minuteString + ".CSV";
+  fileString = "TESTA";
 
   /* writing header */
   String headerString = "entry, time_ms, currSpeed_01rpm, refSpeed_01rpm, busVoltage_V, current_mA, power_mW";
   dataFile = SD.open(fileString, FILE_WRITE);
+  Serial.println(fileString);
   if (!dataFile){
     Serial.println("error opening dataFile"); 
     while(1);
