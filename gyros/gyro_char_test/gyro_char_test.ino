@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include "gyro_wrap.h"
 
+#define PLOT  1
 long intt;
 int i = 0;
 double testtime = 2000;
@@ -8,13 +9,17 @@ boolean testing = 0;
 
 void setup() {
   Serial.begin(115200);
+  #if !PLOT
   Serial.println("Gyroscope characterization test.");
   Serial.print("Test time:  ");
   Serial.print(testtime);
   Serial.println("s");
+  #endif
   quickStartGyro(&Gyro1);
   delay(500);
+  #if !PLOT
   Serial.println("Ready for testing. Type \"start\" to start...");
+  #endif
 }
 
 void loop() {

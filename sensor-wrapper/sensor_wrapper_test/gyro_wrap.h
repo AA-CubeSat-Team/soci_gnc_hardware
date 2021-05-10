@@ -11,15 +11,16 @@
 #define ARDUINO_CODE            1
 
 #if ARDUINO_CODE
-#include <Arduino.h>
 #include <Wire.h>
 #else
 #include "fsl_lpi2c.h"
 #include "fsl_lpi2c_freertos.h"
+#include "peripherals.h"
 #endif
 
+#define COUNT_ZERO_OFFSET     0
 #define COUNT_TEMP_BIAS       0     // if the code count temperature influence on output
-#define MULTI_GYROS         0   // if there are multiple gyroscopes(three)
+#define MULTI_GYROS         1   // if there are multiple gyroscopes(three)
 #define DIFF_TEMP_BIAS_COE      0   // if the gyroscopes have different temperature bias and sensitivity coefficients.
 
 
@@ -56,7 +57,12 @@ typedef struct _Gyro
   char  gyroInitialized; /* gyroscope status */
 } gyro_t;
 
-extern gyro_t Gyro1, Gyro2, Gyro3;                /* gyroscope 1, 2, 3*/
+extern gyro_t Gyro1;                /* gyroscope 1*/
+
+#if MULTI_GYROS
+extern gyro_t Gyro2;
+extern gyro_t Gyro3;
+#endif
 
 
 /*!
@@ -67,9 +73,10 @@ extern gyro_t Gyro1, Gyro2, Gyro3;                /* gyroscope 1, 2, 3*/
  * @param value The variable to hold the value of the register.
  * @param valueSize The size of the value of the register.
  * @param Gyro The gyroscope want to be read.
+ * @return void
  *
  */
-void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro);
+void readRegsGyro(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro);
 
 /*!
  * @brief write a value to the registers of a gyroscope.
@@ -118,6 +125,30 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
  *
  */
 void startGyro(gyro_t * Gyro);
+
+/*!
+ * @brief initialize the gyroscope and start the gyroscope's reading
+ *
+ *
+ * @param Gyro The gyroscope wants to be set.
+ * @return void
+ *
+ */
+/*!
+ * @brief initialize the gyroscope and start the gyroscope's reading. This
+ * is the function going to be used on the FSW for starting the gyroscope.
+ *
+ *
+ * @param Gyro The gyroscope wants to be set.
+ * @return void
+ *
+ */
+#if ARDUINO_CODE
+void quickStartGyro(gyro_t * Gyro);
+#else
+void quickStartGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
+#endif
+
 
 /*!
  * @brief Read the temperature of a gyroscope.

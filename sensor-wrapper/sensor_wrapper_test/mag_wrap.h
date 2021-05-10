@@ -8,34 +8,17 @@
 
 #ifndef mag_wrap_h
 #define mag_wrap_h
-#include <stdio.h>
 
 #define ARDUINO_CODE            1
-#define MULTI_MAGS              0
+#define MULTI_MAGS              1
 
 #if ARDUINO_CODE
-#include <Arduino.h>
 #include <Wire.h>
 #else
 #include "fsl_lpi2c.h"
 #include "fsl_lpi2c_freertos.h"
+#include "peripherals.h"
 #endif
-
-// Gain multipliers
-#define GAUSS_TO_MICROTESLA                       100
-#define _lsm303Mag_Gauss_LSB_XY                   1100
-#define _lsm303Mag_Gauss_LSB_Z                    980
-// Address
-#define LSM303_ADDRESS_MAG                        (uint8_t)(0x3C >> 1)   // 0011110x
-
-// Registers
-#define LSM303_REGISTER_MAG_CRA_REG_M             0x00
-#define LSM303_REGISTER_MAG_CRB_REG_M             0x01
-#define LSM303_REGISTER_MAG_MR_REG_M              0x02
-#define LSM303_REGISTER_MAG_OUT_X_H_M             0x03
-#define LSM303_REGISTER_MAG_SR_REG_Mg             0x09
-#define LSM303_MAGGAIN_1_3                        0x20
-#define LSM303_REGISTER_MAG_TEMP_OUT_X_H_M        0x31
 
 
 /*!
@@ -46,9 +29,9 @@ typedef struct _Mag
 {
   float magXYZ[3];            /* measured field strengths*/
   int8_t temperature;         /* measured temperature*/
-  #if !ARDUINO_CODE
+#if !ARDUINO_CODE
   lpi2c_rtos_handle_t * magHandle;        /* i2c handle?*/
-  #endif
+#endif
   float magCalVec[3];
   float magCalCoe[3];
   char magInitialized;
@@ -64,6 +47,14 @@ void write8(uint8_t reg, uint8_t value, mag_t * Mag);
 void initMag(mag_t * Mag);
 #else
 void initMag(mag_t * Mag, lpi2c_rtos_handle_t *magHandle);
+#endif
+
+void startMag(mag_t * Mag);
+
+#if ARDUINO_CODE
+void quickStartMag(mag_t * Mag);
+#else
+void quickStartMag(mag_t * Mag, lpi2c_rtos_handle_t * magHandle);
 #endif
 
 void readMagData(mag_t * Mag);

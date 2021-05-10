@@ -6,12 +6,30 @@
 //
 
 #include "mag_wrap.h"
-#if !ARDUINO_CODE
-#include <peripherals.h>
-#endif
+
+// Gain multipliers
+#define GAUSS_TO_MICROTESLA                       100
+#define _lsm303Mag_Gauss_LSB_XY                   1100
+#define _lsm303Mag_Gauss_LSB_Z                    980
+// Address
+#define LSM303_ADDRESS_MAG                        (uint8_t)(0x3C >> 1)   // 0011110x
+
+// Registers
+#define LSM303_REGISTER_MAG_CRA_REG_M             0x00
+#define LSM303_REGISTER_MAG_CRB_REG_M             0x01
+#define LSM303_REGISTER_MAG_MR_REG_M              0x02
+#define LSM303_REGISTER_MAG_OUT_X_H_M             0x03
+#define LSM303_REGISTER_MAG_SR_REG_Mg             0x09
+#define LSM303_MAGGAIN_1_3                        0x20
+#define LSM303_REGISTER_MAG_TEMP_OUT_X_H_M        0x31
+
 
 // initialize struct.
+#if MULTI_MAGS
 mag_t Mag1, Mag2, Mag3;
+#else
+mag_t Mag1;
+#endif
 
 void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, mag_t * Mag)
 {
@@ -26,8 +44,7 @@ void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, mag_t * Mag)
       i++;
     }
 #else
-  I2C_send(Mag->magHandle, LSM303_ADDRESS_MAG, &reg, 1);
-  I2C_request(Mag->magHandle, LSM303_ADDRESS_MAG, value, valueSize);
+  I2C_request(Mag->magHandle, LSM303_ADDRESS_MAG, reg, value, valueSize);
 #endif
 }
 
@@ -39,8 +56,7 @@ void write8(uint8_t reg, uint8_t value, mag_t * Mag)
     Wire.write((uint8_t)value);
     Wire.endTransmission();
 #else
-  I2C_send(Mag->magHandle, LSM303_ADDRESS_MAG, &reg, 1);
-  I2C_send(Mag->magHandle, LSM303_ADDRESS_MAG, &value, 1);
+  I2C_send(Mag->magHandle, LSM303_ADDRESS_MAG, reg, &value, 1);
 #endif
 }
 
@@ -86,6 +102,20 @@ void startMag(mag_t * Mag)
     if (reg1_a != 0x10) { Mag->errorFlag = 1;}
     write8(LSM303_REGISTER_MAG_CRB_REG_M, LSM303_MAGGAIN_1_3, Mag);
   }
+}
+
+#if ARDUINO_CODE
+void quickStartMag(mag_t * Mag)
+#else
+void quickStartMag(mag_t * Mag, lpi2c_rtos_handle_t *magHandle)
+#endif
+{
+#if ARDUINO_CODE
+  initMag(Mag);
+#else
+  initMag(Mag, magHandle);
+#endif
+  startMag(Mag);
 }
 
 void readMagData(mag_t * Mag)
