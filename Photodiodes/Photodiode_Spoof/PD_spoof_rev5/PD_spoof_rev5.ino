@@ -67,21 +67,25 @@ void setup(){
 
           
 void loop(){
-  // arbitrary, slave just waits for master to send/request data
-  delay(100);
+  if (Serial.available()) {
+    simulinkRecieve();
+  }
 }
 
 
-// Alex look over here? I don't know how to distinguish between simulink writing to spoof vs wrapper writing to spoof
-void simulinkRecieve (double numBytes) {
-    while(Wire.available()) {
-    double current_array = Wire.read();
-    }
-    int ii = 0;  
+void simulinkRecieve() {
+  int ii = 0;
+  uint8_t serial_received[10];    // need to double check size
+  
+  if (Serial.available() > 0) {
+    serial_received[ii] = Serial.read();
+    ii++;
+  }
+     
   for(ii=0; ii<5; ii++){
     // split the calculation step into multiple lines for clarity
     // D_out_16bit = desired 12bit value, but more clear that it still takes up 16 bits of storage
-    dVIN = current_array[ii]*R;
+    dVIN = serial_received[ii]*R;
     D_out_64bit = dVIN/V_ref * pow(2,12);
     D_out_16bit = int(D_out_64bit);
     D_out_byte_array[2*ii] = D_out_16bit & 0xFF;

@@ -2,7 +2,7 @@
 /* issues:
  * add init function (clear reset, set current limit)
  * add CRC error processing
- * freezing on Due (possibly can't handle all 0x7E reply)
+ * possibly can't handle all 0x7E reply
  * add double conversion
  * flight wrapper should request reqSpeed and return currSpeed
  * make reply data read more robust
