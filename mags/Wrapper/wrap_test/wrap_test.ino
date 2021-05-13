@@ -1,13 +1,13 @@
 #include "mag_wrap.h"
 #include <Wire.h>
 
-#define TEST_READGYRODATA true
+#define TEST_READMAGDATA true
 #define TEST_READTEMPDATA false
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  if (TEST_READGYRODATA || TEST_READTEMPDATA) {
+  if (TEST_READMAGDATA || TEST_READTEMPDATA) {
     initMag(&Mag1);
   }
 }
@@ -18,7 +18,7 @@ void loop() {
     readMagTemp(&Mag1);
     Serial.println(Mag1.temperature);
   }
-  if (TEST_READGYRODATA) {
+  if (TEST_READMAGDATA) {
     readMagData(&Mag1);
     for (int i = 0; i < 3; i++) {
       Serial.print(" ");

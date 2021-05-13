@@ -10,6 +10,8 @@ byte error;
 void setup() {
   Serial.begin(115200);            // Set Baudrate
   Serial1.begin(115200);
+  SerialUSB.begin(115200);            // Set Baudrate
+
 }
 
 void serialRecieveSimulink(double * doubleBuffer, int n) {
@@ -19,6 +21,8 @@ void serialRecieveSimulink(double * doubleBuffer, int n) {
   for (int ii = 0; ii < n; ii++) {
     Serial.readBytes(doubleConvertor,sizeof(doubleConvertor));
     memcpy(doubleBuffer + ii, doubleConvertor, sizeof(double));
+    SerialUSB.print("Receive from Simulink:");
+    SerialUSB.println(doubleBuffer[ii]);
   }
 }
 
@@ -34,8 +38,9 @@ void serialSendOBC() {
     byte Checksum = byte(Command[1] + Length + Data1[0] + Data1[1] + Data1[2] + Data1[3] + Data2[0] + Data2[1] + Data2[2] + Data2[3] + Data3[0] + Data3[1] + Data3[2] + Data3[3] + error);
     Checksum = Checksum & 0xFF;
     byte Answer[] = {Address,Command[1],Length,Data1[0],Data1[1],Data1[2],Data1[3],Data2[0],Data2[1],Data2[2],Data2[3],Data3[0],Data3[1],Data3[2],Data3[3],error,Checksum};
+    SerialUSB.print("Send to OBC:");
     for(int i = 0; i < 17; i++){
-      Serial.println(Answer[i]);
+      SerialUSB.println(Answer[i]);
     }
     Serial1.write(Answer,17);
 }
@@ -56,6 +61,10 @@ void serialRecieveOBC() {
       // Incoming checksum
       Command[3] = Serial1.read();
       delay(1);
+      serialSendOBC();
+    } else {
+      Serial1.read();
+      Serial1.read();
     }
   }
 }
@@ -70,6 +79,5 @@ void loop() {
   }
   if(Serial1.available()){
     serialRecieveOBC();
-    serialSendOBC();
   }
 }

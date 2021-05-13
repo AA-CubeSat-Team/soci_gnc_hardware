@@ -91,7 +91,7 @@ void startMag(mag_t * Mag)
 void readMagData(mag_t * Mag)
 {
     uint8_t reg_mg;
-    readRegs(LSM303_REGISTER_MAG_SR_RE+G_Mg, &reg_mg, 1, Mag);
+    readRegs(LSM303_REGISTER_MAG_SR_REG_Mg, &reg_mg, 1, Mag);
     if (!(reg_mg & 0x1)) {
       Mag->errorFlag = 2;
     }
@@ -103,10 +103,10 @@ void readMagData(mag_t * Mag)
     // Note high before low (different than accel)
     uint8_t xhi = raw[0];
     uint8_t xlo = raw[1];
-    uint8_t yhi = raw[2];
-    uint8_t ylo = raw[3];
-    uint8_t zhi = raw[4];
-    uint8_t zlo = raw[5];
+    uint8_t zhi = raw[2];
+    uint8_t zlo = raw[3];
+    uint8_t yhi = raw[4];
+    uint8_t ylo = raw[5];
 
     // Shift values to create properly formed integer (low uint8_t first)
     int16_t raw_x = (int16_t)((int16_t)xlo | ((int16_t)xhi << 8));
@@ -115,7 +115,7 @@ void readMagData(mag_t * Mag)
     
     if ((raw_x >= 2040) | (raw_x <= -2040) |
         (raw_y >= 2040) | (raw_y <= -2040) |
-        (raw_z >= 2040) | (raw_z <= -2040) )  {Mag->errorFlag = 4; }
+        (raw_z >= 2040) | (raw_z <= -2040) )  {Mag->errorFlag = 3; }
 
     Mag->magXYZ[0] = Mag->magCalCoe[0]*(((float)raw_x/_lsm303Mag_Gauss_LSB_XY*GAUSS_TO_MICROTESLA) - Mag->magCalVec[0]);
     Mag->magXYZ[1] = Mag->magCalCoe[1]*(((float)raw_y/_lsm303Mag_Gauss_LSB_XY*GAUSS_TO_MICROTESLA) - Mag->magCalVec[1]);
