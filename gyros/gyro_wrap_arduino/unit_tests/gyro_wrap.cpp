@@ -9,7 +9,11 @@
 #include "gyro_wrap.h"
 
 // gyroscope struct.
+#if MULTI_GYROS
+gyro_t Gyro1, Gyro2, Gyro3;
+#else
 gyro_t Gyro1;
+#endif
 
 
 /*!
@@ -23,7 +27,7 @@ gyro_t Gyro1;
  * @return void
  *
  */
-void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
+void readRegsGyro(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
 {
 #if ARDUINO_CODE
     Wire.beginTransmission(GYRO_ADDRESS);
@@ -37,7 +41,6 @@ void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
     }
 #else
     I2C_request(Gyro->gyroHandle, GYRO_ADDRESS, reg, value, valueSize);
-
 #endif
 }
 
@@ -194,7 +197,7 @@ void quickStartGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle)
 void readTempData(gyro_t * Gyro)
 {
   uint8_t rawTempData;
-  readRegs(GYRO_TEMP, &rawTempData, 1, Gyro);
+  readRegsGyro(GYRO_TEMP, &rawTempData, 1, Gyro);
   Gyro->temperature = (int8_t) rawTempData;
 }
 
@@ -210,7 +213,7 @@ void readGyroData(gyro_t * Gyro)
 {
   readTempData(Gyro);
   unsigned char rawData[6];  // x/y/z gyro register data stored here
-  readRegs(GYRO_OUT_X_MSB,rawData, 6, Gyro);  // Read the six raw data registers into data array
+  readRegsGyro(GYRO_OUT_X_MSB,rawData, 6, Gyro);  // Read the six raw data registers into data array
 
 
 #if COUNT_TEMP_BIAS
@@ -224,8 +227,6 @@ void readGyroData(gyro_t * Gyro)
     Gyro->gyroXYZ[i] = ((float) tempValue)*GYRO_SENSITIVITY  - (Gyro->gyroBias[i]);
 #endif
   }
-
-
 }
 
 /*!
@@ -240,8 +241,8 @@ void resetGyro(gyro_t * Gyro){
   writeReg(GYRO_CTRL_REG1, 0b1000000, Gyro); // set reset bit to 1 to assert software reset to zero at end of boot process
 
   uint8_t flag;
-  readRegs(GYRO_INT_SRC_FLAG, &flag, 1, Gyro);
+  readRegsGyro(GYRO_INT_SRC_FLAG, &flag, 1, Gyro);
   while(!(flag & 0x08))  { // wait for boot end flag to be set
-      readRegs(GYRO_INT_SRC_FLAG, &flag, 1, Gyro);
+      readRegsGyro(GYRO_INT_SRC_FLAG, &flag, 1, Gyro);
   }
 }

@@ -76,7 +76,7 @@ extern gyro_t Gyro3;
  * @return void
  *
  */
-void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro);
+void readRegsGyro(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro);
 
 /*!
  * @brief write a value to the registers of a gyroscope.

@@ -194,6 +194,6 @@ void getVoltage(diodes_t * Diodes){
 
   for (int i = 0; i < 5; i++) {
     D_out[i] = ((uint16_t)PDVol[2*i]<<8 | (uint16_t)PDVol[2*i + 1]);
-    Diodes->current[i] = (((D_out[i]/4096)*V_REF)/R)*100000;
+    Diodes->current[i] = (((D_out[i]/4096)*V_REF)/R)*1000;
   }
 }

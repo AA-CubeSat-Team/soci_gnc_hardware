@@ -14,7 +14,7 @@ mag_t Mag1, Mag2, Mag3;
 mag_t Mag1;
 #endif
 
-void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, mag_t * Mag)
+void readRegsMag(uint8_t reg, uint8_t *value, uint8_t valueSize, mag_t * Mag)
 {
 #if ARDUINO_CODE
     Wire.beginTransmission(LSM303_ADDRESS_MAG);
@@ -31,7 +31,7 @@ void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, mag_t * Mag)
 #endif
 }
 
-void write8(uint8_t reg, uint8_t value, mag_t * Mag)
+void writeRegMag(uint8_t reg, uint8_t value, mag_t * Mag)
 {
 #if ARDUINO_CODE
     Wire.beginTransmission(LSM303_ADDRESS_MAG);
@@ -46,7 +46,7 @@ void write8(uint8_t reg, uint8_t value, mag_t * Mag)
 void readMagTemp(mag_t * Mag)
 {
   uint8_t rawTempData;
-  readRegs(LSM303_REGISTER_MAG_TEMP_OUT_X_H_M, &rawTempData, 1, Mag);
+  readRegsMag(LSM303_REGISTER_MAG_TEMP_OUT_X_H_M, &rawTempData, 1, Mag);
   Mag->temperature = (int8_t) rawTempData;
 }
 
@@ -76,14 +76,14 @@ void initMag(mag_t * Mag, lpi2c_rtos_handle_t *magHandle)
 void startMag(mag_t * Mag)
 {
   if (Mag->magInitialized){
-    write8(LSM303_REGISTER_MAG_MR_REG_M, 0x00, Mag);
+    writeRegMag(LSM303_REGISTER_MAG_MR_REG_M, 0x00, Mag);
     
     // LSM303DLHC has no WHOAMI register so read CRA_REG_M to check
     // the default value (0b00010000/0x10)
     uint8_t reg1_a;
-    readRegs(LSM303_REGISTER_MAG_CRA_REG_M, &reg1_a, 1, Mag);
+    readRegsMag(LSM303_REGISTER_MAG_CRA_REG_M, &reg1_a, 1, Mag);
     if (reg1_a != 0x10) { Mag->errorFlag = 1;}
-    write8(LSM303_REGISTER_MAG_CRB_REG_M, LSM303_MAGGAIN_1_3, Mag);
+    writeRegMag(LSM303_REGISTER_MAG_CRB_REG_M, LSM303_MAGGAIN_1_3, Mag);
   }
 }
 
@@ -104,14 +104,14 @@ void quickStartMag(mag_t * Mag, lpi2c_rtos_handle_t *magHandle)
 void readMagData(mag_t * Mag)
 {
     uint8_t reg_mg;
-    readRegs(LSM303_REGISTER_MAG_SR_REG_Mg, &reg_mg, 1, Mag);
+    readRegsMag(LSM303_REGISTER_MAG_SR_REG_Mg, &reg_mg, 1, Mag);
     if (!(reg_mg & 0x1)) {
       Mag->errorFlag = 2;
     }
 
     // Read the magnetometer
     uint8_t raw[6];
-   readRegs(LSM303_REGISTER_MAG_OUT_X_H_M, raw, (uint8_t)6, Mag); 
+   readRegsMag(LSM303_REGISTER_MAG_OUT_X_H_M, raw, (uint8_t)6, Mag);
 
     // Note high before low (different than accel)
     uint8_t xhi = raw[0];
