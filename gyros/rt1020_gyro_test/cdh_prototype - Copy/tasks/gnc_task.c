@@ -9,7 +9,9 @@
 #define OSC_TEST    0
 
 #include "dummy_type.h"
-#include "wrappers/gyro_wrapper/gyro_wrap.h"
+#include "wrappers/sensor_wrap/gyro_wrap.h"
+#include "wrappers/sensor_wrap/mag_wrap.h"
+#include "wrappers/sensor_wrap/phd_wrap.h"
 #include <gnc_task.h>
 #include "FreeRTOS.h"
 #include "task.h"
@@ -57,13 +59,13 @@ void test_initGyro() {
   PRINTF("********************\n");
 }
 
-void test_readRegs() {
+void test_readRegsGyro() {
 	PRINTF("Testing raedRegs...\n");
 #if SPOOF
   uint8_t referenceRawData[6] = {0b00000001, 0b00000010, 0b00000011, 0b00000100, 0b00000101, 0b00000110};
   uint8_t readRawData[6];
   initGyro(&Gyro1, &i2c1_m_rtos_handle);
-  readRegs(GYRO_OUT_X_MSB, &readRawData[0], 6, &Gyro1);
+  readRegsGyro(GYRO_OUT_X_MSB, &readRawData[0], 6, &Gyro1);
   PRINTF("Reference raw data  Read raw data Result\n");
 
   for (int i = 0; i < 6; i++) {
@@ -80,7 +82,7 @@ void test_readRegs() {
                                   0, 0, 1, 0, 0, 0,    0};
   uint8_t readRawData[15];
   initGyro(&Gyro1, &i2c1_m_rtos_handle);
-  readRegs(0x07, &readRawData[0], 15, &Gyro1);
+  readRegsGyro(0x07, &readRawData[0], 15, &Gyro1);
   PRINTF("Reference raw data  Read raw data Result\n");
 
   for (int i = 0; i < 15; i++) {
@@ -95,15 +97,15 @@ void test_readRegs() {
 #endif
 }
 
-void test_writeReg() {
+void test_writeRegGyro() {
 
-	PRINTF("Testing writeReg...\n");
+	PRINTF("Testing writeRegGyro...\n");
   uint8_t referenceValue = 2;
   PRINTF("Reference value:	%d\n", referenceValue);
 	initGyro(&Gyro1, &i2c1_m_rtos_handle);
-  writeReg(GYRO_CTRL_REG1, referenceValue, &Gyro1);
+  writeRegGyro(GYRO_CTRL_REG1, referenceValue, &Gyro1);
   uint8_t readValue;
-  readRegs(GYRO_CTRL_REG1, &readValue, 1, &Gyro1);
+  readRegsGyro(GYRO_CTRL_REG1, &readValue, 1, &Gyro1);
   PRINTF("Read value: %hhd	", readValue);
   if (readValue == referenceValue) {
 	  PRINTF("Pass\n");
@@ -122,7 +124,7 @@ void test_startGyro() {
 	startGyro(&Gyro1);
 
   uint8_t readCtrlReg0;
-  readRegs(GYRO_CTRL_REG0, &readCtrlReg0, 1, &Gyro1);
+  readRegsGyro(GYRO_CTRL_REG0, &readCtrlReg0, 1, &Gyro1);
   PRINTF("Read CTRL_REG0:	%x	", readCtrlReg0);
   if (readCtrlReg0 == GYRO_FSR_NUM) {
 	  PRINTF("Pass\n");
@@ -131,7 +133,7 @@ void test_startGyro() {
   }
 
   uint8_t readCtrlReg1;
-  readRegs(GYRO_CTRL_REG1, &readCtrlReg1, 1, &Gyro1);
+  readRegsGyro(GYRO_CTRL_REG1, &readCtrlReg1, 1, &Gyro1);
   PRINTF("Read CTRL_REG1:	%x	", readCtrlReg1);
   if (readCtrlReg1 == ((GYRO_ODR_NUM << 2) | 0b10)) {
 	  PRINTF("Pass\n");
@@ -152,7 +154,7 @@ void test_restGyro() {
 
   uint8_t referenceRawData[6] = {0b00000001, 0b00000010, 0b00000011, 0b00000100, 0b00000101, 0b00000110};
   uint8_t readRawData[6];
-  readRegs(GYRO_OUT_X_MSB, &readRawData[0], 6, &Gyro1);
+  readRegsGyro(GYRO_OUT_X_MSB, &readRawData[0], 6, &Gyro1);
 
   PRINTF("Reference raw data  Read raw data Result\n");
 
@@ -175,7 +177,7 @@ void test_restGyro() {
   uint8_t referenceRawData[15] = {0, 0, 0, 0, 8, 0xD7, 0, 0,
                                   0, 0, 1, 0, 0, 0,    0};
   uint8_t readRawData[15];
-  readRegs(0x07, &readRawData[0], 15, &Gyro1);
+  readRegsGyro(0x07, &readRawData[0], 15, &Gyro1);
 
   PRINTF("Reference raw data  Read raw data Result\n");
 
@@ -195,8 +197,8 @@ void gnc_task(void *pvParameters)
   PRINTF("********************\n");
 
   test_initGyro();
-  test_readRegs();
-  test_writeReg();
+  test_readRegsGyro();
+  test_writeRegGyro();
   test_startGyro();
   test_restGyro();
 
