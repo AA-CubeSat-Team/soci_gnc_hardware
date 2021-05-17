@@ -74,30 +74,31 @@ struct rw_data
     int32_t mcuTemp;
     float presSensTemp;
     float pressure;
-    uint32_t numOfInvalidCrcPackets;
-    uint32_t numOfInvalidLenPackets;
-    uint32_t numOfInvalidCmdPackets; 
-    uint32_t numOfCmdExecutedRequests;
-    uint32_t numOfCmdReplies; 
-    uint32_t uartNumOfBytesWritten; 
-    uint32_t uartNumOfBytesRead;
-    uint32_t uartNumOfParityErrors; 
-    uint32_t uartNumOfNoiseErrors; 
-    uint32_t uartNumOfFrameErrors; 
-    uint32_t uartNumOfRegisterOverrunErrors; 
-    uint32_t uartTotalNumOfErrors; 
-    uint32_t spiNumOfBytesWritten; 
-    uint32_t spiNumOfBytesRead; 
-    uint32_t spiNumOfRegisterOverrunErrors; 
-    uint32_t spiTotalNumOfErrors;
-    uint32_t versionMajor; 
-    uint32_t versionBuildNumber; 
-    uint32_t uid1; 
-    uint32_t uid2; 
-    uint32_t uid3;
+//    uint32_t numOfInvalidCrcPackets;
+//    uint32_t numOfInvalidLenPackets;
+//    uint32_t numOfInvalidCmdPackets; 
+//    uint32_t numOfCmdExecutedRequests;
+//    uint32_t numOfCmdReplies; 
+//    uint32_t uartNumOfBytesWritten; 
+//    uint32_t uartNumOfBytesRead;
+//    uint32_t uartNumOfParityErrors; 
+//    uint32_t uartNumOfNoiseErrors; 
+//    uint32_t uartNumOfFrameErrors; 
+//    uint32_t uartNumOfRegisterOverrunErrors; 
+//    uint32_t uartTotalNumOfErrors; 
+//    uint32_t spiNumOfBytesWritten; 
+//    uint32_t spiNumOfBytesRead; 
+//    uint32_t spiNumOfRegisterOverrunErrors; 
+//    uint32_t spiTotalNumOfErrors;
+//    uint32_t versionMajor; 
+//    uint32_t versionBuildNumber; 
+//    uint32_t uid1; 
+//    uint32_t uid2; 
+//    uint32_t uid3;
 }; 
 
-extern struct rw_data rw1, rw2, rw3, rw4;
+extern struct rw_data rw1;
+//extern struct rw_data rw1, rw2, rw3, rw4;   saving SRAM
 
 // test only
 extern bool debug_mode;

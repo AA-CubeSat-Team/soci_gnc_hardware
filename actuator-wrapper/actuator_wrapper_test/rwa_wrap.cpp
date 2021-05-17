@@ -17,7 +17,8 @@
 
 SPISettings spiSet(125000, MSBFIRST, SPI_MODE0); 
 
-struct rw_data rw1, rw2, rw3, rw4;
+struct rw_data rw1;
+//struct rw_data rw1, rw2, rw3, rw4;    saving SRAM
 
 void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *req_payload_len_pt, uint8_t *req_packet_len_pt) { // --- --- --- --- --- --- --- --- ---
   uint8_t req_array_A[MAX_REQ_PACKET] = {0}; // need to allocate max possible size of uint8_t

@@ -1,13 +1,12 @@
 //SPI MASTER (ARDUINO)
 
+/* having issue with SRAM usage, need ~600 bytes free for SD card */
+
 #include "rwa_wrap.h"
 
 #include <SD.h>
 const int chipSelect = 10;
 File dataFile;
-
-#include "RTClib.h"
-RTC_PCF8523 rtc;
 
 #include <Wire.h>
 #include <Adafruit_INA219.h>
@@ -17,6 +16,15 @@ bool debug_mode = 0;
 
 int16_t time_0;
 
+String dateString = "15162318";
+
+
+int freeRam() {
+  extern int __heap_start,*__brkval;
+  int v;
+  return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int) __brkval);  
+}
+
 
 void setup (void) {
   delay(100);
@@ -25,27 +33,18 @@ void setup (void) {
 
   /* SD card init */
   if (SD.begin(chipSelect)) {
-    Serial.println("card initialized");
+    Serial.println("SD card initialized");
   }
   if (!SD.begin(chipSelect)) {
-    Serial.println("card failed, or not present");
+    Serial.println("SD card failed, or not present");
     while (1);
   }
 
-  /* RTC init */
-  if (! rtc.begin()) {
-    Serial.println("couldn't find RTC");
-    Serial.flush();
-    abort();
-  }
-  if (! rtc.initialized() || rtc.lostPower()) {
-    Serial.println("RTC is NOT initialized, let's set the time!");
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-  }
-  rtc.start();
-
   /* INA219 init */
-  if (! ina219.begin()) {
+  if (ina219.begin()) {
+    Serial.println("INA219 initialized");
+  }
+  if (!ina219.begin()) {
     Serial.println("failed to find INA219 chip");
     while (1) { delay(10); }
   }
@@ -56,9 +55,12 @@ void setup (void) {
 
   delay(100);
 
-  rwaSysID(&rw1);
+  Serial.print(F("SRAM = "));
+  Serial.println(freeRam());
 
   Serial.println("setup complete");
+
+  rwaSysID(&rw1);
 }
 
 void loop(void) {   
@@ -69,19 +71,18 @@ void loop(void) {
 void rwaSysID(struct rw_data *rwX_pt){
   debug_mode = 0;
 
-  /* generating dataFile name */
-  DateTime now = rtc.now();
-  String monthString = (now.month() < 10) ? "0" + String(now.month()) : String(now.month());
-  String dayString = (now.day() < 10) ? "0" + String(now.day()) : String(now.day());
-  String hourString = (now.hour() < 10) ? "0" + String(now.hour()) : String(now.hour());
-  String minuteString = (now.minute() < 10) ? "0" + String(now.minute()) : String(now.minute());
-  String fileString = monthString + dayString + hourString + minuteString + ".CSV";
-  fileString = "TESTA";
+//  /* generating dataFile name */
+//  Serial.println("enter file name (MMDDmmss):");
+//  while(!Serial.available()){
+//    delay(10);
+//  }
+//  
+//  String dateString = "15162318";
+  String fileString = dateString + ".CSV";
 
   /* writing header */
   String headerString = "entry, time_ms, currSpeed_01rpm, refSpeed_01rpm, busVoltage_V, current_mA, power_mW";
-  dataFile = SD.open(fileString, FILE_WRITE);
-  Serial.println(fileString);
+  dataFile = SD.open(fileString, FILE_WRITE);  
   if (!dataFile){
     Serial.println("error opening dataFile"); 
     while(1);
@@ -130,7 +131,7 @@ void rwaSysID(struct rw_data *rwX_pt){
         Serial.print(String(ii) + "\t");
         Serial.print(String(rw1.time_N) + "\t");
         Serial.print(String(rwX_pt->currSpeed) + "\t");
-        Serial.print(String(rwX_pt->refSpeed));
+        Serial.println(String(rwX_pt->refSpeed));
 
     /* data recording */
     String dataString = String(ii) + "," + String(rwX_pt->time_N) + "," + String(rwX_pt->currSpeed) + "," + String(rwX_pt->refSpeed)
