@@ -4,13 +4,13 @@
 
 #include "rwa_wrap.h"
 
-#include <SD.h>
-const int chipSelect = 10;
-File dataFile;
+//#include <SD.h>
+//const int chipSelect = 10;
+//File dataFile;
 
-#include <Wire.h>
-#include <Adafruit_INA219.h>
-Adafruit_INA219 ina219;
+//#include <Wire.h>
+//#include <Adafruit_INA219.h>
+//Adafruit_INA219 ina219;
 
 bool debug_mode = 0;
 
@@ -31,24 +31,24 @@ void setup (void) {
   
   Serial.begin(115200);
 
-  /* SD card init */
-  if (SD.begin(chipSelect)) {
-    Serial.println("SD card initialized");
-  }
-  if (!SD.begin(chipSelect)) {
-    Serial.println("SD card failed, or not present");
-    while (1);
-  }
+//  /* SD card init */
+//  if (SD.begin(chipSelect)) {
+//    Serial.println("SD card initialized");
+//  }
+//  if (!SD.begin(chipSelect)) {
+//    Serial.println("SD card failed, or not present");
+//    while (1);
+//  }
 
-  /* INA219 init */
-  if (ina219.begin()) {
-    Serial.println("INA219 initialized");
-  }
-  if (!ina219.begin()) {
-    Serial.println("failed to find INA219 chip");
-    while (1) { delay(10); }
-  }
-  ina219.setCalibration_32V_1A();
+//  /* INA219 init */
+//  if (ina219.begin()) {
+//    Serial.println("INA219 initialized");
+//  }
+//  if (!ina219.begin()) {
+//    Serial.println("failed to find INA219 chip");
+//    while (1) { delay(10); }
+//  }
+//  ina219.setCalibration_32V_1A();
   
   /* RWA init */
   rwaArduinoBoot();   
@@ -60,46 +60,57 @@ void setup (void) {
 
   Serial.println("setup complete");
 
-  rwaSysID(&rw1);
+  Serial.println("zeroing reaction wheel");
+  rw1.reqClcMode = 0;   // sets CLC to low current limit
+  commandAll(7);
+  
+  rw1.reqSpeed = 0;     // sets RPM to 0
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+  Serial.println("max speed set");
+
+  rw1.reqSpeed = 0;     // sets RPM to 1000
+  rw1.rampTime = 10;
+  commandAll(6);
+
+//  rwaSysID(&rw1);
 }
 
-void loop(void) {   
-  delay(1000);
+void loop(void) {  
+   commandAll(4);
+   
+  Serial.println(rw1.currSpeed);
+  
+  delay(3000);
 }
 
 
 void rwaSysID(struct rw_data *rwX_pt){
   debug_mode = 0;
 
-//  /* generating dataFile name */
-//  Serial.println("enter file name (MMDDmmss):");
-//  while(!Serial.available()){
-//    delay(10);
+//  /* writing header */
+//  String fileString = dateString + ".CSV";
+//  String headerString = "entry, time_ms, currSpeed_01rpm, refSpeed_01rpm, busVoltage_V, current_mA, power_mW";
+//  dataFile = SD.open(fileString, FILE_WRITE);  
+//  if (!dataFile){
+//    Serial.println("error opening dataFile"); 
+//    while(1);
 //  }
-//  
-//  String dateString = "15162318";
-  String fileString = dateString + ".CSV";
-
-  /* writing header */
-  String headerString = "entry, time_ms, currSpeed_01rpm, refSpeed_01rpm, busVoltage_V, current_mA, power_mW";
-  dataFile = SD.open(fileString, FILE_WRITE);  
-  if (!dataFile){
-    Serial.println("error opening dataFile"); 
-    while(1);
-  }
-  if (dataFile) {
-    dataFile.println(headerString);
-    dataFile.close();
-  }
+//  if (dataFile) {
+//    dataFile.println(headerString);
+//    dataFile.close();
+//  }
 
   /* prepping test */
   Serial.println("zeroing reaction wheel");
   rw1.reqSpeed = 0;     // sets RPM to 0
   rw1.rampTime = 10;
-//  commandAll(6);
+  commandAll(6);
 
   rw1.reqClcMode = 0;   // sets CLC to low current limit
-//  commandAll(7);
+  commandAll(7);
 
   float busVoltage_V = 0;
   float current_mA = 0;
@@ -115,36 +126,27 @@ void rwaSysID(struct rw_data *rwX_pt){
   rw1.rampTime = 10;
 
   time_0 = millis();
-//  commandAll(6);
+  commandAll(6);
 
   for (int ii=0;ii<100;ii++){
-//    commandAll(4);
+    commandAll(4);
 
-    busVoltage_V = ina219.getBusVoltage_V();
-    current_mA = ina219.getCurrent_mA();
-    power_mW = ina219.getPower_mW();
+//    busVoltage_V = ina219.getBusVoltage_V();
+//    current_mA = ina219.getCurrent_mA();
+//    power_mW = ina219.getPower_mW();
 
-        rwX_pt->currSpeed = 3470;
-        rwX_pt->refSpeed = 3500;
-        rwX_pt->time_N = 120;
-
-        Serial.print(String(ii) + "\t");
-        Serial.print(String(rw1.time_N) + "\t");
-        Serial.print(String(rwX_pt->currSpeed) + "\t");
-        Serial.println(String(rwX_pt->refSpeed));
-
-    /* data recording */
-    String dataString = String(ii) + "," + String(rwX_pt->time_N) + "," + String(rwX_pt->currSpeed) + "," + String(rwX_pt->refSpeed)
-                        + "," + String(busVoltage_V) + "," + String(current_mA) + "," + String(power_mW);
-    dataFile = SD.open(fileString, FILE_WRITE);
-    if (!dataFile){
-      Serial.println("error opening dataFile"); 
-      while(1);
-    }
-    if (dataFile) {
-      dataFile.println(dataString);
-      dataFile.close();
-    }
+//    /* data recording */
+//    String dataString = String(ii) + "," + String(rwX_pt->time_N) + "," + String(rwX_pt->currSpeed) + "," + String(rwX_pt->refSpeed)
+//                        + "," + String(busVoltage_V) + "," + String(current_mA) + "," + String(power_mW);
+//    dataFile = SD.open(fileString, FILE_WRITE);
+//    if (!dataFile){
+//      Serial.println("error opening dataFile"); 
+//      while(1);
+//    }
+//    if (dataFile) {
+//      dataFile.println(dataString);
+//      dataFile.close();
+//    }
         
     delay(1000);
   }
