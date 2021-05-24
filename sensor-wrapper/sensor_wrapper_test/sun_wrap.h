@@ -38,7 +38,6 @@ typedef struct _Sun
   double angles[4];           /* measured alpha and beta angles*/
   double unFiltVolts[4];      /* measured unfiltered voltages*/
   double filtVolts[4];        /* measured filtered voltages*/
-  int recall = 0;             /* for checking if a command has been tried twice (freeRTOS only) */
 } sun_t;
 
 extern sun_t Sun1;                /* sun sensor 1*/

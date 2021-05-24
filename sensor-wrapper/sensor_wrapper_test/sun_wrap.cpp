@@ -96,20 +96,12 @@ void getUnfiltVolts(sun_t * Sun){
       delay(3);
    #else
       error = LPUART_RTOS_Send(&uart3_handle, &unfiltVoltsComm, sizeof(unfiltVoltsComm));
-      /* if there was an error with RTOS functions, try sending the command again if not already tried */
+      /* if there was an error with RTOS functions, assign an error code */
       if(error != kStatus_Success){
-         if(recall == 0){
-            vTaskDelay(xDelay20ms);
-            getUnfiltVolts(Sun);
-            *(Sun->recall) = 1;
-         }
-         else{
-            *(Sun->unFiltVolts) = -2000.0;
-            *(Sun->unFiltVolts + 1) = -2000.0;
-            *(Sun->unFiltVolts + 2) = -2000.0;
-            *(Sun->unFiltVolts + 3) = -2000.0
-            *(Sun->recall) = 0;
-         }
+        *(Sun->unFiltVolts) = -2000.0;
+        *(Sun->unFiltVolts + 1) = -2000.0;
+        *(Sun->unFiltVolts + 2) = -2000.0;
+        *(Sun->unFiltVolts + 3) = -2000.0
          return;
       }
       vTaskDelay(xDelay3ms);
@@ -123,18 +115,10 @@ void getUnfiltVolts(sun_t * Sun){
       size_t numRecvBytes = 0;
       error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, sizeof(recv_buffer), &numRecvBytes);
       if(error != kStatus_Success){
-         if(recall == 0){
-            vTaskDelay(xDelay20ms);
-            getUnfiltVolts(Sun);
-            *(Sun->recall) = 1;
-         }
-         else{
-            *(Sun->unFiltVolts) = -2000.0;
-            *(Sun->unFiltVolts + 1) = -2000.0;
-            *(Sun->unFiltVolts + 2) = -2000.0;
-            *(Sun->unFiltVolts + 3) = -2000.0
-            *(Sun->recall) = 0;
-         }
+         *(Sun->unFiltVolts) = -2000.0;
+         *(Sun->unFiltVolts + 1) = -2000.0;
+         *(Sun->unFiltVolts + 2) = -2000.0;
+         *(Sun->unFiltVolts + 3) = -2000.0
          return;
       }
    #endif
@@ -164,18 +148,10 @@ void getFiltVolts(sun_t * Sun){
    #else
       error = LPUART_RTOS_Send(&uart3_handle, &filtVoltsComm, sizeof(filtVoltsComm));
       if(error != kStatus_Success){
-         if(recall == 0){
-            vTaskDelay(xDelay20ms);
-            getFiltVolts(Sun);
-            *(Sun->recall) = 1;
-         }
-         else{
-            *(Sun->filtVolts) = -2000.0;
-            *(Sun->filtVolts + 1) = -2000.0;
-            *(Sun->filtVolts + 2) = -2000.0;
-            *(Sun->filtVolts + 3) = -2000.0
-            *(Sun->recall) = 0;
-         }
+         *(Sun->filtVolts) = -2000.0;
+         *(Sun->filtVolts + 1) = -2000.0;
+         *(Sun->filtVolts + 2) = -2000.0;
+         *(Sun->filtVolts + 3) = -2000.0
          return;
       }
       vTaskDelay(xDelay3ms);
@@ -189,18 +165,10 @@ void getFiltVolts(sun_t * Sun){
       size_t numRecvBytes = 0;
       error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, sizeof(recv_buffer), &numRecvBytes);
       if(error != kStatus_Success){
-         if(recall ==0){
-            vTaskDelay(xDelay20ms);
-            getFiltVolts(Sun);
-            *(Sun->recall) = 1;
-         }
-         else{
-            *(Sun->filtVolts) = -2000.0;
-            *(Sun->filtVolts + 1) = -2000.0;
-            *(Sun->filtVolts + 2) = -2000.0;
-            *(Sun->filtVolts + 3) = -2000.0
-            *(Sun->recall) = 0;
-         }
+         *(Sun->filtVolts) = -2000.0;
+         *(Sun->filtVolts + 1) = -2000.0;
+         *(Sun->filtVolts + 2) = -2000.0;
+         *(Sun->filtVolts + 3) = -2000.0
          return;
       }
    #endif
@@ -228,18 +196,10 @@ void getSunAngles(sun_t * Sun){
    #else
       error = LPUART_RTOS_Send(&uart3_handle, &anglesComm, sizeof(anglesComm));
       if(error != kStatus_Success){
-         if(recall == 0){
-            vTaskDelay(xDelay20ms);
-            getSunAngles(Sun);
-            *(Sun->recall) = 1;
-         }
-         else{
-            *(Sun->angles) = -2000.0;
-            *(Sun->angles + 1) = -2000.0;
-            *(Sun->angles + 2) = -2000.0;
-            *(Sun->angles + 3) = -2000.0
-            *(Sun->recall) = 0;
-         }
+         *(Sun->angles) = -2000.0;
+         *(Sun->angles + 1) = -2000.0;
+         *(Sun->angles + 2) = -2000.0;
+         *(Sun->angles + 3) = -2000.0
          return;
       }
       vTaskDelay(xDelay7ms);
@@ -253,18 +213,10 @@ void getSunAngles(sun_t * Sun){
       size_t numRecvBytes = 0;
       error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, angleRespLength, &numRecvBytes);
       if(error != kStatus_Success){
-         if(recall ==0){
-            vTaskDelay(xDelay20ms);
-            getSunAngles(Sun);
-            *(Sun->recall) = 1;
-         }
-         else{
-            *(Sun->angles) = -2000.0;
-            *(Sun->angles + 1) = -2000.0;
-            *(Sun->angles + 2) = -2000.0;
-            *(Sun->angles + 3) = -2000.0
-            *(Sun->recall) = 0;
-         }
+         *(Sun->angles) = -2000.0;
+         *(Sun->angles + 1) = -2000.0;
+         *(Sun->angles + 2) = -2000.0;
+         *(Sun->angles + 3) = -2000.0
          return;
       }
    #endif
