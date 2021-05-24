@@ -1,0 +1,102 @@
+
+void init_struct(mag_t * Mag) {
+    if (!Mag->magInitialized)  {
+    } Mag->magInitialized = 1;  
+}
+
+void test_read8(mag_t * Mag) {
+    // Read a static register
+    uint8_t reg1_a = read8(LSM303_ADDRESS_MAG, LSM303_REGISTER_MAG_CRA_REG_M, Mag);
+    // Serial.println(reg1_a);
+    if (reg1_a == 0x10) {
+      Serial.println("test_read8 passed");
+    }
+    else {
+      Serial.println("test_read8 failed");
+    }
+}
+
+void test_write8(mag_t * Mag) {
+    // Set gain to the minimum 
+    write8(LSM303_ADDRESS_MAG, LSM303_REGISTER_MAG_CRB_REG_M, LSM303_MAGGAIN_8_1, Mag);
+    // Read the gain
+    uint8_t reg_gain = read8(LSM303_ADDRESS_MAG, LSM303_REGISTER_MAG_CRB_REG_M, Mag);
+    if (reg_gain == LSM303_MAGGAIN_8_1) {
+      Serial.println("test_write8 passed");
+    }
+    else {
+      Serial.println("test_write8 failed");
+    }
+    // Set gain back to the maximum
+    write8(LSM303_ADDRESS_MAG, LSM303_REGISTER_MAG_CRB_REG_M, LSM303_MAGGAIN_1_3, Mag);
+}
+
+void test_readRegs(mag_t * Mag) {
+    // Read 3 static registers
+    uint8_t reg1_a[3];
+    reg1_a[0] = read8(LSM303_ADDRESS_MAG, 0x0A, Mag);
+    reg1_a[1] = read8(LSM303_ADDRESS_MAG, 0x0B, Mag);
+    reg1_a[2] = read8(LSM303_ADDRESS_MAG, 0x0C, Mag);
+    // Read the same 3 static registers
+    uint8_t reg1_b[3];
+    readRegs(0x0A, reg1_b, 3, Mag);
+    if (reg1_a[0] == reg1_b[0] && reg1_a[1] == reg1_b[1] && reg1_a[2] == reg1_b[2]) {
+      Serial.println("test_readRegs passed");
+    }
+    else {
+      Serial.println("test_readRegs failed");
+    }
+}
+
+void test_initMag(mag_t * Mag) {
+    // Run the function
+    initMag(Mag);
+    // Check error flag
+    if (errorFlag == 0) {
+      Serial.println("test_initMag passed");
+    }
+    else {
+      Serial.println("test_initMag failed");
+    }
+}
+
+void test_readMagData(mag_t * Mag) {
+    // Run the function
+    readMagData(Mag);
+    // Check error flag
+    if (errorFlag == 0) {
+      Serial.println("test_readMagData passed");
+    }
+    else {
+      Serial.println("test_readMagData failed");
+    }
+}
+
+void test_readMagData(mag_t * Mag) {
+    // Run the function
+    readMagData(Mag);
+    // Check error flag
+    if (errorFlag == 0) {
+      Serial.println("test_readMagData passed");
+    }
+    else {
+      Serial.println("test_readMagData failed");
+    }
+}
+
+void setup() {
+    init_struct(&Mag1);
+    Wire.begin();
+    Serial.begin(9600);
+
+    Serial.println("testing");
+    test_read8(&Mag1);
+    test_write8(&Mag1);
+    test_readRegs(&Mag1);
+    test_initMag(&Mag1);
+    test_readMagData(&Mag1);
+}
+
+void loop() {
+    delay(2000);
+}

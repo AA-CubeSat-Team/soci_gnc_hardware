@@ -1,9 +1,9 @@
 #include <Wire.h>
 #include "gyro_wrap.h"
 
-#define TEST_READGYRODATA true
+#define TEST_READGYRODATA false
 #define TEST_READTEMPDATA false
-#define TEST_PLOTTER         true
+#define TEST_PLOTTER         false
 void setup() {
   Serial.begin(115200);
   
@@ -47,6 +47,8 @@ void loop() {
 void test_initGyro()
 {
   Serial.println("Testing initGyro...");
+  Wire.beginTransmission(GYRO_ADDRESS);
+  Serial.println(Wire.endTransmission());
   initGyro(&Gyro1);
   if (Gyro1.gyroInitialized)
   {

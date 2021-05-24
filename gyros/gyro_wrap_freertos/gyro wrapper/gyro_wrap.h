@@ -15,6 +15,7 @@
 #else
 #include "fsl_lpi2c.h"
 #include "fsl_lpi2c_freertos.h"
+#include "peripherals.h"
 #endif
 
 #define COUNT_TEMP_BIAS       0     // if the code count temperature influence on output
@@ -123,6 +124,30 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
  *
  */
 void startGyro(gyro_t * Gyro);
+
+/*!
+ * @brief initialize the gyroscope and start the gyroscope's reading
+ *
+ *
+ * @param Gyro The gyroscope wants to be set.
+ * @return void
+ *
+ */
+/*!
+ * @brief initialize the gyroscope and start the gyroscope's reading. This
+ * is the function going to be used on the FSW for starting the gyroscope.
+ *
+ *
+ * @param Gyro The gyroscope wants to be set.
+ * @return void
+ *
+ */
+#if ARDUINO_CODE
+void quickStartGyro(gyro_t * Gyro)
+#else
+void quickStartGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
+#endif
+
 
 /*!
  * @brief Read the temperature of a gyroscope.

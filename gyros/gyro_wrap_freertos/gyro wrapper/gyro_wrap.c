@@ -7,9 +7,6 @@
 
 
 #include "gyro_wrap.h"
-#if !ARDUINO_CODE
-#include <peripherals.h>
-#endif
 
 // gyroscope struct.
 gyro_t Gyro1;
@@ -39,8 +36,8 @@ void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
       i++;
     }
 #else
-  I2C_send(Gyro->gyroHandle, GYRO_ADDRESS, &reg, 1);
-  I2C_request(Gyro->gyroHandle, GYRO_ADDRESS, value, valueSize);
+    I2C_request(Gyro->gyroHandle, GYRO_ADDRESS, reg, value, valueSize);
+
 #endif
 }
 
@@ -63,8 +60,7 @@ void writeReg(uint8_t reg, uint8_t value, gyro_t * Gyro)
   Wire.write(value);
   Wire.endTransmission();
 #else
-  I2C_send(Gyro->gyroHandle, GYRO_ADDRESS, &reg, 1);
-  I2C_send(Gyro->gyroHandle, GYRO_ADDRESS, &value, 1);
+  I2C_send(Gyro->gyroHandle, GYRO_ADDRESS, reg, &value, 1);
 #endif
 }
 
@@ -92,7 +88,7 @@ void initGyro(gyro_t * Gyro)
 void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle)
 #endif
 {
-  if (!Gyro->gyroInitialized) 
+  if (!Gyro->gyroInitialized)
   {
 #if !ARDUINO_CODE
     Gyro->gyroHandle = gyroHandle;
@@ -157,6 +153,28 @@ void startGyro(gyro_t * Gyro)
   }
 }
 
+/*!
+ * @brief initialize the gyroscope and start the gyroscope's reading. This
+ * is the function going to be used on the FSW for starting the gyroscope.
+ *
+ *
+ * @param Gyro The gyroscope wants to be set.
+ * @return void
+ *
+ */
+#if ARDUINO_CODE
+void quickStartGyro(gyro_t * Gyro)
+#else
+void quickStartGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle)
+#endif
+{
+#if ARDUINO_CODE
+  initGyro(Gyro);
+#else
+  initGyro(Gyro, gyroHandle);
+#endif
+  startGyro(Gyro);
+}
 
 /*!
  * @brief Read the temperature of a gyroscope.
@@ -184,7 +202,7 @@ void readTempData(gyro_t * Gyro)
 void readGyroData(gyro_t * Gyro)
 {
   readTempData(Gyro);
-  uint8_t rawData[6];  // x/y/z gyro register data stored here
+  unsigned char rawData[6];  // x/y/z gyro register data stored here
   readRegs(GYRO_OUT_X_MSB,rawData, 6, Gyro);  // Read the six raw data registers into data array
 
 
@@ -192,11 +210,11 @@ void readGyroData(gyro_t * Gyro)
   int8_t tempDelta = Gyro->temperature - GYRO_TEMP_0;
 #endif
   for (int i = 0; i<3; i++){
-    Gyro->gyroXYZ[i] = ((int16_t)(((int16_t)rawData[2*i]) << 8 | ((int16_t) rawData[2*i + 1])));
+    short tempValue = ((short)(((unsigned short)rawData[2*i]) << 8 | ((unsigned short) rawData[2*i + 1])));
 #if COUNT_TEMP_BIAS
-    Gyro->gyroXYZ[i] = (Gyro->gyroXYZ[i])*GYRO_SENSITIVITY*(1 + (Gyro->gyroTempSensCoe[i])*(int16_t) tempDelta) - (Gyro->gyroBias[i]) - Gyro->gyroTempBiasCoe[i]*(int16_t) tempDelta;
+    Gyro->gyroXYZ[i] = tempValue*GYRO_SENSITIVITY*(1 + (Gyro->gyroTempSensCoe[i])*(int16_t) tempDelta) - (Gyro->gyroBias[i]) - Gyro->gyroTempBiasCoe[i]*(int16_t) tempDelta;
 #else
-    Gyro->gyroXYZ[i] = (Gyro->gyroXYZ[i])*GYRO_SENSITIVITY - (Gyro->gyroBias[i]);
+    Gyro->gyroXYZ[i] = ((float) tempValue)*GYRO_SENSITIVITY  - (Gyro->gyroBias[i]);
 #endif
   }
 

@@ -10,15 +10,11 @@ void setup() {
   Serial.println("Tests begin");
   Serial.println("********************");
   test_initGyro();
-  test_readRegs();
+  test_readRegsGyro();
   test_writeReg();
   test_startGyro();
   test_restGyro();
-
-  if (TEST_READGYRODATA || TEST_READTEMPDATA) {
-    initGyro(&Gyro1);
-    startGyro(&Gyro1);
-  }
+  test_quickStartGyro();
 }
 
 void loop() {
@@ -35,36 +31,19 @@ void loop() {
     }
     Serial.println();
   }
-  while (micros() - t0 < 1.0 / GYRO_ODR_VALUE * 1e6) {
+  while (micros() - t0 < 0.5 * 1e6) {
   }
 }
 
-void test_initGyro() {
-  Serial.println("Testing initGyro...");
-  initGyro(&Gyro1);
-  Wire.beginTransmission(GYRO_ADDRESS);
-  if (Wire.endTransmission()) {
-    Serial.println("Fail to connect i2c");
-  } else {
-    Serial.println("Success to connect i2c");
-  }
-  if (Gyro1.gyroInitialized) {
-    Serial.println("Gyro initialized");
-    Serial.println("Pass");
-  } else {
-    Serial.println("Gryo failed to be initialized");
-    Serial.println("Fail");
-  }
-  Serial.println("********************");
-}
 
-void test_readRegs() {
+
+void test_readRegsGyro() {
   Serial.println("Testing raedRegs...");
   uint8_t referenceRawData[15] = {0, 0, 0, 0, 8, 0xD7, 0, 0,
                                   0, 0, 1, 0, 0, 0,    0};
   uint8_t readRawData[15];
   initGyro(&Gyro1);
-  readRegs(0x07, &readRawData[0], 15, &Gyro1);
+  readRegsGyro(0x07, &readRawData[0], 15, &Gyro1);
 
   Serial.println("Reference raw data  Read raw data Result");
 
@@ -91,12 +70,34 @@ void test_writeReg() {
   writeReg(GYRO_CTRL_REG1, referenceValue, &Gyro1);
 
   uint8_t readValue;
-  readRegs(GYRO_CTRL_REG1, &readValue, 1, &Gyro1);
+  readRegsGyro(GYRO_CTRL_REG1, &readValue, 1, &Gyro1);
   Serial.print("Read value: ");
   Serial.println(readValue);
   if (readValue == referenceValue) {
     Serial.println("Pass");
   } else {
+    Serial.println("Fail");
+  }
+  Serial.println("********************");
+}
+
+void test_initGyro() {
+  Serial.println("Testing initGyro...");
+  initGyro(&Gyro1);
+  Wire.beginTransmission(GYRO_ADDRESS);
+  int i2cStatus = Wire.endTransmission();
+  if (i2cStatus) {
+    Serial.print("Status:");
+    Serial.print(i2cStatus);
+    Serial.println("  Fail to connect i2c");
+  } else {
+    Serial.println("Success to connect i2c");
+  }
+  if (Gyro1.gyroInitialized) {
+    Serial.println("Gyro initialized");
+    Serial.println("Pass");
+  } else {
+    Serial.println("Gryo failed to be initialized");
     Serial.println("Fail");
   }
   Serial.println("********************");
@@ -113,7 +114,7 @@ void test_startGyro() {
   startGyro(&Gyro1);
 
   uint8_t readCtrlReg0;
-  readRegs(GYRO_CTRL_REG0, &readCtrlReg0, 1, &Gyro1);
+  readRegsGyro(GYRO_CTRL_REG0, &readCtrlReg0, 1, &Gyro1);
   Serial.print("Read CTRL_REG0: ");
   Serial.println(readCtrlReg0, BIN);
   if (readCtrlReg0 == GYRO_FSR_NUM) {
@@ -122,7 +123,7 @@ void test_startGyro() {
     Serial.println("Fail");
   }
   uint8_t readCtrlReg1;
-  readRegs(GYRO_CTRL_REG1, &readCtrlReg1, 1, &Gyro1);
+  readRegsGyro(GYRO_CTRL_REG1, &readCtrlReg1, 1, &Gyro1);
   Serial.print("Read CTRL_REG1: ");
   Serial.println(readCtrlReg1, BIN);
   if (readCtrlReg1 == ((GYRO_ODR_NUM << 2) | 0b10)) {
@@ -133,10 +134,17 @@ void test_startGyro() {
   Serial.println("********************");
 }
 
+void test_quickStartGyro() {
+  Serial.println("Test quick start gyro...");
+  test_initGyro();
+  test_startGyro();
+  Serial.println("********************");
+}
+
 void test_restGyro() {
   Serial.println("Test restGyro...");
   initGyro(&Gyro1);
-  startGyro(&Gyro1);
+//  startGyro(&Gyro1);
   Serial.println("Start the Gyro");
   resetGyro(&Gyro1);
   Serial.println("Rest the gyro");
@@ -144,7 +152,7 @@ void test_restGyro() {
   uint8_t referenceRawData[15] = {0, 0, 0, 0, 8, 0xD7, 0, 0,
                                   0, 0, 1, 0, 0, 0,    0};
   uint8_t readRawData[15];
-  readRegs(0x07, &readRawData[0], 15, &Gyro1);
+  readRegsGyro(0x07, &readRawData[0], 15, &Gyro1);
 
   Serial.println("Reference raw data  Read raw data Result");
 
@@ -159,4 +167,5 @@ void test_restGyro() {
       Serial.println("Fail");
     }
   }
+  Serial.println("********************");
 }

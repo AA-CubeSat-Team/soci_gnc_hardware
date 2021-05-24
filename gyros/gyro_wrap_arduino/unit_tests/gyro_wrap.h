@@ -8,15 +8,17 @@
 #ifndef GYRO_WRAP_H_
 #define GYRO_WRAP_H_
 
-#define ARDUINO_CODE            0
+#define ARDUINO_CODE            1
 
 #if ARDUINO_CODE
 #include <Wire.h>
 #else
 #include "fsl_lpi2c.h"
 #include "fsl_lpi2c_freertos.h"
+#include "peripherals.h"
 #endif
 
+#define COUNT_ZERO_OFFSET     0
 #define COUNT_TEMP_BIAS       0     // if the code count temperature influence on output
 #define MULTI_GYROS         0   // if there are multiple gyroscopes(three)
 #define DIFF_TEMP_BIAS_COE      0   // if the gyroscopes have different temperature bias and sensitivity coefficients.
@@ -74,7 +76,7 @@ extern gyro_t Gyro3;
  * @return void
  *
  */
-void readRegs(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro);
+void readRegsGyro(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro);
 
 /*!
  * @brief write a value to the registers of a gyroscope.
@@ -123,6 +125,30 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
  *
  */
 void startGyro(gyro_t * Gyro);
+
+/*!
+ * @brief initialize the gyroscope and start the gyroscope's reading
+ *
+ *
+ * @param Gyro The gyroscope wants to be set.
+ * @return void
+ *
+ */
+/*!
+ * @brief initialize the gyroscope and start the gyroscope's reading. This
+ * is the function going to be used on the FSW for starting the gyroscope.
+ *
+ *
+ * @param Gyro The gyroscope wants to be set.
+ * @return void
+ *
+ */
+#if ARDUINO_CODE
+void quickStartGyro(gyro_t * Gyro);
+#else
+void quickStartGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle);
+#endif
+
 
 /*!
  * @brief Read the temperature of a gyroscope.
