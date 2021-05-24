@@ -1,4 +1,4 @@
-#last updated 1-18-21
+#last updated 4-22-21
 #Sun Sensor General Communication code written by William Lacrampe
 #This code is meant to be used to try and get the sun sensor to respond to each command. It does not keep track
 #of the data the sun sensor returns; other scripts must be used for that kind of testing. This is just to make sure
@@ -25,7 +25,7 @@ def readData(commandCode):
     #it's either 2 for angles (1 float per angle) or 4 for voltage (1 per cell)
     floatNum = 0
     if commandCode == 4:
-        floatNum = 2
+        floatNum = 3
     else:
         floatNum = 4
     #sun sensor also hands along length, which is the next byte:
@@ -37,6 +37,8 @@ def readData(commandCode):
         frac = 1.0
         #need to get the 4 bytes that will give one of the floats
         inputBytes = [ser.read(), ser.read(), ser.read(), ser.read()]
+        print("response data bytes are: ")
+        print(inputBytes)
         #I've got to put these into bits and then put them in the right order
         #currently they're reversed
         for i in range(0,4):
@@ -53,6 +55,8 @@ def readData(commandCode):
             #then pad the bits with 0s since they are important
             for k in range(1, 9-len(inputBytes[i])):
                 inputBytes[i] = '0' + inputBytes[i]
+        print("formatted in binary")
+        print(inputBytes)
         #combine all of the strings into one long string
         longForm = inputBytes[3] + inputBytes[2] + inputBytes[1] + inputBytes[0]
         #the first "bit" of longForm is the sign bit, which defaults to -1, so I only need to check
@@ -70,12 +74,12 @@ def readData(commandCode):
                 frac = frac + 2**(-(i-8))
         #lastly, put it all through the formula:
         readVals[x-1] = sign*2**(exp-127)*frac
-    #the third value for an angle reading is actually an error code, need to check
+    #the fourth value for an angle reading is actually an error code, need to check
     #if it's supposed to read it, and if so, read it
-    if floatNum == 2:
-        readVals[2] = int.from_bytes(ser.read(), byteorder='big')
+    if floatNum == 3:
+        readVals[3] = int.from_bytes(ser.read(), byteorder='big')
         #also need to add it to checkSum
-        checkSum = checkSum + readVals[2]
+        checkSum = checkSum + readVals[3]
     #Need to cut checkSum down to just the least significant byte
     #A byte can be no greater than 255, and 256 is a factor of 2^(8+i) nonnegative i
     #so check if checkSum is greater than 255 and remove 256

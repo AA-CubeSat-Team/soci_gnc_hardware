@@ -1,10 +1,3 @@
-#last updated 4-22-21
-#Zero Bias code written by William Lacrampe
-#The zero bias code is meant to test if the sun sensor has any inherit offset in any of the data
-#it can return. This should be done in a completely dark enviornment. The code will ask the user to
-#name a file that it will save the responses to, and ask what command the user would like to test,
-#and how many times the user would like to test it. It will then repeatedly contact the sun sensor and
-#save its responses to the named file.
 import serial
 from time import sleep
 import csv
@@ -145,62 +138,41 @@ def getFilteredVoltage():
     ser.write(lengthByte)
     ser.write(b'\x04')
     sleep(0.25)
+    if(ser.in_waiting == 0):
+        print("error: no response")
+        return[-2000, -2000, -2000, -2000]
     ser.read()
     if ser.read()== b'\x03':
         returnedData = readData(3)
         return returnedData
     else:
+        print("error: incorrect command")
         ser.reset_input_buffer()
         return[-2000, -2000, -2000, -2000]
 
 #takes a command and a number of times to read in data, then repeatedly calls the command and stores its values in a file
-def repeatedRead(comm, numReads):
+def repeatedRead(numReads):
     #name the file
     filename = input("Please give a name for the file: ") +".csv"
     #start up the writer
     with open(filename, 'w') as file:
         writer = csv.writer(file)
-        #check what command it is, read in vals and write them to the file if they are non-error vals
-        if comm == "A":
-            writer.writerow(["Alpha", "Beta", "Sun Detection", "Error Code"])
-            for x in range(numReads):
-                readVals = getAngles()
-                #make sure they're not errors:
-                if readVals != [-2000, -2000, -2000, -2000] and readVals != [-1000, -1000, -1000, -1000]:
-                    #write the values
-                    writer.writerow(readVals)
-                else:
-                    print("Failure at read number")
-                    print(x)
-        elif comm == "V":
-            writer.writerow(["Cell 1", "Cell 2", "Cell 3", "Cell 4"])
-            for x in range(numReads):
-                readVals = getVoltage()
-                if readVals != [-2000, -2000, -2000, -2000] and readVals != [-1000, -1000, -1000, -1000]:
-                    writer.writerow(readVals)
-        elif comm == "F":
-            writer.writerow(["Cell 1", "Cell 2", "Cell 3", "Cell 4"])
-            for x in range(numReads):
-                readVals = getFilteredVoltage()
-                if readVals != [-2000, -2000, -2000, -2000] and readVals != [-1000, -1000, -1000, -1000]:
-                    writer.writerow(readVals)
+        writer.writerow(["Cell 1", "Cell 2", "Cell 3", "Cell 4", "Sun Detection", "Error Code", "PSU Voltage", "PSU Current"])
+        for x in range(numReads):
+            volts = getFilteredVoltage()
+            angles = getAngles()
+            #make sure they're not errors:
+            if volts != [-2000, -2000, -2000, -2000] and volts != [-1000, -1000, -1000, -1000] and angles != [-2000, -2000, -2000, -2000] and angles != [-1000, -1000, -1000, -1000]:
+                #write the values
+                psuVolts = float(input("What is the PSU voltage?"))
+                psuAmps = float(input("What is the PSU current?"))
+                writer.writerow([volts[0], volts[1], volts[2], volts[3], angles[2], angles[3], psuVolts, psuAmps])
+            else:
+                print("Failure at read number")
+                print(x)
         #inform the user the reading is complete
         print("Reading completed.")
 
 sleep(1)
-gettingComm = True
-while gettingComm:
-    #prompt user for command
-    comm = input("Give command: voltage (V), filtered voltage (F), or angles (A) or quit (Q): ")
-    #check to make sure they gave a valid input
-    if comm != "V" and comm != "F" and comm != "A" and comm != "Q":
-        print("Command not recognized, please try again.")
-    #check if they want to quit
-    elif comm == "Q":
-        gettingComm = False
-    else:
-        #prompt user for number of times to read in values
-        numReads = int(input("How many times to read in values? "))
-        repeatedRead(comm, numReads)
-        gettingComm = False
-
+numReads = int(input("How many times to read in values? "))
+repeatedRead(numReads)
