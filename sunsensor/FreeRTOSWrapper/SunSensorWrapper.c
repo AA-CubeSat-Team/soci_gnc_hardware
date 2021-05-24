@@ -113,7 +113,6 @@ void getUnfiltVolts(double* unFiltVolts){
    vTaskDelay(xDelay3ms);
    /* this variable can be used to see how many bytes were received */
    size_t numRecvBytes = 0;
-   /* read in response to receiver buffer - takes the entire length of the receive buffer */
    error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, sizeof(recv_buffer), &numRecvBytes);
    if(error != kStatus_Success){
        if(recall == 0){
@@ -231,7 +230,7 @@ void getSunAngles(double* angles){
    }
    vTaskDelay(xDelay7ms);
    size_t numRecvBytes = 0;
-   error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, 13, &numRecvBytes);
+   error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, angleRespLength, &numRecvBytes);
    if(error != kStatus_Success){
       if(recall == 0){
          vTaskDelay(xDelay20ms);
