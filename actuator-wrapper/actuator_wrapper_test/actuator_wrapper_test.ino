@@ -60,6 +60,85 @@ void setup (void) {
 
   Serial.println("setup complete");
 
+
+//  rwaSysID(&rw1);
+}
+
+void loop(void) {  
+//  commandAll(10);
+   
+//  Serial.println(rw1.currSpeed);
+  
+  delay(3000);
+}
+
+
+void rwaSysID(struct rw_data *rwX_pt){
+  debug_mode = 0;
+
+//  /* writing header */
+//  String fileString = dateString + ".CSV";
+//  String headerString = "entry, time_ms, currSpeed_01rpm, refSpeed_01rpm, busVoltage_V, current_mA, power_mW";
+//  dataFile = SD.open(fileString, FILE_WRITE);  
+//  if (!dataFile){
+//    Serial.println("error opening dataFile"); 
+//    while(1);
+//  }
+//  if (dataFile) {
+//    dataFile.println(headerString);
+//    dataFile.close();
+//  }
+
+  /* prepping test */
+  Serial.println("zeroing reaction wheel");
+  rw1.reqSpeed = 0;     // sets RPM to 0
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  rw1.reqClcMode = 0;   // sets CLC to low current limit
+  commandAll(7);
+
+  float busVoltage_V = 0;
+  float current_mA = 0;
+  float power_mW = 0;
+
+  delay(10000);
+  Serial.println("starting system identification");
+
+  delay(1000);
+
+  /* starting test */
+  rw1.reqSpeed = 10000;
+  rw1.rampTime = 10;
+
+  time_0 = millis();
+  commandAll(6);
+
+  for (int ii=0;ii<100;ii++){
+    commandAll(4);
+
+//    busVoltage_V = ina219.getBusVoltage_V();
+//    current_mA = ina219.getCurrent_mA();
+//    power_mW = ina219.getPower_mW();
+
+//    /* data recording */
+//    String dataString = String(ii) + "," + String(rwX_pt->time_N) + "," + String(rwX_pt->currSpeed) + "," + String(rwX_pt->refSpeed)
+//                        + "," + String(busVoltage_V) + "," + String(current_mA) + "," + String(power_mW);
+//    dataFile = SD.open(fileString, FILE_WRITE);
+//    if (!dataFile){
+//      Serial.println("error opening dataFile"); 
+//      while(1);
+//    }
+//    if (dataFile) {
+//      dataFile.println(dataString);
+//      dataFile.close();
+//    }
+        
+    delay(1000);
+  }
+}
+
+void rwaMagInterference(){
   Serial.println("zeroing reaction wheel");
   rw1.reqClcMode = 0;   // sets CLC to low current limit
   commandAll(7);
@@ -141,82 +220,6 @@ void setup (void) {
   delay(10000);
 
   Serial.println("test end");
-
-//  rwaSysID(&rw1);
-}
-
-void loop(void) {  
-//  commandAll(10);
-   
-//  Serial.println(rw1.currSpeed);
-  
-  delay(3000);
-}
-
-
-void rwaSysID(struct rw_data *rwX_pt){
-  debug_mode = 0;
-
-//  /* writing header */
-//  String fileString = dateString + ".CSV";
-//  String headerString = "entry, time_ms, currSpeed_01rpm, refSpeed_01rpm, busVoltage_V, current_mA, power_mW";
-//  dataFile = SD.open(fileString, FILE_WRITE);  
-//  if (!dataFile){
-//    Serial.println("error opening dataFile"); 
-//    while(1);
-//  }
-//  if (dataFile) {
-//    dataFile.println(headerString);
-//    dataFile.close();
-//  }
-
-  /* prepping test */
-  Serial.println("zeroing reaction wheel");
-  rw1.reqSpeed = 0;     // sets RPM to 0
-  rw1.rampTime = 10;
-  commandAll(6);
-
-  rw1.reqClcMode = 0;   // sets CLC to low current limit
-  commandAll(7);
-
-  float busVoltage_V = 0;
-  float current_mA = 0;
-  float power_mW = 0;
-
-  delay(10000);
-  Serial.println("starting system identification");
-
-  delay(1000);
-
-  /* starting test */
-  rw1.reqSpeed = 10000;
-  rw1.rampTime = 10;
-
-  time_0 = millis();
-  commandAll(6);
-
-  for (int ii=0;ii<100;ii++){
-    commandAll(4);
-
-//    busVoltage_V = ina219.getBusVoltage_V();
-//    current_mA = ina219.getCurrent_mA();
-//    power_mW = ina219.getPower_mW();
-
-//    /* data recording */
-//    String dataString = String(ii) + "," + String(rwX_pt->time_N) + "," + String(rwX_pt->currSpeed) + "," + String(rwX_pt->refSpeed)
-//                        + "," + String(busVoltage_V) + "," + String(current_mA) + "," + String(power_mW);
-//    dataFile = SD.open(fileString, FILE_WRITE);
-//    if (!dataFile){
-//      Serial.println("error opening dataFile"); 
-//      while(1);
-//    }
-//    if (dataFile) {
-//      dataFile.println(dataString);
-//      dataFile.close();
-//    }
-        
-    delay(1000);
-  }
 }
 
 
