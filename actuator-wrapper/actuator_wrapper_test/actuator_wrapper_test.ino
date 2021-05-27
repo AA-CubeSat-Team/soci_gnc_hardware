@@ -64,24 +64,91 @@ void setup (void) {
   rw1.reqClcMode = 0;   // sets CLC to low current limit
   commandAll(7);
   
-  rw1.reqSpeed = 0;     // sets RPM to 0
+  rw1.reqSpeed = 0;
   rw1.rampTime = 10;
   commandAll(6);
 
   delay(10000);
-  Serial.println("max speed set");
-
-  rw1.reqSpeed = 0;     // sets RPM to 1000
+  
+  Serial.println("-6500");
+  rw1.reqSpeed = -65000;
   rw1.rampTime = 10;
   commandAll(6);
+
+  delay(10000);
+
+  Serial.println("-4500");
+  rw1.reqSpeed = -45000;
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+
+  Serial.println("-2500");
+  rw1.reqSpeed = -25000;
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+
+  Serial.println("-1000");
+  rw1.reqSpeed = -10000;
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+
+  Serial.println("-500");
+  rw1.reqSpeed = -5000;
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+
+  Serial.println("500");
+  rw1.reqSpeed = 5000;
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+
+  Serial.println("1000");
+  rw1.reqSpeed = 10000;
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+
+  Serial.println("2500");
+  rw1.reqSpeed = 25000;
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+
+  Serial.println("4500");
+  rw1.reqSpeed = 45000;
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+
+  Serial.println("6500");
+  rw1.reqSpeed = 65000;
+  rw1.rampTime = 10;
+  commandAll(6);
+
+  delay(10000);
+
+  Serial.println("test end");
 
 //  rwaSysID(&rw1);
 }
 
 void loop(void) {  
-   commandAll(4);
+//  commandAll(10);
    
-  Serial.println(rw1.currSpeed);
+//  Serial.println(rw1.currSpeed);
   
   delay(3000);
 }
