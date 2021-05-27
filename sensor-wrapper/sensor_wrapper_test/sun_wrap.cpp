@@ -4,15 +4,13 @@
 // sun sensor struct
 sun_t Sun1;
 
-int recv_buffer[20];
+uint8_t recv_buffer[20];
 
 /* converts the response bytes into floats, but saves them as doubles */
 /* since the data is stored as a double */
 /* takes a pointer to the data that will be written over (e.g. angles) */
 /* and the number of floats to read */
 void readFloats(double* data, int floatsToRead){
-
-  
 //   /* read in floatsToRead num of "floats" */
 //   for (int x = 0; x < floatsToRead; x++){
 //      /* initialize some variables that will be used to calculate the value of a "float" later */
@@ -44,8 +42,8 @@ void readFloats(double* data, int floatsToRead){
 
    // new section
    for (int x = 0; x < floatsToRead; x++){
-      int bytes[4] = {recv_buffer[4*x+3], recv_buffer[4*x+4], recv_buffer[4*x+5], recv_buffer[4*x+6]};
-      memcpy(&data[0]+x, &bytes[0], sizeof(double));
+      uint8_t bytes[4] = {recv_buffer[4*x+3], recv_buffer[4*x+4], recv_buffer[4*x+5], recv_buffer[4*x+6]};
+      memcpy((data + x), &bytes, sizeof(float));
    }
 
       
@@ -90,15 +88,40 @@ void readFloats(double* data, int floatsToRead){
 /* it needs the pointer to the unfiltered cell voltages */
 void getUnfiltVolts(sun_t * Sun){
    /* issue command to sun sensor */
-   for(int i = 0; i < 4; i++){
-     Serial1.write(unFiltVoltsComm[i]);
-   }
-   /* wait until response can be sent */
-   delay(3);
-   /* read in response to receiver buffer - takes the entire length of the receive buffer */
-   for(int i = 0; i < voltRespLength; i++){
-      recv_buffer[i] = Serial1.read();
-   }
+   #if ARDUINO_CODE
+      for(int i = 0; i < 4; i++){
+         Serial1.write(unFiltVoltsComm[i]);
+      }
+      /* wait until response can be sent */
+      delay(3);
+   #else
+      error = LPUART_RTOS_Send(&uart3_handle, &unfiltVoltsComm, sizeof(unfiltVoltsComm));
+      /* if there was an error with RTOS functions, assign an error code */
+      if(error != kStatus_Success){
+        *(Sun->unFiltVolts) = -2000.0;
+        *(Sun->unFiltVolts + 1) = -2000.0;
+        *(Sun->unFiltVolts + 2) = -2000.0;
+        *(Sun->unFiltVolts + 3) = -2000.0
+         return;
+      }
+      vTaskDelay(xDelay3ms);
+   #endif
+   /* read in response to receiver buffer */
+   #if ARDUINO_CODE
+      for(int i = 0; i < voltRespLength; i++){
+         recv_buffer[i] = Serial1.read();
+      }
+   #else
+      size_t numRecvBytes = 0;
+      error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, sizeof(recv_buffer), &numRecvBytes);
+      if(error != kStatus_Success){
+         *(Sun->unFiltVolts) = -2000.0;
+         *(Sun->unFiltVolts + 1) = -2000.0;
+         *(Sun->unFiltVolts + 2) = -2000.0;
+         *(Sun->unFiltVolts + 3) = -2000.0
+         return;
+      }
+   #endif
    /* check that the command byte (the 2nd byte) sent corresponds to the command byte received */
    if(unFiltVoltsComm[1] == recv_buffer[1]){
       /* if it's correct, call readFloats and read in 4 floats */
@@ -116,16 +139,40 @@ void getUnfiltVolts(sun_t * Sun){
 
 /* similar to getUnfiltVolts() */
 void getFiltVolts(sun_t * Sun){
-   /* issue command to sun sensor */
-   for(int i = 0; i < 4; i++){
-     Serial1.write(filtVoltsComm[i]);
-   }
-   /* wait until response can be sent */
-   delay(3);
-   /* read in response to receiver buffer - takes the entire length of the receive buffer */
-   for(int i = 0; i < voltRespLength; i++){
-      recv_buffer[i] = Serial1.read();
-   }
+   /* issue command */
+   #if ARDUINO_CODE
+      for(int i = 0; i < 4; i++){
+         Serial1.write(filtVoltsComm[i]);
+      }
+      delay(3);
+   #else
+      error = LPUART_RTOS_Send(&uart3_handle, &filtVoltsComm, sizeof(filtVoltsComm));
+      if(error != kStatus_Success){
+         *(Sun->filtVolts) = -2000.0;
+         *(Sun->filtVolts + 1) = -2000.0;
+         *(Sun->filtVolts + 2) = -2000.0;
+         *(Sun->filtVolts + 3) = -2000.0
+         return;
+      }
+      vTaskDelay(xDelay3ms);
+   #endif
+   /* read response */
+   #if ARDUINO_CODE
+      for(int i = 0; i < voltRespLength; i++){
+         recv_buffer[i] = Serial1.read();
+      }
+   #else
+      size_t numRecvBytes = 0;
+      error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, sizeof(recv_buffer), &numRecvBytes);
+      if(error != kStatus_Success){
+         *(Sun->filtVolts) = -2000.0;
+         *(Sun->filtVolts + 1) = -2000.0;
+         *(Sun->filtVolts + 2) = -2000.0;
+         *(Sun->filtVolts + 3) = -2000.0
+         return;
+      }
+   #endif
+   /* check response */
    if(filtVoltsComm[1] == recv_buffer[1]){
       readFloats(Sun->filtVolts, 4);
    }else{
@@ -140,15 +187,40 @@ void getFiltVolts(sun_t * Sun){
 
 /* similar to getUnfiltVolts() */
 void getSunAngles(sun_t * Sun){
-   for(int i = 0; i < 4; i++){
-     Serial1.write(anglesComm[i]);
-   }
-   /* wait until response can be sent */
-   delay(50);
-   /* read in response to receiver buffer - takes the entire length of the receive buffer */
-   for(int i = 0; i < angleRespLength; i++){
-      recv_buffer[i] = Serial1.read();
-   }
+   /* issue command */
+   #if ARDUINO_CODE
+      for(int i = 0; i < 4; i++){
+         Serial1.write(anglesComm[i]);
+      }
+      delay(7);
+   #else
+      error = LPUART_RTOS_Send(&uart3_handle, &anglesComm, sizeof(anglesComm));
+      if(error != kStatus_Success){
+         *(Sun->angles) = -2000.0;
+         *(Sun->angles + 1) = -2000.0;
+         *(Sun->angles + 2) = -2000.0;
+         *(Sun->angles + 3) = -2000.0
+         return;
+      }
+      vTaskDelay(xDelay7ms);
+   #endif
+   /* read response */
+   #if ARDUINO_CODE
+      for(int i = 0; i < angleRespLength; i++){
+         recv_buffer[i] = Serial1.read();
+      }
+   #else
+      size_t numRecvBytes = 0;
+      error = LPUART_RTOS_Receive(&uart3_handle, &recv_buffer, angleRespLength, &numRecvBytes);
+      if(error != kStatus_Success){
+         *(Sun->angles) = -2000.0;
+         *(Sun->angles + 1) = -2000.0;
+         *(Sun->angles + 2) = -2000.0;
+         *(Sun->angles + 3) = -2000.0
+         return;
+      }
+   #endif
+   /* check response */
    if(anglesComm[1] == recv_buffer[1]){
       readFloats(Sun->angles, 3);
    }else{
@@ -160,3 +232,14 @@ void getSunAngles(sun_t * Sun){
    }
    return;
 }
+
+/* only useful for freeRTOS code */
+void sunSenUARTInit(){
+   #if ARDUINO_CODE
+      /* do nothing */
+   #else
+      /* initialize LPUART instance */
+      LPUART3_init();
+   return;
+}
+
