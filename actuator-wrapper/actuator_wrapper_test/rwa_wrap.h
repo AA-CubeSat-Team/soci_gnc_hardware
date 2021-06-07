@@ -57,8 +57,7 @@ const uint16_t crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x
                             0x6e17, 0x7E36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
                            };
 
-struct rw_data
-{
+struct rw_data{
     int16_t time_N;
     uint8_t result;
     uint16_t rampTime;
@@ -116,4 +115,4 @@ void reqPayloadWrite_cmd7(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, 
 void rplPayloadRead_cmd7(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, struct rw_data *rwX_pt);
 void reqPayloadWrite_cmd10(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, struct rw_data *rwX_pt);
 void rplPayloadRead_cmd10(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, struct rw_data *rwX_pt);
-void commandAll(uint8_t com_id);
+void commandRWA(uint8_t com_id);

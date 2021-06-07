@@ -353,7 +353,7 @@ void rplPayloadReadSwitcher(uint8_t com_id, uint8_t *rpl_payload_pt, uint8_t *rp
 }
 
 
-void commandAll(uint8_t com_id){
+void commandRWA(uint8_t com_id){
   uint8_t req_payload_rw1[MAX_REQ_PAYLOAD] = {0};
   uint8_t req_payload_len_rw1 = MAX_REQ_PAYLOAD;
   uint8_t req_packet_rw1[MAX_REQ_PACKET] = {0};

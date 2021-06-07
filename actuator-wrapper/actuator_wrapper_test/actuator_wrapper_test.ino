@@ -65,7 +65,7 @@ void setup (void) {
 }
 
 void loop(void) {  
-//  commandAll(10);
+//  commandRWA(10);
    
 //  Serial.println(rw1.currSpeed);
   
@@ -93,10 +93,10 @@ void rwaSysID(struct rw_data *rwX_pt){
   Serial.println("zeroing reaction wheel");
   rw1.reqSpeed = 0;     // sets RPM to 0
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   rw1.reqClcMode = 0;   // sets CLC to low current limit
-  commandAll(7);
+  commandRWA(7);
 
   float busVoltage_V = 0;
   float current_mA = 0;
@@ -112,10 +112,10 @@ void rwaSysID(struct rw_data *rwX_pt){
   rw1.rampTime = 10;
 
   time_0 = millis();
-  commandAll(6);
+  commandRWA(6);
 
   for (int ii=0;ii<100;ii++){
-    commandAll(4);
+    commandRWA(4);
 
 //    busVoltage_V = ina219.getBusVoltage_V();
 //    current_mA = ina219.getCurrent_mA();
@@ -141,81 +141,81 @@ void rwaSysID(struct rw_data *rwX_pt){
 void rwaMagInterference(){
   Serial.println("zeroing reaction wheel");
   rw1.reqClcMode = 0;   // sets CLC to low current limit
-  commandAll(7);
+  commandRWA(7);
   
   rw1.reqSpeed = 0;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
   
   Serial.println("-6500");
   rw1.reqSpeed = -65000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
   Serial.println("-4500");
   rw1.reqSpeed = -45000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
   Serial.println("-2500");
   rw1.reqSpeed = -25000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
   Serial.println("-1000");
   rw1.reqSpeed = -10000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
   Serial.println("-500");
   rw1.reqSpeed = -5000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
   Serial.println("500");
   rw1.reqSpeed = 5000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
   Serial.println("1000");
   rw1.reqSpeed = 10000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
   Serial.println("2500");
   rw1.reqSpeed = 25000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
   Serial.println("4500");
   rw1.reqSpeed = 45000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
   Serial.println("6500");
   rw1.reqSpeed = 65000;
   rw1.rampTime = 10;
-  commandAll(6);
+  commandRWA(6);
 
   delay(10000);
 
@@ -223,7 +223,7 @@ void rwaMagInterference(){
 }
 
 
-void rwaArduinoBoot(){
+void rwaArduinoBoot(){ // (Arduino only)
   // pulls SS1,SS2,SS3,SS4 HIGH
   SPI.begin();
   pinMode(SS1, OUTPUT);
