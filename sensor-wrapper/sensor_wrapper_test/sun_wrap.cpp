@@ -8,9 +8,9 @@ uint8_t recv_buffer[20];
 
 /* converts the response bytes into floats, but saves them as doubles */
 /* since the data is stored as a double */
-/* takes a pointer to the data that will be written over (e.g. angles) */
-/* and the number of floats to read */
-void readFloats(double* data, int floatsToRead){
+/* takes a pointer to the data that will be written over (e.g. angles), */
+/* a pointer to the error, a pointer to isValid, and the number of floats to read */
+void readFloats(double* data, uint8_t* error, uint8_t* isValid, int floatsToRead){
 //   /* read in floatsToRead num of "floats" */
 //   for (int x = 0; x < floatsToRead; x++){
 //      /* initialize some variables that will be used to calculate the value of a "float" later */
@@ -68,18 +68,25 @@ void readFloats(double* data, int floatsToRead){
       *(data + 1) = -1000.0;
       *(data + 2) = -1000.0;
       *(data + 3) = -1000.0;
+      *isValid = 0;
+      *error = 14;
       return;
    }else if(totSum != (int)recv_buffer[voltRespLength - 1] && floatsToRead == 4){
       *data = -1000.0;
       *(data + 1) = -1000.0;
       *(data + 2) = -1000.0;
       *(data + 3) = -1000.0;
+      *isValid = 0;
+      *error = 14;
       return;
    }
    /* lastly, if we're getting values for angles (floatsToRead is 3) then the 4th read value needs to be the error (2nd to last) byte */
    if (floatsToRead == 3){
-      *(data + 3) = (double)recv_buffer[angleRespLength - 2];
+      *error = (double)recv_buffer[angleRespLength - 2];
    }
+   /* if we've reached this point, there are no errors, so the data is valid and there is no error */
+   *error = 0;
+   *isValid = 1;
    return;
 }
 
@@ -96,12 +103,14 @@ void getUnfiltVolts(sun_t * Sun){
       delay(3);
    #else
       error = LPUART_RTOS_Send(&uart3_handle, &unfiltVoltsComm, sizeof(unfiltVoltsComm));
-      /* if there was an error with RTOS functions, assign an error code */
+      /* if there was an error with RTOS functions, assign bogus values, label error, and label data invalid*/
       if(error != kStatus_Success){
         *(Sun->unFiltVolts) = -2000.0;
         *(Sun->unFiltVolts + 1) = -2000.0;
         *(Sun->unFiltVolts + 2) = -2000.0;
-        *(Sun->unFiltVolts + 3) = -2000.0
+        *(Sun->unFiltVolts + 3) = -2000.0;
+        *(Sun->error) = 16;
+        *(Sun->isValid) = 0;
          return;
       }
       vTaskDelay(xDelay3ms);
@@ -118,20 +127,24 @@ void getUnfiltVolts(sun_t * Sun){
          *(Sun->unFiltVolts) = -2000.0;
          *(Sun->unFiltVolts + 1) = -2000.0;
          *(Sun->unFiltVolts + 2) = -2000.0;
-         *(Sun->unFiltVolts + 3) = -2000.0
+         *(Sun->unFiltVolts + 3) = -2000.0;
+         *(Sun->error) = 16;
+         *(Sun->isValid) = 0;
          return;
       }
    #endif
    /* check that the command byte (the 2nd byte) sent corresponds to the command byte received */
    if(unFiltVoltsComm[1] == recv_buffer[1]){
       /* if it's correct, call readFloats and read in 4 floats */
-      readFloats(Sun->unFiltVolts, 4);
+      readFloats(Sun->unFiltVolts, Sun->error, Sun->isValid, 4);
    }else{
-      /* if it's incorrect, assign an error value */
+      /* if it's incorrect, assign bogus values, identify error, and label data invalid */
       *(Sun->unFiltVolts) = -1000.0;
       *(Sun->unFiltVolts + 1) = -1000.0;
       *(Sun->unFiltVolts + 2) = -1000.0;
       *(Sun->unFiltVolts + 3) = -1000.0;
+      *(Sun->error) = 15;
+      *(Sun->isValid) = 0;
       return;
    }
    return;
@@ -152,6 +165,8 @@ void getFiltVolts(sun_t * Sun){
          *(Sun->filtVolts + 1) = -2000.0;
          *(Sun->filtVolts + 2) = -2000.0;
          *(Sun->filtVolts + 3) = -2000.0
+         *(Sun->error) = 16;
+         *(Sun->isValid) = 0;
          return;
       }
       vTaskDelay(xDelay3ms);
@@ -169,17 +184,21 @@ void getFiltVolts(sun_t * Sun){
          *(Sun->filtVolts + 1) = -2000.0;
          *(Sun->filtVolts + 2) = -2000.0;
          *(Sun->filtVolts + 3) = -2000.0
+         *(Sun->error) = 16;
+         *(Sun->isValid) = 0;
          return;
       }
    #endif
    /* check response */
    if(filtVoltsComm[1] == recv_buffer[1]){
-      readFloats(Sun->filtVolts, 4);
+      readFloats(Sun->filtVolts, Sun->error, Sun->isValid, 4);
    }else{
       *(Sun->filtVolts) = -1000.0;
       *(Sun->filtVolts + 1) = -1000.0;
       *(Sun->filtVolts + 2) = -1000.0;
       *(Sun->filtVolts + 3) = -1000.0;
+      *(Sun->error) = 15;
+      *(Sun->isValid) = 0;
       return;
    }
    return;
@@ -200,6 +219,8 @@ void getSunAngles(sun_t * Sun){
          *(Sun->angles + 1) = -2000.0;
          *(Sun->angles + 2) = -2000.0;
          *(Sun->angles + 3) = -2000.0
+         *(Sun->error) = 16;
+         *(Sun->isValid) = 0;
          return;
       }
       vTaskDelay(xDelay7ms);
@@ -217,29 +238,22 @@ void getSunAngles(sun_t * Sun){
          *(Sun->angles + 1) = -2000.0;
          *(Sun->angles + 2) = -2000.0;
          *(Sun->angles + 3) = -2000.0
+         *(Sun->error) = 16;
+         *(Sun->isValid) = 0;
          return;
       }
    #endif
    /* check response */
    if(anglesComm[1] == recv_buffer[1]){
-      readFloats(Sun->angles, 3);
+      readFloats(Sun->angles, Sun->error, Sun->isValid, 3);
    }else{
       *(Sun->angles) = -1000.0;
       *(Sun->angles + 1) = -1000.0;
       *(Sun->angles + 2) = -1000.0;
       *(Sun->angles + 3) = -1000.0;
+      *(Sun->error) = 15;
+      *(Sun->isValid) = 0;
       return;
    }
    return;
 }
-
-/* only useful for freeRTOS code */
-void sunSenUARTInit(){
-   #if ARDUINO_CODE
-      /* do nothing */
-   #else
-      /* initialize LPUART instance */
-      LPUART3_init();
-   return;
-}
-

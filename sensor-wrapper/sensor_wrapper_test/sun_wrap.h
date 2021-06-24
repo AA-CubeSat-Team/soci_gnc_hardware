@@ -35,15 +35,26 @@ extern uint8_t recv_buffer[20];
  */
 typedef struct _Sun
 {
-  double angles[4];           /* measured alpha and beta angles*/
+  double angles[3];           /* measured alpha and beta angles and sun detection */
   double unFiltVolts[4];      /* measured unfiltered voltages*/
   double filtVolts[4];        /* measured filtered voltages*/
+  uint8_t error;              /* used to identify errors - see list below */
+  uint8_t isValid;            /* used to identify if data is usable - 0 is unusable, 1 is usable */
 } sun_t;
+
+/* error list */
+/* 0 - nominal */
+/* 10 - not enough radiation detected */
+/* 11 - albedo */
+/* 12 - albedo + sun */
+/* 13 - detected light source but out of FoV */
+/* 14 - incorrect checksum */
+/* 15 - incorrect command byte response */
+/* 16 - UART communications failure */
 
 extern sun_t Sun1;                /* sun sensor 1*/
 
-void readFloats(double* data, int floatsToRead);
+void readFloats(double* data, unint8_t* error, uint8_t* isValid, int floatsToRead);
 void getSunAngles(sun_t * Sun);
 void getFiltVolts(sun_t * Sun);
 void getUnfiltVolts(sun_t * Sun);
-void sunSenUARTInit();
