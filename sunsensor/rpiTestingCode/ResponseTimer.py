@@ -49,18 +49,19 @@ def timer(comm, numReads):
                 #do nothing while waiting, make sure that the sun sensor isn't taking too long to respond though
                 #these times are on the order of 1/100th a second at most, an entire second would be absurd
                 if time.time()- startTime > 1:
-                    #inform user and end the reading early
+                    #inform user and end the waiting early
                     print("Timeout error. Ending reading.")
                     timeout = True
                     break
-            #if timed out, break this loop too
-            if timeout:
-                break
-            #if the code has reached this point, there is at least a byte in waiting, so record how long
-            #it's been since the command was issued, then flush the buffer because we don't actually need to read the bytes
+            #see how long it's taken to get to this point
             responseTime = time.time()-startTime
-            writer.writerow([responseTime])
+            #if it didn't time out, write the time it took to respond
+            if timeout == False:
+                writer.writerow([responseTime])
+            #then reset the input buffer since we're not actually using it for anything
             ser.reset_input_buffer()
+            #then wait a little bit
+            time.sleep(0.05)
         print("Reading done")
 
 time.sleep(1)
