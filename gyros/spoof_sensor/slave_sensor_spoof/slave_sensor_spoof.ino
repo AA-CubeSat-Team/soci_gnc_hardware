@@ -32,7 +32,7 @@ void setup()
 
 void loop() {
   serialRecieve(gyroDoubleData, n);
-  double2GyroFromat(gyroDoubleData, gyroByteData, n);
+  double2GyroFormat(gyroDoubleData, gyroByteData, n);
 }
 
 void receiveEventOBC(int numByte) //recieve from OBC
@@ -99,7 +99,7 @@ void serialRecieve(DOUBLE * doubleBuffer, int n)
   Serial.write((char*)doubleBuffer,n*sizeof(DOUBLE));
 }
 
-void double2GyroFromat(DOUBLE * gyroDoubleData, uint8_t * gyroByteData, int n)
+void double2GyroFormat(DOUBLE * gyroDoubleData, uint8_t * gyroByteData, int n)
 {
   int16_t gyroIntData;
   for (int ii = 0; ii < n; ii++) {
