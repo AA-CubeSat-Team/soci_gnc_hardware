@@ -55,7 +55,7 @@ void readRegsGyro(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
  * @return void
  *
  */
-void writeReg(uint8_t reg, uint8_t value, gyro_t * Gyro)
+void writeRegGyroGyro(uint8_t reg, uint8_t value, gyro_t * Gyro)
 {
 #if ARDUINO_CODE
   Wire.beginTransmission(GYRO_ADDRESS);
@@ -158,8 +158,8 @@ void initGyro(gyro_t * Gyro, lpi2c_rtos_handle_t *gyroHandle)
 void startGyro(gyro_t * Gyro)
 {
   if (Gyro->gyroInitialized){
-  writeReg(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
-  writeReg(GYRO_CTRL_REG1, (GYRO_ODR_NUM<<2 | 0b10), Gyro);
+  writeRegGyro(GYRO_CTRL_REG0, GYRO_FSR_NUM, Gyro);
+  writeRegGyro(GYRO_CTRL_REG1, (GYRO_ODR_NUM<<2 | 0b10), Gyro);
   }
 }
 
@@ -238,7 +238,7 @@ void readGyroData(gyro_t * Gyro)
  *
  */
 void resetGyro(gyro_t * Gyro){
-  writeReg(GYRO_CTRL_REG1, 0b1000000, Gyro); // set reset bit to 1 to assert software reset to zero at end of boot process
+  writeRegGyro(GYRO_CTRL_REG1, 0b1000000, Gyro); // set reset bit to 1 to assert software reset to zero at end of boot process
 
   uint8_t flag;
   readRegsGyro(GYRO_INT_SRC_FLAG, &flag, 1, Gyro);

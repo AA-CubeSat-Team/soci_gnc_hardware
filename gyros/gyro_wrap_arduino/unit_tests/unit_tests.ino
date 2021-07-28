@@ -1,7 +1,7 @@
 #include "gyro_wrap.h"
 #include <Wire.h>
 
-#define TEST_READGYRODATA true
+#define TEST_READGYRODATA false
 #define TEST_READTEMPDATA false
 
 void setup() {
@@ -11,7 +11,7 @@ void setup() {
   Serial.println("********************");
   test_initGyro();
   test_readRegsGyro();
-  test_writeReg();
+  test_writeRegGyro();
   test_startGyro();
   test_restGyro();
   test_quickStartGyro();
@@ -61,13 +61,13 @@ void test_readRegsGyro() {
   Serial.println("********************");
 }
 
-void test_writeReg() {
-  Serial.println("Testing writeReg...");
+void test_writeRegGyro() {
+  Serial.println("Testing writeRegGyro...");
   uint8_t referenceValue = 2;
   Serial.print("Reference value: ");
   Serial.println(referenceValue);
   initGyro(&Gyro1);
-  writeReg(GYRO_CTRL_REG1, referenceValue, &Gyro1);
+  writeRegGyro(GYRO_CTRL_REG1, referenceValue, &Gyro1);
 
   uint8_t readValue;
   readRegsGyro(GYRO_CTRL_REG1, &readValue, 1, &Gyro1);

@@ -89,7 +89,7 @@ void readRegsGyro(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
  * @return void
  *
  */
-void writeReg(uint8_t reg, uint8_t value, gyro_t * Gyro);
+void writeRegGyro(uint8_t reg, uint8_t value, gyro_t * Gyro);
 
 
 #if ARDUINO_CODE

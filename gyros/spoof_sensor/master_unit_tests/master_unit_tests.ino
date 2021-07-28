@@ -12,7 +12,7 @@ void setup() {
     Serial.println("Tests begin");
     Serial.println("********************");
     test_initGyro();
-    test_readRegs();
+    test_readRegsGyro();
     test_writeReg();
     test_startGyro();
     test_restGyro();
@@ -62,13 +62,13 @@ void test_initGyro()
   Serial.println("********************");
 }
 
-void test_readRegs()
+void test_readRegsGyro()
 {
   Serial.println("Testing raedRegs...");
   uint8_t referenceRawData[6] = {0b00000001, 0b00000010, 0b00000011, 0b00000100, 0b00000101, 0b00000110};
   uint8_t readRawData[6];
   initGyro(&Gyro1);
-  readRegs(GYRO_OUT_X_MSB, &readRawData[0], 6, &Gyro1);
+  readRegsGyro(GYRO_OUT_X_MSB, &readRawData[0], 6, &Gyro1);
   
   Serial.println("Reference raw data  Read raw data Result");
   
@@ -93,10 +93,10 @@ void test_writeReg()
   Serial.print("Reference value: ");
   Serial.println(referenceValue);
   initGyro(&Gyro1);
-  writeReg(GYRO_CTRL_REG1, referenceValue, &Gyro1);
+  writeRegGyro(GYRO_CTRL_REG1, referenceValue, &Gyro1);
   
   uint8_t readValue;
-  readRegs(GYRO_CTRL_REG1, &readValue, 1, &Gyro1);
+  readRegsGyro(GYRO_CTRL_REG1, &readValue, 1, &Gyro1);
   Serial.print("Read value: ");
   Serial.println(readValue);
   if (readValue == referenceValue) {
@@ -119,7 +119,7 @@ void test_startGyro()
   startGyro(&Gyro1);
   
   uint8_t readCtrlReg0;
-  readRegs(GYRO_CTRL_REG0, &readCtrlReg0, 1, &Gyro1);
+  readRegsGyro(GYRO_CTRL_REG0, &readCtrlReg0, 1, &Gyro1);
   Serial.print("Read CTRL_REG0: ");
   Serial.println(readCtrlReg0, BIN);
   if (readCtrlReg0 == GYRO_FSR_NUM) {
@@ -128,7 +128,7 @@ void test_startGyro()
     Serial.println("Fail");
   }
   uint8_t readCtrlReg1;
-  readRegs(GYRO_CTRL_REG1, &readCtrlReg1, 1, &Gyro1);
+  readRegsGyro(GYRO_CTRL_REG1, &readCtrlReg1, 1, &Gyro1);
   Serial.print("Read CTRL_REG1: ");
   Serial.println(readCtrlReg1, BIN);
   if (readCtrlReg1 == (GYRO_ODR_NUM <<2)|0b10) {
@@ -151,7 +151,7 @@ void test_restGyro()
   uint8_t referenceRawData[6] = {0b00000001, 0b00000010, 0b00000011, 0b00000100, 0b00000101, 0b00000110};
   uint8_t readRawData[6];
   initGyro(&Gyro1);
-  readRegs(GYRO_OUT_X_MSB, &readRawData[0], 6, &Gyro1);
+  readRegsGyro(GYRO_OUT_X_MSB, &readRawData[0], 6, &Gyro1);
   
   Serial.println("Reference raw data  Read raw data Result");
   

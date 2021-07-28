@@ -7,6 +7,7 @@
 
 #define GYR_TEST	1
 #define OSC_TEST    0
+#define SPOOF		1
 
 #include "dummy_type.h"
 #include "wrappers/sensor_wrap/gyro_wrap.h"
