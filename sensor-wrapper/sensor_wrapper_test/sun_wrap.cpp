@@ -10,7 +10,7 @@ uint8_t recv_buffer[20];
 /* since the data is stored as a double */
 /* takes a pointer to the data that will be written over (e.g. angles) */
 /* and the number of floats to read */
-void readFloats(double* data, int floatsToRead){
+void readFloats(float* data, int floatsToRead){
 //   /* read in floatsToRead num of "floats" */
 //   for (int x = 0; x < floatsToRead; x++){
 //      /* initialize some variables that will be used to calculate the value of a "float" later */
@@ -43,10 +43,13 @@ void readFloats(double* data, int floatsToRead){
    // new section
    for (int x = 0; x < floatsToRead; x++){
       uint8_t bytes[4] = {recv_buffer[4*x+3], recv_buffer[4*x+4], recv_buffer[4*x+5], recv_buffer[4*x+6]};
-      memcpy((data + x), &bytes, sizeof(float));
+      memcpy((char*)(data + x), bytes, sizeof(float));
+//      Serial.print("byte data");
+//      Serial.println(*((float*) bytes));
+//      Serial.print("some data");
+//      Serial.println(*(data+x));
    }
-
-      
+   
    /* next, take the total sum of all the bytes except the address byte */
    int totSum = 0;
    /* need to sum from command (2nd) byte to last data byte (2nd to last of array) */
@@ -65,15 +68,15 @@ void readFloats(double* data, int floatsToRead){
    /* then compare it to the checkSum byte, which is the last byte */
    if(totSum != (int)recv_buffer[angleRespLength - 1] && floatsToRead == 3){
       *data = -1000.0;
-      *(data + 1) = -1000.0;
-      *(data + 2) = -1000.0;
-      *(data + 3) = -1000.0;
+      *(data + 1) = -2000.0;
+      *(data + 2) = -2000.0;
+      *(data + 3) = -2000.0;
       return;
    }else if(totSum != (int)recv_buffer[voltRespLength - 1] && floatsToRead == 4){
       *data = -1000.0;
-      *(data + 1) = -1000.0;
-      *(data + 2) = -1000.0;
-      *(data + 3) = -1000.0;
+      *(data + 1) = -2000.0;
+      *(data + 2) = -2000.0;
+      *(data + 3) = -2000.0;
       return;
    }
    /* lastly, if we're getting values for angles (floatsToRead is 3) then the 4th read value needs to be the error (2nd to last) byte */
@@ -220,8 +223,34 @@ void getSunAngles(sun_t * Sun){
          return;
       }
    #endif
+
    /* check response */
-   if(anglesComm[1] == recv_buffer[1]){
+//  Serial.print("Address ");
+//  Serial.print(recv_buffer[0]);
+//  Serial.print("  ");
+//
+//  Serial.print("Command ");
+//  Serial.print(recv_buffer[1]);
+//  Serial.print("  ");
+//
+//  Serial.print("Length ");
+//  Serial.print(recv_buffer[2]);
+//  Serial.print("  ");
+//  
+//  Serial.print("data1: ");
+//  Serial.print(*((float*)(recv_buffer+3)));
+//  Serial.print("  ");
+//  Serial.print("data2: ");
+//  Serial.print(*((float*)(recv_buffer+7)));
+//  Serial.print("  ");
+//  Serial.print("data3: ");
+//  Serial.print(*((float*)(recv_buffer+11))); 
+//  Serial.print("  ");
+//
+//  Serial.print("CheckSum ");
+//  Serial.print(recv_buffer[16]);
+//  Serial.println("  ");
+   if((char)anglesComm[1] == (char)recv_buffer[1]){
       readFloats(Sun->angles, 3);
    }else{
       *(Sun->angles) = -1000.0;
@@ -241,5 +270,5 @@ void sunSenUARTInit(){
       /* initialize LPUART instance */
       LPUART3_init();
    return;
+   #endif
 }
-

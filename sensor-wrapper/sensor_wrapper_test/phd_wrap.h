@@ -2,7 +2,7 @@
 #define PHD_WRAP_H_
   // photodiode wrapper
 
-#define ARDUINO_CODE  0
+#define ARDUINO_CODE  1
 
 #if ARDUINO_CODE
   #include <Arduino.h>

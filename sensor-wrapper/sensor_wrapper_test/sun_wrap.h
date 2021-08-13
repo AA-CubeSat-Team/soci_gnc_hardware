@@ -1,4 +1,4 @@
-#define ARDUINO_CODE 0
+#define ARDUINO_CODE 1
 /* #include <math.h> */
 #if ARDUINO_CODE
    #include <Arduino.h>
@@ -35,7 +35,7 @@ extern uint8_t recv_buffer[20];
  */
 typedef struct _Sun
 {
-  double angles[4];           /* measured alpha and beta angles*/
+  float angles[4];           /* measured alpha and beta angles*/
   double unFiltVolts[4];      /* measured unfiltered voltages*/
   double filtVolts[4];        /* measured filtered voltages*/
 } sun_t;

@@ -12,3 +12,9 @@ t_send_phd = 0.061;
 t_receive_phd = t_send_phd;
 magnitude_phd = 100;
 
+t_send_sun = 0.02;
+t_receive_sun = t_send_sun;
+magnitude_sun_angle = 60;
+magnitude_sun_detection = 50;
+bias_sun_detection = 50;
+
