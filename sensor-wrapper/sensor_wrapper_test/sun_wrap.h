@@ -9,8 +9,8 @@
    #include "fsl_lpuart_freertos.h"
    #include "task.h"
    /* delay times in ticks needed */
-   const TickType_t xDelay3ms = pdMS_TO_TICKS(3);
-   const TickType_t xDelay7ms = pdMS_TO_TICKS(7);
+   /* this is for the angles command */
+   const TickType_t xDelay7ms = pdMS_TO_TICKS(10);
    /* this is the minimum possible time between commands - the typical time is 50 ms, I might want to change this */
    const TickType_t xDelay20ms = pdMS_TO_TICKS(20);
 #endif
@@ -19,25 +19,21 @@ const int unFiltVoltsComm[4] = {0x60, 0x01, 0x01, 0x02};
 const int filtVoltsComm[4] = {0x60, 0x03, 0x01, 0x04};
 const int anglesComm[4] = {0x60, 0x04, 0x01, 0x05};
 
-/* lengths of voltage responses and angle response */
-const int voltRespLength = 20;
+/* number of bytes returned for angle command */
 const int angleRespLength = 17;
 
-/* make a receiver buffer, needs room for at most voltRespLength bytes*/
-/* c gets salty at me if I try to make it of length voltRespLength but */
-/* it gets even saltier if I try to replace voltRespLength as a #define */
-/* so I'm just putting it as 20 */
-extern uint8_t recv_buffer[20];
+/* make a receiver buffer, needs room for angleRespLength bytes*/
+/* c gets salty at me if I try to make it of length angleRespLength but */
+/* so I'm just putting it as 17 */
+extern uint8_t recv_buffer[17];
 
 /*!
- * @brief Structure contains information about one gyroscope
+ * @brief Structure contains information about sun sensor
  *
  */
 typedef struct _Sun
 {
   double angles[3];           /* measured alpha and beta angles and sun detection */
-  double unFiltVolts[4];      /* measured unfiltered voltages*/
-  double filtVolts[4];        /* measured filtered voltages*/
   uint8_t error;              /* used to identify errors - see list below */
   uint8_t isValid;            /* used to identify if data is usable - 0 is unusable, 1 is usable */
 } sun_t;
@@ -56,5 +52,3 @@ extern sun_t Sun1;                /* sun sensor 1*/
 
 void readFloats(double* data, unint8_t* error, uint8_t* isValid, int floatsToRead);
 void getSunAngles(sun_t * Sun);
-void getFiltVolts(sun_t * Sun);
-void getUnfiltVolts(sun_t * Sun);
