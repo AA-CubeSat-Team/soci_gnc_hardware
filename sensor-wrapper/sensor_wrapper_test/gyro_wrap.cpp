@@ -40,7 +40,7 @@ void readRegsGyro(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
       i++;
     }
 #else
-    I2C_request(Gyro->gyroHandle, GYRO_ADDRESS, reg, value, valueSize);
+    I2C_request_1(Gyro->gyroHandle, GYRO_ADDRESS, reg, value, valueSize);
 #endif
 }
 
@@ -55,7 +55,7 @@ void readRegsGyro(uint8_t reg, uint8_t *value, uint8_t valueSize, gyro_t * Gyro)
  * @return void
  *
  */
-void writeRegGyroGyro(uint8_t reg, uint8_t value, gyro_t * Gyro)
+void writeRegGyro(uint8_t reg, uint8_t value, gyro_t * Gyro)
 {
 #if ARDUINO_CODE
   Wire.beginTransmission(GYRO_ADDRESS);
@@ -63,7 +63,7 @@ void writeRegGyroGyro(uint8_t reg, uint8_t value, gyro_t * Gyro)
   Wire.write(value);
   Wire.endTransmission();
 #else
-  I2C_send(Gyro->gyroHandle, GYRO_ADDRESS, reg, &value, 1);
+  I2C_send_1(Gyro->gyroHandle, GYRO_ADDRESS, reg, &value, 1);
 #endif
 }
 

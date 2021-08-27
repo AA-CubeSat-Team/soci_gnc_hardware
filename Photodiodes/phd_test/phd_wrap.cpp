@@ -116,7 +116,6 @@ if((Phd->current[0] > MAX_CURRENT || Phd->current[1] > MAX_CURRENT ||
 }
 }
 
-
 // reads voltages from ADC
 void readPhdData(phd_t * Phd){
   uint8_t rawData8[2];

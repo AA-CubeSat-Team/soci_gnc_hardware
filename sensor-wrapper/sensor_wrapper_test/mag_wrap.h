@@ -9,7 +9,7 @@
 #ifndef mag_wrap_h
 #define mag_wrap_h
 
-#define ARDUINO_CODE            1
+#define ARDUINO_CODE            0
 #define MULTI_MAGS              1
 
 #if ARDUINO_CODE
