@@ -1,6 +1,17 @@
 
-#include <Arduino.h>
-#include <SPI.h>
+
+#define ARDUINO_CODE     1
+
+#if ARDUINO_CODE
+  #include <Arduino.h>
+  #include <SPI.h>
+#else
+  #include "fsl_lpspi.c"
+  #include "fsl_lpspi_freertos.h"
+  #include "peripherals.h"
+#endif
+
+
 
 // set timeout between request and reply (milliseconds)
 #define SPI_TIMEOUT 20
@@ -57,7 +68,8 @@ const uint16_t crc_table[] = {0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x
                             0x6e17, 0x7E36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
                            };
 
-struct rw_data{
+struct rw_data
+{
     int16_t time_N;
     uint8_t result;
     uint16_t rampTime;
@@ -73,6 +85,8 @@ struct rw_data{
     int32_t mcuTemp;
     float presSensTemp;
     float pressure;
+    
+  
 //    uint32_t numOfInvalidCrcPackets;
 //    uint32_t numOfInvalidLenPackets;
 //    uint32_t numOfInvalidCmdPackets; 
@@ -99,6 +113,15 @@ struct rw_data{
 extern struct rw_data rw1;
 //extern struct rw_data rw1, rw2, rw3, rw4;   saving SRAM
 
+struct handle 
+{
+    #if !ARDUINO_CODE
+    lpspi_rtos_handle_t * rwaHandle; //Add struct for SPI_rtos_handle 
+    #endif
+}handle_t;
+
+extern handle_t handle;
+
 // test only
 extern bool debug_mode;
 extern int16_t time_0;
@@ -115,4 +138,4 @@ void reqPayloadWrite_cmd7(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, 
 void rplPayloadRead_cmd7(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, struct rw_data *rwX_pt);
 void reqPayloadWrite_cmd10(uint8_t *req_payload_pt, uint8_t *req_payload_len_pt, struct rw_data *rwX_pt);
 void rplPayloadRead_cmd10(uint8_t *rpl_payload_pt, uint8_t *rpl_payload_len_pt, struct rw_data *rwX_pt);
-void commandRWA(uint8_t com_id);
+void commandAll(uint8_t com_id);

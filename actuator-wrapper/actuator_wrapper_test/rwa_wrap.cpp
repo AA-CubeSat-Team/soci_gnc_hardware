@@ -11,11 +11,19 @@
  /* notes:
   * tested SPI_TIMEOUT down to 1 ms on Arduino Uno with com_id 6
   */
+#include "rwa_wrap.h" 
+#if ARDUINO_CODE
+  #include <Arduino.h>
+#endif                     
 
-#include <Arduino.h>                     
-#include "rwa_wrap.h"  
 
-SPISettings spiSet(125000, MSBFIRST, SPI_MODE0); 
+void init_rwa(name of struct, lpspi_rtos_hande_t * rwaHandle){
+  #if !ARDUINO_CODE
+  rwa->rwaHandle = rwaHandle;
+  #endif 
+}
+
+SPISettings spiSet(125000, MSBFIRST, SPI_MODE0); // SPI driver is initialized 
 
 struct rw_data rw1;
 //struct rw_data rw1, rw2, rw3, rw4;    saving SRAM
@@ -106,10 +114,15 @@ void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *
     *(req_packet_pt+ii) = req_array_E[ii];
   }
   *req_packet_len_pt = req_len_E;
-}
+} 
 
+#if ARDUINO_CODE
+void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, uint8_t SS_id) 
+#else
+void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, handle_t * handle) 
+#endif 
 
-void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, uint8_t SS_id) { // --- --- --- --- --- --- --- --- ---
+{ // --- --- --- --- --- --- --- --- ---
   int ii;
   
   uint8_t spi_buffer[MAX_REQ_PACKET] = {0};
@@ -117,7 +130,25 @@ void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, uint8_t 
   for (ii = 0; ii < *req_packet_len_pt; ii++) {
     spi_buffer[ii] = *(req_packet_pt+ii);
   }
+
   
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//defining placeholder for buffer not in use during request 
+  int jj;
+  
+    uint8_t rxBuffer[placeholder] = {0};
+
+    jj = 0;
+    for (jj = 0; jj < placeholder; jj++) {
+      rxBuffer[jj] = 0x7A;
+    }
+
+// Arduino SPI driver format
+  #if ARDUINO_CODE
   SPI.beginTransaction(spiSet);
   digitalWrite(SS_id, LOW);
   SPI.transfer(spi_buffer, *req_packet_len_pt);
@@ -125,8 +156,30 @@ void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, uint8_t 
   SPI.endTransaction();
 }
 
+// DevBoard SPI driver format: SPI_transfer(uint8_t *txBuffer, uint8_t *rxBuffer, size_t transferSize, uint32_t pcsPin)
+  #else
+  SPI_transfer(uint8_t *req_packet_pt,uint8_t *rxBuffer, uint8_t *req_packet_len_pt, handle->rwaHandle)     // pcsPin for req_packet must be a struct defined in the .h file 
+  #endif
 
-void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t SS_id) { // --- --- --- --- --- --- --- --- ---
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+#if ARDUINO_CODE
+void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t SS_id) 
+#else
+void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, handle_t * handle) 
+#endif 
+
+{ // --- --- --- --- --- --- --- --- ---
   int ii;
   
   uint8_t spi_buffer[MAX_RPL_PACKET] = {0};
@@ -135,17 +188,53 @@ void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t 
   for (ii = 0; ii < MAX_RPL_PACKET; ii++) {
     spi_buffer[ii] = 0x7E;
   }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//defining placeholder for buffer not in use during reply
+  int jj;
   
+    uint8_t txBuffer[placeholder] = {0};
+
+    jj = 0;
+    for (jj = 0; jj < placeholder; jj++) {
+      txBuffer[jj] = 0x7B;
+    }
+
+//  Arduino SPI Driver format
+  #if ARDUINO_CODE
   SPI.beginTransaction(spiSet);
   digitalWrite(SS_id, LOW);
   SPI.transfer(spi_buffer, *rpl_packet_len_pt);
   digitalWrite(SS_id, HIGH);
   SPI.endTransaction();
 
+  #else
+  SPI_transfer(uint8_t *txBuffer, uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, handle->rwaHandle)  // pcsPin for rpl_packet must be a struct defined in the .h file 
+  #endif
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   for (ii = 0; ii < *rpl_packet_len_pt; ii++) {
     *(rpl_packet_pt+ii) = spi_buffer[ii];
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void rplPacketProcess(uint8_t *rpl_payload_pt, uint8_t *rpl_packet_pt, uint8_t *rpl_payload_len_pt, uint8_t *rpl_packet_len_pt) { //(NEEDS WORK) --- --- --- --- --- --- --- --- ---
@@ -353,7 +442,7 @@ void rplPayloadReadSwitcher(uint8_t com_id, uint8_t *rpl_payload_pt, uint8_t *rp
 }
 
 
-void commandRWA(uint8_t com_id){
+void commandAll(uint8_t com_id){
   uint8_t req_payload_rw1[MAX_REQ_PAYLOAD] = {0};
   uint8_t req_payload_len_rw1 = MAX_REQ_PAYLOAD;
   uint8_t req_packet_rw1[MAX_REQ_PACKET] = {0};
