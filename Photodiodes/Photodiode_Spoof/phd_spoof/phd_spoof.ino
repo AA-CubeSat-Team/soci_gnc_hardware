@@ -28,12 +28,14 @@ uint8_t start_value = 0;
 
 //uint16_t V_ref = 3.3;
 int n = 5;
-float phdFloatData[5];  // Array of spoof outputs
-uint8_t phdByteData[10];
+int bytesPerFloat = 4;
+//byte bytesRecieve[20] = {0xc1, 0xa1, 0xa3, 0xe8, 0xc2, 0xba, 0xa8, 0x24, 0xc2, 0xa1, 0x4a, 0xca, 0x41, 0x77, 0x46, 0x87, 0x42, 0xae, 0xa7, 0x0a};
+byte bytesRecieve[20] = {0x42, 0xb5, 0x27, 0x2b, 0x42, 0x66, 0x9a, 0xba, 0x42, 0xf0, 0x07, 0x2b, 0x41, 0x77, 0x46, 0x87, 0x42, 0xae, 0xa7, 0x0a};
+float phdFloatData[5] = {90, 110, 130, 150, 170};  // Array of spoof outputs
+byte phdByteData[10];
 
 uint8_t tempReg = 0; // variable holding the temporary requested register
 uint8_t tempValue = 0; // variable holding the temporary value
-
 
 void setup(){
   Serial.begin(115600);
@@ -43,14 +45,24 @@ void setup(){
   Wire.onRequest(requestEventOBC); // sets request event, calls function automatically when master requests data
 }
 
-          
 void loop(){
-  serialRecieve(phdFloatData, n);
+//  for (int ii = 0; ii < 5; ii++) {
+//    Serial.print(phdFloatData[ii]);
+//    Serial.print(" ");
+//  }
+//  Serial.println(" ");
+  
+  serialRecieve(bytesRecieve, n);
+  buffer2float(bytesRecieve, phdFloatData, n);
   double2PhdFormat(phdFloatData, phdByteData, n);
+  //delay(1000);
 }
 
 void receiveEventOBC (int numByte)
 {
+  //buffer2float(bytesRecieve, phdFloatData, n);
+  double2PhdFormat(phdFloatData, phdByteData, n);
+  
   if(numByte == 2) {
     tempReg = Wire.read();
     tempValue = Wire.read();
@@ -86,12 +98,16 @@ void receiveEventOBC (int numByte)
 
 
 void requestEventOBC(){
+//  Serial.println("request");
 // this function is used when the master uses Wire.requestFrom()
 // IFF the wrapper is requesting a value, must first check current register in reg variable, which corresponds to the last sent register
 // switch case takes the form:
   // evaluate register previously sent
     // write the value that corresponds to the register
       // else print "unknown register received" 
+      
+//buffer2float(bytesRecieve, phdFloatData, n);
+double2PhdFormat(phdFloatData, phdByteData, n);
 
 switch (tempReg){
   case ADVANCE_CONFIG_REG:
@@ -128,12 +144,27 @@ switch (tempReg){
   }
 }
 
-void serialRecieve(float * floatBuffer, int n)
+void serialRecieve(byte * Buffer, int n)
 {
-  while (Serial.available() < n*sizeof(float)){
+  while (Serial.available() < 20){
   }
-  Serial.readBytes((char*)floatBuffer,n*sizeof(float));
-  Serial.write((char*)floatBuffer,n*sizeof(float));
+  Serial.readBytesUntil(0x0A, (char*)Buffer, 20);
+  Serial.write((char*)Buffer, 20);
+  Serial.write(0x0A);
+}
+
+void buffer2float(byte * in_bytes, float * out_Floats, int n)
+{
+  for (int ii = 0; ii < n; ii++) {
+    union {
+      byte temp_bytes[4];
+      float temp_f;
+    } u;
+    for (int iii = 0; iii < 4; iii++) {
+      u.temp_bytes[3-iii] = in_bytes[iii+4*ii];
+    }
+    out_Floats[4-ii] = u.temp_f;
+  }
 }
 
 void double2PhdFormat(float * phdFloatData, uint8_t * phdByteData, int n)
