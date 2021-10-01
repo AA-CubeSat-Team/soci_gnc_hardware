@@ -4,7 +4,7 @@
 #define FXAS21002C_H_OUT_X_MSB        0x01
 #define FXAS21002C_H_CTRL_REG0        0x0D
 #define FXAS21002C_H_CTRL_REG1        0x13
-#define FXAS21002C_H_TEMP         0x12
+#define FXAS21002C_H_TEMP             0x12
 #define FXAS21002C_H_INT_SRC_FLAG     0x0B
 #define SENSITIVITY                   7.8125e-3
 #define ADDRESS                       (uint8_t) 0x20
@@ -15,11 +15,10 @@ uint8_t tempReg; // variable holding the temporary requested register
 uint8_t tempValue = 0; // variable holding the temporary value
 uint8_t ctrl_reg0 = 0b00000000;
 uint8_t ctrl_reg1 = 0b00000000;
+byte bytesRecieve[12] = {0xc1, 0xa1, 0xa3, 0xe8, 0xc2, 0xba, 0xa8, 0x24, 0xc2, 0xa1, 0x4a, 0xca};
 uint8_t gyroByteData[6] = {0b00000001, 0b00000010, 0b00000011, 0b00000100, 0b00000101, 0b00000110};
-DOUBLE gyroDoubleData[3];
+DOUBLE gyroDoubleData[3] = {.01, .0625, 81};
 int     n = 3;
-
-
 
 void setup()
 {
@@ -31,7 +30,8 @@ void setup()
 }
 
 void loop() {
-  serialRecieve(gyroDoubleData, n);
+  serialRecieve(bytesRecieve, n);
+  buffer2float(bytesRecieve, gyroDoubleData, n);
   double2GyroFormat(gyroDoubleData, gyroByteData, n);
 }
 
@@ -91,12 +91,28 @@ void resetGyro() {
   ctrl_reg1 = 0b00000000;
 }
 
-void serialRecieve(DOUBLE * doubleBuffer, int n)
+void serialRecieve(byte * Buffer, int n)
 {
   while (Serial.available() < n*sizeof(DOUBLE)){
   }
-  Serial.readBytes((char*)doubleBuffer,n*sizeof(DOUBLE));
-  Serial.write((char*)doubleBuffer,n*sizeof(DOUBLE));
+  Serial.readBytes((char*)Buffer, n*sizeof(DOUBLE));
+  Serial.write((char*)Buffer, n*sizeof(DOUBLE));
+  // delay(10);
+  // Serial.write(0x0A);
+}
+
+void buffer2float(byte * in_bytes, float * out_Floats, int n)
+{
+  for (int ii = 0; ii < n; ii++) {
+    union {
+      byte temp_bytes[4];
+      float temp_f;
+    } u;
+    for (int iii = 0; iii < 4; iii++) {
+      u.temp_bytes[3-iii] = in_bytes[iii+4*ii];
+    }
+    out_Floats[2-ii] = u.temp_f;
+  }
 }
 
 void double2GyroFormat(DOUBLE * gyroDoubleData, uint8_t * gyroByteData, int n)
@@ -104,6 +120,7 @@ void double2GyroFormat(DOUBLE * gyroDoubleData, uint8_t * gyroByteData, int n)
   int16_t gyroIntData;
   for (int ii = 0; ii < n; ii++) {
     gyroIntData = *(gyroDoubleData + ii)/SENSITIVITY;
+    // Serial.println(gyroIntData);
     *(gyroByteData + 2*ii) = (uint8_t)(gyroIntData>>8);
     *(gyroByteData + 2*ii + 1) = (uint8_t)((gyroIntData<<8)>>8);
   }
