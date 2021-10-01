@@ -13,10 +13,10 @@ extern TwoWire Wire1;
 #ifndef GAUSS_TO_MICROTESLA
   #define GAUSS_TO_MICROTESLA 100
 #endif
-int gauss_LSB[3] = {1100, 1100, 980};
+int gauss_LSB[3] = {1100, 980, 1100};
 // Address
 #define LSM303_ADDRESS_MAG                        (0x3C>>1)
-
+#define DOUBLE                        float
 
 uint8_t tempReg; // variable holding the temporary requested register
 uint8_t tempValue = 0; // variable holding the temporary value
@@ -24,8 +24,9 @@ uint8_t cra_reg_m = 0b00010000;
 uint8_t crb_reg_m = 0b0010000;
 uint8_t mr_reg_m = 0b00000011;
 uint8_t sr_reg_mg = 0b00000000;
+byte bytesRecieve[12] = {0xc1, 0xa1, 0xa3, 0xe8, 0xc2, 0xba, 0xa8, 0x24, 0xc2, 0xa1, 0x4a, 0xca};
 uint8_t magByteData[6] = {0b00000001, 0b00000010, 0b00000011, 0b00000101, 0b00000110, 0b00000111};
-double magDoubleData[3];
+DOUBLE magDoubleData[3] = {13, 44, 27};
 int n=3;
 
 void setup()
@@ -39,15 +40,21 @@ void setup()
 
 void loop()
 {
-  serialRecieve(magDoubleData, n);
+  serialRecieve(bytesRecieve, n);
+  buffer2float(bytesRecieve, magDoubleData, n);
   double2MagFormat(magDoubleData, magByteData, n);
 }
 
 void receiveEventOBC(int numByte) //recieve from OBC
 {  
+//  Serial.println("recieve");
+  double2MagFormat(magDoubleData, magByteData, n);
+  
   if(numByte > 1) {
     tempReg = Wire.read();
     tempValue = Wire.read();
+
+//    Serial.println(tempReg, HEX);
     switch (tempReg) {
       case LSM303_REGISTER_MAG_CRA_REG_M:
         cra_reg_m = tempValue;
@@ -64,8 +71,11 @@ void receiveEventOBC(int numByte) //recieve from OBC
   }
 }
 
-
 void requestEventOBC() {  // request event sent from OBC 
+//  Serial.println("request");
+  double2MagFormat(magDoubleData, magByteData, n);
+
+//  Serial.println(tempReg, HEX);
   switch (tempReg) {
     case LSM303_REGISTER_MAG_CRA_REG_M:
       Wire.write(cra_reg_m);
@@ -75,6 +85,10 @@ void requestEventOBC() {  // request event sent from OBC
       break;
     case LSM303_REGISTER_MAG_OUT_X_H_M:
       Wire.write(magByteData, 6);
+//      for (int i = 0; i < 6; i++) {
+//        Serial.print(magByteData[i], HEX);
+//      }
+//      Serial.println(" ");
       break;
     case LSM303_REGISTER_MAG_SR_REG_Mg:
       Wire.write(sr_reg_mg);
@@ -82,19 +96,31 @@ void requestEventOBC() {  // request event sent from OBC
   } 
 }
 
-  
-void serialRecieve(double * doubleBuffer, int n)
+void serialRecieve(byte * Buffer, int n)
 {
-  while (Serial.available() < n*sizeof(double)){
+  while (Serial.available() < n*sizeof(DOUBLE)){
   }
-  uint8_t doubleConvertor[sizeof(double)];
+  Serial.readBytes((char*)Buffer, n*sizeof(DOUBLE));
+  Serial.write((char*)Buffer, n*sizeof(DOUBLE));
+  // delay(10);
+  // Serial.write(0x0A);
+}
+  
+void buffer2float(byte * in_bytes, float * out_Floats, int n)
+{
   for (int ii = 0; ii < n; ii++) {
-    Serial.readBytes(doubleConvertor,sizeof(doubleConvertor));
-    memcpy(doubleBuffer + ii, doubleConvertor, sizeof(double));
+    union {
+      byte temp_bytes[4];
+      float temp_f;
+    } u;
+    for (int iii = 0; iii < 4; iii++) {
+      u.temp_bytes[3-iii] = in_bytes[iii+4*ii];
+    }
+    out_Floats[2-ii] = u.temp_f;
   }
 }
 
-void double2MagFormat(double * magDoubleData, uint8_t * magByteData, int n)
+void double2MagFormat(float * magDoubleData, uint8_t * magByteData, int n)
 {
   int16_t magIntData;
   for (int ii = 0; ii < n; ii++) {
