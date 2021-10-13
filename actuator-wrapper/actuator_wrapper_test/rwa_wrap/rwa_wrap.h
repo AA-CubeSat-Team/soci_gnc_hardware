@@ -1,3 +1,4 @@
+
 // rwa_wrap.h
 
 
@@ -99,6 +100,8 @@ extern bool debug_mode;
 extern int16_t time_0;
 
 
+void quickStartRWA();
+void setSpeeds(rw_data_t *rw1, uint8_t w1, rw_data_t *rw2, uint8_t w2, rw_data_t *rw3, uint8_t w3, rw_data_t *rw4, uint8_t w4, float rt);
 void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *req_payload_len_pt, uint8_t *req_packet_len_pt);
 void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, uint8_t SS_id);
 void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t SS_id);
@@ -115,3 +118,4 @@ void commandAll(uint8_t com_id);
 
 
 #endif /* ACTUATOR_WRAP_RWA_WRAP_H_ */
+
