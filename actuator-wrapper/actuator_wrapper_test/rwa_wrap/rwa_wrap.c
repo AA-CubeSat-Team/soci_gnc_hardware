@@ -1,18 +1,6 @@
+
 // rwa_wrap.c
 
-
-/* issues:
- * add init function (clear reset, set current limit)
- * add CRC error processing
- * possibly can't handle all 0x7E reply
- * add double conversion
- * flight wrapper should request reqSpeed and return currSpeed
- * make reply data read more robust
- */
-
- /* notes:
-  * tested SPI_TIMEOUT down to 1 ms on Arduino Uno with com_id 6
-  */
 
 #include "rwa_wrap.h"
 #if ARDUINO_CODE
@@ -25,6 +13,30 @@ rw_data_t rw1, rw2, rw3, rw4;    // saving SRAM
 #else
 rw_data rw1;
 #endif
+
+void quickStartRWA() {
+	rw1.reqClcMode = 0;
+#if WHEELS_INDEPENDANT
+	rw2.reqClcMode = 0;
+	rw3.reqClcMode = 0;
+	rw4.reqClcMode = 0;
+#endif
+	commandAll(7);
+}
+
+void setSpeeds(rw_data_t *rw1, uint8_t w1, rw_data_t *rw2, uint8_t w2, rw_data_t *rw3, uint8_t w3, rw_data_t *rw4, uint8_t w4, float rt) {
+	rw1->reqSpeed = w1/10;
+	rw1->rampTime = rt;
+#if WHEELS_INDEPENDANT
+	rw2->reqSpeed = w2/10;
+	rw2->rampTime = rt;
+	rw3->reqSpeed = w3/10;
+	rw3->rampTime = rt;
+	rw4->reqSpeed = w4/10;
+	rw4->rampTime = rt;
+#endif
+	commandAll(6);
+}
 
 void reqPacketProcess(uint8_t *req_payload_pt, uint8_t *req_packet_pt, uint8_t *req_payload_len_pt, uint8_t *req_packet_len_pt) { // --- --- --- --- --- --- --- --- ---
   uint8_t req_array_A[MAX_REQ_PACKET] = {0}; // need to allocate max possible size of uint8_t
@@ -172,7 +184,7 @@ void reqSpiTransfer(uint8_t *req_packet_pt, uint8_t *req_packet_len_pt, uint8_t 
 
   // DevBoard SPI driver format: SPI_transfer(uint8_t *txBuffer, uint8_t *rxBuffer, size_t transferSize, uint32_t pcsPin)
   #else
-  SPI_transfer(tx_buffer, rx_buffer, req_packet_len_pt, SS_id);     // pcsPin for req_packet must be a struct defined in the .h file
+  SPI_transfer(tx_buffer, rx_buffer, (size_t) *req_packet_len_pt, SS_id);     // pcsPin for req_packet must be a struct defined in the .h file
   #endif
 }
 
@@ -194,7 +206,7 @@ void rplSpiTransfer(uint8_t *rpl_packet_pt, uint8_t *rpl_packet_len_pt, uint8_t 
   digitalWrite(SS_id, HIGH);
   SPI.endTransaction();
   #else
-  SPI_transfer(tx_buffer, rx_buffer, rpl_packet_len_pt, SS_id);
+  SPI_transfer(tx_buffer, rx_buffer, (size_t) *rpl_packet_len_pt, SS_id);
   #endif
 
   for (int ii = 0; ii < *rpl_packet_len_pt; ii++) {
@@ -550,3 +562,5 @@ void commandAll(uint8_t com_id) {
   rplPayloadReadSwitcher(com_id, &rpl_payload_rw4[0], &rpl_payload_len_rw4, &rw4);
   #endif
 }
+
+
